@@ -41,20 +41,20 @@ Statement
     ;
 
 ConditionalStatement
-    : IF PrimaryExpression LF Body END {
-        $$ = "if (" + $2 + ") {\n" + $4 + indentBody("}");
+    : IF PrimaryExpression Body END {
+        $$ = "if (" + $2 + ") {\n" + $3 + indentBody("}");
     }
-    | IF PrimaryExpression LF Body ElseStatement END {
-        $$ = "if (" + $2 + ") {\n" + $4 + indentBody("} ") + $5;
+    | IF PrimaryExpression Body ElseStatement END {
+        $$ = "if (" + $2 + ") {\n" + $3 + indentBody("} ") + $4;
     }
-    | IF PrimaryExpression LF Body ElsifStatement END {
-        $$ = "if (" + $2 + ") {\n" + $4 + indentBody("} ") + $5;
+    | IF PrimaryExpression Body ElsifStatement END {
+        $$ = "if (" + $2 + ") {\n" + $3 + indentBody("} ") + $4;
     }
-    | IF PrimaryExpression LF Body ElsifStatement ElseStatement END {
-        $$ = "if (" + $2 + ") {\n" + $4 + indentBody("} ") + $5 + " " + $6;
+    | IF PrimaryExpression Body ElsifStatement ElseStatement END {
+        $$ = "if (" + $2 + ") {\n" + $3 + indentBody("} ") + $4 + " " + $5;
     }
-    | UNLESS PrimaryExpression LF Body END {
-        $$ = "if (!(" + $2 + ")) {\n" + $4 + indentBody("}");
+    | UNLESS PrimaryExpression Body END {
+        $$ = "if (!(" + $2 + ")) {\n" + $3 + indentBody("}");
     }
     | PrimaryExpression IF PrimaryExpression {
         pullIndent();
@@ -67,15 +67,15 @@ ConditionalStatement
     ;
 
 ElseStatement
-    : ELSE LF Body { $$ = "else {\n" + $3 + indentBody("}"); }
+    : ELSE Body { $$ = "else {\n" + $2 + indentBody("}"); }
     ;
 
 ElsifStatement
-    : ELSIF PrimaryExpression LF Body {
-        $$ = "else if (" + $2 + ") {\n" + $4 + indentBody("}", -1);
+    : ELSIF PrimaryExpression Body {
+        $$ = "else if (" + $2 + ") {\n" + $3 + indentBody("}", -1);
     }
-    | ELSIF PrimaryExpression LF Body ElsifStatement {
-        $$ = "else if (" + $2 + ") {\n" + $4 + indentBody("} ", -1) + $5;
+    | ELSIF PrimaryExpression Body ElsifStatement {
+        $$ = "else if (" + $2 + ") {\n" + $3 + indentBody("} ", -1) + $4;
     }
     ;
 
@@ -109,6 +109,7 @@ PrimaryExpression
 Expression
     : CONSTANT                         { $$ = $1; }
     | IDENTIFIER                       { $$ = $1; }
+    | Array                            { $$ = $1; }
     | STRING_LITERAL                   { $$ = $1.replace(/\n/g, "\\\n"); }
     | STRING                           { $$ = $1.replace(/\n/g, "\\\n"); }
     | MathExpression                   { $$ = $1; }
@@ -116,6 +117,25 @@ Expression
     | LogicalExpression                { $$ = $1; }
     | TYPEOF Expression                { $$ = "typeof " + $2; }
     | '(' Expression ')'               { $$ = "(" + $2 + ")"; }
+    | '(' Expression LF ')'            { $$ = "(" + $2 + ")"; }
+    | '(' LF Expression LF ')'         { $$ = "(" + $3 + ")"; }
+    | '(' LF Expression ')'            { $$ = "(" + $3 + ")"; }
+    ;
+
+Array
+    : '[' ']'                          { $$ = "[]"; }
+    | '[' DeclarationList ']'          { $$ = "[" + $2 + "]"; }
+    | '[' DeclarationList LF ']'       { $$ = "[" + $2 + "]"; }
+    | '[' LF DeclarationList LF ']'    { $$ = "[" + $3 + "]"; }
+    | '[' LF DeclarationList ']'       { $$ = "[" + $3 + "]"; }
+    ;
+
+DeclarationList
+    : Expression                           { $$ = $1; }
+    | DeclarationList ',' Expression       { $$ = $1 + ", " + $3; }
+    | DeclarationList ',' LF Expression    { $$ = $1 + ", " + $4; }
+    | DeclarationList LF ',' LF Expression { $$ = $1 + ", " + $5; }
+    | DeclarationList LF ',' Expression    { $$ = $1 + ", " + $4; }
     ;
 
 AssignExpression
