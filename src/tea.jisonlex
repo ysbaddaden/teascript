@@ -22,11 +22,19 @@ E  [eE][-+]?{D}+
         global.currentScope = function () {
             return scopes[scopes.length - 1];
         }
-        global.pushIdentifier = function (identifier) {
-            var scope = currentScope();
-            if (scope.indexOf(identifier) == -1) {
-                scope.push(identifier);
+        global.identifierExistsInScope = function (identifier) {
+            var i = scopes.length;
+            while (i--) {
+              if (scopes[i].indexOf(identifier) != -1) {
+                return true;
+              }
             }
+            return false;
+        }
+        global.pushIdentifier = function (identifier) {
+          if (!identifierExistsInScope(identifier)) {
+            currentScope().push(identifier);
+          }
         }
         
         global.indentValue = 1;
@@ -56,8 +64,8 @@ E  [eE][-+]?{D}+
 "null"                               return 'CONSTANT';
 [-+~]?{D}+(\.{D}+)?({E})?            return 'CONSTANT';
 [-+~]?\.{D}+({E})?                   return 'CONSTANT';
-\"(\\.|[^\\"])*\"	                 return 'STRING_LITERAL';
-\'(\\.|[^\\'])*\'	                 return 'STRING';
+\"(\\.|[^\\"])*\"	                   return 'STRING_LITERAL';
+\'(\\.|[^\\'])*\'	                   return 'STRING';
 
 "end"                                { pullIndent(); return 'END'; }
 
@@ -65,6 +73,8 @@ E  [eE][-+]?{D}+
 "unless"                             { pushIndent(); return 'UNLESS'; }
 "else"                               return 'ELSE';
 "elsif"                              return 'ELSIF';
+"case"                               return 'CASE';
+"when"                               return 'WHEN';
 
 "while"                              { pushIndent(); return 'WHILE'; }
 "until"                              { pushIndent(); return 'UNTIL'; }
