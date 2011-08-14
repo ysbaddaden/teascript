@@ -110,6 +110,7 @@ Expression
     : CONSTANT                         { $$ = $1; }
     | IDENTIFIER                       { $$ = $1; }
     | Array                            { $$ = $1; }
+    | Object                           { $$ = $1; }
     | STRING_LITERAL                   { $$ = $1.replace(/\n/g, "\\\n"); }
     | STRING                           { $$ = $1.replace(/\n/g, "\\\n"); }
     | MathExpression                   { $$ = $1; }
@@ -136,6 +137,29 @@ DeclarationList
     | DeclarationList ',' LF Expression    { $$ = $1 + ", " + $4; }
     | DeclarationList LF ',' LF Expression { $$ = $1 + ", " + $5; }
     | DeclarationList LF ',' Expression    { $$ = $1 + ", " + $4; }
+    ;
+
+Object
+    : '{' '}'                                     { $$ = "{}"; }
+    | '{' ObjectDeclarationList '}'               { $$ = "{" + $2 + "}"; }
+    | '{' ObjectDeclarationList LF '}'            { $$ = "{" + $2 + "}"; }
+    | '{' LF ObjectDeclarationList LF '}'         { $$ = "{" + $3 + "}"; }
+    | '{' LF ObjectDeclarationList '}'            { $$ = "{" + $3 + "}"; }
+    ;
+
+ObjectDeclarationList
+    : ObjectDeclaration                                 { $$ = $1; }
+    | ObjectDeclarationList ',' ObjectDeclaration       { $$ = $1 + ", " + $3; }
+    | ObjectDeclarationList ',' LF ObjectDeclaration    { $$ = $1 + ", " + $4; }
+    | ObjectDeclarationList LF ',' LF ObjectDeclaration { $$ = $1 + ", " + $5; }
+    | ObjectDeclarationList LF ',' ObjectDeclaration    { $$ = $1 + ", " + $4; }
+    ;
+
+ObjectDeclaration
+    : Expression ':' Expression                   { $$ = $1 + ": " + $3; }
+    | Expression ':' LF Expression                { $$ = $1 + ": " + $4; }
+    | Expression LF ':' LF Expression             { $$ = $1 + ": " + $5; }
+    | Expression LF ':' Expression                { $$ = $1 + ": " + $4; }
     ;
 
 AssignExpression
