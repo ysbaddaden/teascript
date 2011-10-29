@@ -17,8 +17,7 @@
 
 Program
     : Body EOF {
-        $$ = $1;
-        console.log(JSON.stringify($$));
+        return $1
     }
     ;
 
@@ -53,7 +52,7 @@ WhenStatement
         $$ = [ [ "when", $2, $3 ] ];
     }
     | WhenStatement WHEN PrimaryExpression Body {
-        $1.push([ "when", $3, $4 ])
+        $1.push([ "when", $3, $4 ]);
         $$ = $1;
     }
     ;
@@ -128,8 +127,8 @@ Expression
     | IDENTIFIER                { $$ = [ "ident", $1 ]; }
     | Array                     { $$ = $1; }
     | Object                    { $$ = $1; }
-    | STRING_LITERAL            { $$ = [ "string", $1.replace(/\n/g, "\\\n") ]; }
-    | STRING                    { $$ = [ "string", $1.replace(/\n/g, "\\\n") ]; }
+    | STRING_LITERAL            { $$ = [ "string", $1 ]; }
+    | STRING                    { $$ = [ "string", $1 ]; }
     | MathExpression            { $$ = $1; }
     | BitwiseExpression         { $$ = $1; }
     | LogicalExpression         { $$ = $1; }
@@ -215,7 +214,7 @@ LogicalExpression
     | Expression GE_OP  Expression        { $$ = [ "op", ">=",  $1, $3 ]; }
     | Expression OR_OP  Expression        { $$ = [ "op", "||",  $1, $3 ]; }
     | Expression AND_OP Expression        { $$ = [ "op", "&&",  $1, $3 ]; }
-    | NOT_OP Expression                   { $$ = [ "op", "!", null, $2 ]; }
+    | NOT_OP Expression                   { $$ = [ "not", $2 ]; }
     ;
 
 Terminator

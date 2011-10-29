@@ -3,5 +3,5 @@
 cd `dirname $0`
 ROOT=`dirname $(pwd -P)`
 
-node $ROOT/lib/tea.js ../$1
+node $ROOT/lib/teascript.js ../$1
 
