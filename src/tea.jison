@@ -126,8 +126,8 @@ Expression
     | IDENTIFIER                { $$ = [ "ident", $1 ]; }
     | Array                     { $$ = $1; }
     | Object                    { $$ = $1; }
-    | STRING_LITERAL            { $$ = $1.replace(/\n/g, "\\\n"); }
-    | STRING                    { $$ = $1.replace(/\n/g, "\\\n"); }
+    | STRING_LITERAL            { $$ = [ "string", $1.replace(/\n/g, "\\\n") ]; }
+    | STRING                    { $$ = [ "string", $1.replace(/\n/g, "\\\n") ]; }
     | MathExpression            { $$ = $1; }
     | BitwiseExpression         { $$ = $1; }
     | LogicalExpression         { $$ = $1; }
@@ -147,11 +147,11 @@ Array
     ;
 
 DeclarationList
-    : Expression                                        { $$ = $1; }
-    | DeclarationList ',' Expression                    { $$ = [ "decl_list", $1, $3 ]; }
-    | DeclarationList ',' LF Expression                 { $$ = [ "decl_list", $1, $4 ]; }
-    | DeclarationList LF ',' LF Expression              { $$ = [ "decl_list", $1, $5 ]; }
-    | DeclarationList LF ',' Expression                 { $$ = [ "decl_list", $1, $4 ]; }
+    : Expression                                        { $$ = [ $1 ]; }
+    | DeclarationList ',' Expression                    { $1.push($3); $$ = $1; }
+    | DeclarationList ',' LF Expression                 { $1.push($4); $$ = $1; }
+    | DeclarationList LF ',' LF Expression              { $1.push($5); $$ = $1; }
+    | DeclarationList LF ',' Expression                 { $1.push($4); $$ = $1; }
     ;
 
 Object
@@ -163,18 +163,18 @@ Object
     ;
 
 ObjectDeclarationList
-    : ObjectDeclaration                                 { $$ = $1; }
-    | ObjectDeclarationList ',' ObjectDeclaration       { $$ = [ "object_decl_list", $1, $3 ]; }
-    | ObjectDeclarationList ',' LF ObjectDeclaration    { $$ = [ "object_decl_list", $1, $4 ]; }
-    | ObjectDeclarationList LF ',' LF ObjectDeclaration { $$ = [ "object_decl_list", $1, $5 ]; }
-    | ObjectDeclarationList LF ',' ObjectDeclaration    { $$ = [ "object_decl_list", $1, $4 ]; }
+    : ObjectDeclaration                                 { $$ = [ $1 ]; }
+    | ObjectDeclarationList ',' ObjectDeclaration       { $1.push($3); $$ = $1; }
+    | ObjectDeclarationList ',' LF ObjectDeclaration    { $1.push($4); $$ = $1; }
+    | ObjectDeclarationList LF ',' LF ObjectDeclaration { $1.push($5); $$ = $1; }
+    | ObjectDeclarationList LF ',' ObjectDeclaration    { $1.push($4); $$ = $1; }
     ;
 
 ObjectDeclaration
-    : Expression ':' Expression                         { $$ = [ "object_decl", $1, $3 ]; }
-    | Expression ':' LF Expression                      { $$ = [ "object_decl", $1, $4 ]; }
-    | Expression LF ':' LF Expression                   { $$ = [ "object_decl", $1, $5 ]; }
-    | Expression LF ':' Expression                      { $$ = [ "object_decl", $1, $4 ]; }
+    : Expression ':' Expression                         { $$ = [ "assoc", $1, $3 ]; }
+    | Expression ':' LF Expression                      { $$ = [ "assoc", $1, $4 ]; }
+    | Expression LF ':' LF Expression                   { $$ = [ "assoc", $1, $5 ]; }
+    | Expression LF ':' Expression                      { $$ = [ "assoc", $1, $4 ]; }
     ;
 
 AssignExpression
