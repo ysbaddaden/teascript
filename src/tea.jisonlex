@@ -3,56 +3,9 @@ L  [a-zA-Z_]
 E  [eE][-+]?{D}+
 
 %{
-    if (typeof pushScope == 'undefined') {
-        Array.prototype.pull = function () {
-            var index = scopes.length - 1,
-                value = scopes[index];
-            delete scopes[index];
-            return value;
-        }
-        
-        global.scopes = [[]];
-        
-        global.pushScope = function () {
-            scopes.push([]);
-        }
-        global.pullScope = function () {
-            return scopes.pull();
-        }
-        global.currentScope = function () {
-            return scopes[scopes.length - 1];
-        }
-        global.identifierExistsInScope = function (identifier) {
-            var i = scopes.length;
-            while (i--) {
-              if (scopes[i].indexOf(identifier) != -1) {
-                return true;
-              }
-            }
-            return false;
-        }
-        global.pushIdentifier = function (identifier) {
-          if (!identifierExistsInScope(identifier)) {
-            currentScope().push(identifier);
-          }
-        }
-        
-        global.indentValue = 1;
-        
-        global.indentBody = function (str, by) {
-            var _indent = "";
-            for (i = 0; i < indentValue + (by || 0); i++) {
-                _indent += "  ";
-            }
-            return _indent + str;
-        }
-        global.pushIndent = function () {
-            global.indentValue += 1;
-        }
-        global.pullIndent = function () {
-            global.indentValue -= 1;
-        }
-    }
+
+// put some javascript here if needed
+
 %}
 
 %%
@@ -67,18 +20,18 @@ E  [eE][-+]?{D}+
 \"(\\.|[^\\"])*\"	                   return 'STRING_LITERAL';
 \'(\\.|[^\\'])*\'	                   return 'STRING';
 
-"end"                                { pullIndent(); return 'END'; }
+"end"                                return 'END';
 
-"if"                                 { pushIndent(); return 'IF'; }
-"unless"                             { pushIndent(); return 'UNLESS'; }
+"if"                                 return 'IF';
+"unless"                             return 'UNLESS';
 "else"                               return 'ELSE';
 "elsif"                              return 'ELSIF';
-"case"                               { pushIndent(); return 'CASE'; }
+"case"                               return 'CASE';
 "when"                               return 'WHEN';
 
-"while"                              { pushIndent(); return 'WHILE'; }
-"until"                              { pushIndent(); return 'UNTIL'; }
-"loop"                               { pushIndent(); return 'LOOP'; }
+"while"                              return 'WHILE';
+"until"                              return 'UNTIL';
+"loop"                               return 'LOOP';
 "break"                              return 'BREAK';
 "next"                               return 'CONTINUE';
 "continue"                           return 'CONTINUE';
@@ -110,9 +63,9 @@ E  [eE][-+]?{D}+
 ">="                                 return 'GE_OP';
 ">"                                  return 'GT_OP';
 "=="                                 return 'EQ_OP';
-[()=;,:\[\]\{\}]                      return yytext;
+[()=;,:\[\]\{\}]                     return yytext;
 
-{L}({L}|{D})*                        { pushIdentifier(yytext); return 'IDENTIFIER'; }
+{L}({L}|{D})*                        return 'IDENTIFIER';
 
 [ \t]+                               ; // skip whitespace
 \n+                                  return 'LF';
