@@ -50,10 +50,11 @@ CaseStatement
 
 WhenStatement
     : WHEN PrimaryExpression Body {
-        $$ = [ "when", $2, $3 ];
+        $$ = [ [ "when", $2, $3 ] ];
     }
     | WhenStatement WHEN PrimaryExpression Body {
-        $$ = [ $1, "when", $3, $4 ];
+        $1.push([ "when", $3, $4 ])
+        $$ = $1;
     }
     ;
 
@@ -89,10 +90,11 @@ ElseStatement
 
 ElsifStatement
     : ELSIF PrimaryExpression Body {
-        $$ = [ "elsif", $2, $3 ];
+        $$ = [ [ "elsif", $2, $3 ] ];
     }
     | ELSIF PrimaryExpression Body ElsifStatement {
-        $$ = [ "elsif", $2, $3, $4 ];
+        $4.unshift([ "elsif", $2, $3 ])
+        $$ = $4;
     }
     ;
 
@@ -117,8 +119,8 @@ LoopStatement
 PrimaryExpression
     : Expression                { $$ = $1; }
     | AssignExpression          { $$ = $1; }
-    | BREAK                     { $$ = "break"; }
-    | CONTINUE                  { $$ = "continue"; }
+    | BREAK                     { $$ = [ "keyword", "break" ]; }
+    | CONTINUE                  { $$ = [ "keyword", "continue" ]; }
     ;
 
 Expression
@@ -178,16 +180,16 @@ ObjectDeclaration
     ;
 
 AssignExpression
-    : IDENTIFIER '=' Expression           { $$ = [ "assign",  "=",  $1, $3 ]; }
-    | IDENTIFIER ADD_ASSIGN   Expression  { $$ = [ "assign", "+=",  $1, $3 ]; }
-    | IDENTIFIER SUB_ASSIGN   Expression  { $$ = [ "assign", "-=",  $1, $3 ]; }
-    | IDENTIFIER MUL_ASSIGN   Expression  { $$ = [ "assign", "*=",  $1, $3 ]; }
-    | IDENTIFIER MOD_ASSIGN   Expression  { $$ = [ "assign", "%=",  $1, $3 ]; }
-    | IDENTIFIER AND_ASSIGN   Expression  { $$ = [ "assign", "&=",  $1, $3 ]; }
-    | IDENTIFIER OR_ASSIGN    Expression  { $$ = [ "assign", "|=",  $1, $3 ]; }
-    | IDENTIFIER XOR_ASSIGN   Expression  { $$ = [ "assign", "^=",  $1, $3 ]; }
-    | IDENTIFIER RIGHT_ASSIGN Expression  { $$ = [ "assign", ">>=", $1, $3 ]; }
-    | IDENTIFIER LEFT_ASSIGN  Expression  { $$ = [ "assign", "<<=", $1, $3 ]; }
+    : IDENTIFIER '=' Expression           { $$ = [ "assign",  "=",  [ "ident", $1 ], $3 ]; }
+    | IDENTIFIER ADD_ASSIGN   Expression  { $$ = [ "assign", "+=",  [ "ident", $1 ], $3 ]; }
+    | IDENTIFIER SUB_ASSIGN   Expression  { $$ = [ "assign", "-=",  [ "ident", $1 ], $3 ]; }
+    | IDENTIFIER MUL_ASSIGN   Expression  { $$ = [ "assign", "*=",  [ "ident", $1 ], $3 ]; }
+    | IDENTIFIER MOD_ASSIGN   Expression  { $$ = [ "assign", "%=",  [ "ident", $1 ], $3 ]; }
+    | IDENTIFIER AND_ASSIGN   Expression  { $$ = [ "assign", "&=",  [ "ident", $1 ], $3 ]; }
+    | IDENTIFIER OR_ASSIGN    Expression  { $$ = [ "assign", "|=",  [ "ident", $1 ], $3 ]; }
+    | IDENTIFIER XOR_ASSIGN   Expression  { $$ = [ "assign", "^=",  [ "ident", $1 ], $3 ]; }
+    | IDENTIFIER RIGHT_ASSIGN Expression  { $$ = [ "assign", ">>=", [ "ident", $1 ], $3 ]; }
+    | IDENTIFIER LEFT_ASSIGN  Expression  { $$ = [ "assign", "<<=", [ "ident", $1 ], $3 ]; }
     ;
 
 MathExpression
