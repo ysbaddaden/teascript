@@ -73,7 +73,7 @@ E  [eE][-+]?{D}+
 "unless"                             { pushIndent(); return 'UNLESS'; }
 "else"                               return 'ELSE';
 "elsif"                              return 'ELSIF';
-"case"                               return 'CASE';
+"case"                               { pushIndent(); return 'CASE'; }
 "when"                               return 'WHEN';
 
 "while"                              { pushIndent(); return 'WHILE'; }

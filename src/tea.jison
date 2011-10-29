@@ -37,22 +37,22 @@ Body
 Statement
     : PrimaryExpression     { $$ = indentBody($1) + ";\n"; }
     | ConditionalStatement  { $$ = "\n" + indentBody($1) + "\n"; }
-    | LoopStatement         { $$ = "\n" + indentBody($1) + "\n"; }
     | CaseStatement         { $$ = "\n" + indentBody($1) + "\n"; }
+    | LoopStatement         { $$ = "\n" + indentBody($1) + "\n"; }
     ;
 
 CaseStatement
     : CASE Expression LF WhenStatement END {
-        $$ = "switch (" + $2 + ") {\n" + $4 + "}";
+        $$ = "switch (" + $2 + ") {\n" + indentBody($4) + indentBody("}");
     }
     ;
 
 WhenStatement
     : WHEN PrimaryExpression Body {
-        $$ = "case " + $2 + ":\n" + $3 + "break;\n";
+        $$ = "case " + $2 + ":\n" + $3 + indentBody("break;\n");
     }
     | WhenStatement WHEN PrimaryExpression Body {
-        $$ = $1 + "case " + $3 + ":\n" + $4 + "break;\n";
+        $$ = $1 + indentBody("case " + $3 + ":\n") + $4 + indentBody("break;\n");
     }
     ;
 
