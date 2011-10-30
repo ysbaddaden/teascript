@@ -62,22 +62,23 @@ ConditionalStatement
         $$ = [ "if", $2, $3 ];
     }
     | IF PrimaryExpression Body ElseStatement END {
-        $$ = [ "if", $2, $3, $4 ];
+        $$ = [ "if", $2, $3, [ $4 ] ];
     }
     | IF PrimaryExpression Body ElsifStatement END {
         $$ = [ "if", $2, $3, $4 ];
     }
     | IF PrimaryExpression Body ElsifStatement ElseStatement END {
-        $$ = [ "if", $2, $3, $4, $5 ];
+        $4.push($5);
+        $$ = [ "if", $2, $3, $4 ];
     }
     | UNLESS PrimaryExpression Body END {
         $$ = [ "unless", $2, $3 ];
     }
     | PrimaryExpression IF PrimaryExpression {
-        $$ = [ "if", $3, $1 ];
+        $$ = [ "if", $3, [ $1 ] ];
     }
     | PrimaryExpression UNLESS PrimaryExpression {
-        $$ = [ "unless", $3, $1 ];
+        $$ = [ "unless", $3, [ $1 ] ];
     }
     ;
 
@@ -105,10 +106,10 @@ LoopStatement
         $$ = [ "until", $2, $3 ];
     }
     | PrimaryExpression WHILE PrimaryExpression {
-        $$ = [ "while", $3, $1 ];
+        $$ = [ "while", $3, [ $1 ] ];
     }
     | PrimaryExpression UNTIL PrimaryExpression {
-        $$ = [ "until", $3, $1 ];
+        $$ = [ "until", $3, [ $1 ] ];
     }
     | LOOP Body END {
         $$ = [ "loop", $2 ];
