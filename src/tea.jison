@@ -51,8 +51,15 @@ WhenStatement
     : WHEN PrimaryExpression Body {
         $$ = [ [ "when", $2, $3 ] ];
     }
+    | ELSE Body {
+        $$ = [ [ "else", $2 ] ];
+    }
     | WhenStatement WHEN PrimaryExpression Body {
         $1.push([ "when", $3, $4 ]);
+        $$ = $1;
+    }
+    | WhenStatement ELSE Body {
+        $1.push([ "else", $3 ]);
         $$ = $1;
     }
     ;
