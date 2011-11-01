@@ -187,16 +187,16 @@ ObjectDeclaration
     ;
 
 AssignExpression
-    : IDENTIFIER '=' Expression           { $$ = [ "assign",  "=",  [ "var", $1 ], $3 ]; }
-    | IDENTIFIER ADD_ASSIGN   Expression  { $$ = [ "assign", "+=",  [ "var", $1 ], $3 ]; }
-    | IDENTIFIER SUB_ASSIGN   Expression  { $$ = [ "assign", "-=",  [ "var", $1 ], $3 ]; }
-    | IDENTIFIER MUL_ASSIGN   Expression  { $$ = [ "assign", "*=",  [ "var", $1 ], $3 ]; }
-    | IDENTIFIER MOD_ASSIGN   Expression  { $$ = [ "assign", "%=",  [ "var", $1 ], $3 ]; }
-    | IDENTIFIER AND_ASSIGN   Expression  { $$ = [ "assign", "&=",  [ "var", $1 ], $3 ]; }
-    | IDENTIFIER OR_ASSIGN    Expression  { $$ = [ "assign", "|=",  [ "var", $1 ], $3 ]; }
-    | IDENTIFIER XOR_ASSIGN   Expression  { $$ = [ "assign", "^=",  [ "var", $1 ], $3 ]; }
-    | IDENTIFIER RIGHT_ASSIGN Expression  { $$ = [ "assign", ">>=", [ "var", $1 ], $3 ]; }
-    | IDENTIFIER LEFT_ASSIGN  Expression  { $$ = [ "assign", "<<=", [ "var", $1 ], $3 ]; }
+    : IDENTIFIER '=' PrimaryExpression           { $$ = [ "assign",  "=",  [ "var", $1 ], $3 ]; }
+    | IDENTIFIER ADD_ASSIGN   PrimaryExpression  { $$ = [ "assign", "+=",  [ "var", $1 ], $3 ]; }
+    | IDENTIFIER SUB_ASSIGN   PrimaryExpression  { $$ = [ "assign", "-=",  [ "var", $1 ], $3 ]; }
+    | IDENTIFIER MUL_ASSIGN   PrimaryExpression  { $$ = [ "assign", "*=",  [ "var", $1 ], $3 ]; }
+    | IDENTIFIER MOD_ASSIGN   PrimaryExpression  { $$ = [ "assign", "%=",  [ "var", $1 ], $3 ]; }
+    | IDENTIFIER AND_ASSIGN   PrimaryExpression  { $$ = [ "assign", "&=",  [ "var", $1 ], $3 ]; }
+    | IDENTIFIER OR_ASSIGN    PrimaryExpression  { $$ = [ "assign", "|=",  [ "var", $1 ], $3 ]; }
+    | IDENTIFIER XOR_ASSIGN   PrimaryExpression  { $$ = [ "assign", "^=",  [ "var", $1 ], $3 ]; }
+    | IDENTIFIER RIGHT_ASSIGN PrimaryExpression  { $$ = [ "assign", ">>=", [ "var", $1 ], $3 ]; }
+    | IDENTIFIER LEFT_ASSIGN  PrimaryExpression  { $$ = [ "assign", "<<=", [ "var", $1 ], $3 ]; }
     ;
 
 MathExpression
