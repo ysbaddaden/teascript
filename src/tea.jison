@@ -39,6 +39,8 @@ Statement
     | ConditionalStatement  { $$ = $1; }
     | CaseStatement         { $$ = $1; }
     | LoopStatement         { $$ = $1; }
+    | BREAK                 { $$ = [ "keyword", "break" ]; }
+    | CONTINUE              { $$ = [ "keyword", "continue" ]; }
     ;
 
 CaseStatement
@@ -81,10 +83,10 @@ ConditionalStatement
     | UNLESS PrimaryExpression Body END {
         $$ = [ "unless", $2, $3 ];
     }
-    | PrimaryExpression IF PrimaryExpression {
+    | Statement IF PrimaryExpression {
         $$ = [ "if", $3, [ $1 ] ];
     }
-    | PrimaryExpression UNLESS PrimaryExpression {
+    | Statement UNLESS PrimaryExpression {
         $$ = [ "unless", $3, [ $1 ] ];
     }
     ;
@@ -112,10 +114,10 @@ LoopStatement
     | UNTIL PrimaryExpression Body END {
         $$ = [ "until", $2, $3 ];
     }
-    | PrimaryExpression WHILE PrimaryExpression {
+    | Statement WHILE PrimaryExpression {
         $$ = [ "while", $3, [ $1 ] ];
     }
-    | PrimaryExpression UNTIL PrimaryExpression {
+    | Statement UNTIL PrimaryExpression {
         $$ = [ "until", $3, [ $1 ] ];
     }
     | LOOP Body END {
@@ -126,8 +128,6 @@ LoopStatement
 PrimaryExpression
     : Expression                { $$ = $1; }
     | AssignExpression          { $$ = $1; }
-    | BREAK                     { $$ = [ "keyword", "break" ]; }
-    | CONTINUE                  { $$ = [ "keyword", "continue" ]; }
     ;
 
 Expression
