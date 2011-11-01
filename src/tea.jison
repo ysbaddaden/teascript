@@ -50,19 +50,19 @@ CaseStatement
     ;
 
 WhenStatement
-    : WHEN PrimaryExpression Body {
-        $$ = [ [ "when", $2, $3 ] ];
+    : WHEN DeclarationList LF Body {
+        $$ = [ [ "when", $2, $4 ] ];
     }
-    | ELSE Body {
-        $$ = [ [ "else", $2 ] ];
-    }
-    | WhenStatement WHEN PrimaryExpression Body {
-        $1.push([ "when", $3, $4 ]);
+    | WhenStatement WHEN DeclarationList LF Body {
+        $1.push([ "when", $3, $5 ]);
         $$ = $1;
     }
     | WhenStatement ELSE Body {
         $1.push([ "else", $3 ]);
         $$ = $1;
+    }
+    | ELSE Body {
+        $$ = [ [ "else", $2 ] ];
     }
     ;
 
@@ -156,11 +156,11 @@ Array
     ;
 
 DeclarationList
-    : Expression                                        { $$ = [ $1 ]; }
-    | DeclarationList ',' Expression                    { $1.push($3); $$ = $1; }
-    | DeclarationList ',' LF Expression                 { $1.push($4); $$ = $1; }
-    | DeclarationList LF ',' LF Expression              { $1.push($5); $$ = $1; }
-    | DeclarationList LF ',' Expression                 { $1.push($4); $$ = $1; }
+    : PrimaryExpression                                 { $$ = [ $1 ]; }
+    | DeclarationList ',' PrimaryExpression             { $1.push($3); $$ = $1; }
+    | DeclarationList ',' LF PrimaryExpression          { $1.push($4); $$ = $1; }
+    | DeclarationList LF ',' LF PrimaryExpression       { $1.push($5); $$ = $1; }
+    | DeclarationList LF ',' PrimaryExpression          { $1.push($4); $$ = $1; }
     ;
 
 Object
