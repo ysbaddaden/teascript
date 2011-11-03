@@ -22,7 +22,6 @@ Program
 Body
     : Statement                  { $$ = [ $1 ]; }
     | Body Statement             { $1.push($2); $$ = $1; }
-    |                            { $$ = []; }
     ;
 
 Statement
@@ -199,8 +198,8 @@ SelectionStatement
     | IF Expression Then Body ElsifStatement ElseStatement END  { $4.push($5); $$ = [ "if", $2, $3, $4 ]; }
     | UNLESS Expression Then Body END                           { $$ = [ "unless", $2, $3 ]; }
     | UNLESS Expression Then Body ElseStatement END             { $$ = [ "unless", $2, $3, [ $4 ] ]; }
-    | Statement IF Expression Terminator                        { $$ = [ "if", $3, [ $1 ] ]; }
-    | Statement UNLESS Expression Terminator                    { $$ = [ "unless", $3, [ $1 ] ]; }
+//    | Statement IF Expression Terminator                        { $$ = [ "if", $3, [ $1 ] ]; }
+//    | Statement UNLESS Expression Terminator                    { $$ = [ "unless", $3, [ $1 ] ]; }
     | CASE Expression Terminator WhenStatement END              { $$ = [ "case", $2, $4 ]; }
     ;
 
@@ -223,8 +222,8 @@ WhenStatement
 IterationStatement
     : WHILE Expression Do Body END      { $$ = [ "while", $2, $3 ]; }
     | UNTIL Expression Do Body END      { $$ = [ "until", $2, $3 ]; }
-    | Body WHILE Expression Terminator  { $$ = [ "while", $3, [ $1 ] ]; }
-    | Body UNTIL Expression Terminator  { $$ = [ "until", $3, [ $1 ] ]; }
+//    | Statement WHILE Expression Terminator  { $$ = [ "while", $3, [ $1 ] ]; }
+//    | Statement UNTIL Expression Terminator  { $$ = [ "until", $3, [ $1 ] ]; }
     | LOOP Do Body END                  { $$ = [ "loop", $2 ]; }
     ;
 
