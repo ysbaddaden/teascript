@@ -18,6 +18,7 @@ E  [eE][-+]?{D}+
 \"(\\.|[^\\"])*\"                    return 'STRING';
 \'(\\.|[^\\'])*\'                    return 'STRING';
 
+"def"                                return 'DEF';
 "then"                               return 'THEN';
 "do"                                 return 'DO';
 "end"                                return 'END';

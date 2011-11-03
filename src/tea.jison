@@ -1,7 +1,7 @@
 %token LF EOF
 %token CONSTANT STRING IDENTIFIER
 %token EQ_OP NE_OP LT_OP LE_OP GT_OP GE_OP AND_OP OR_OP
-%token END
+%token DEF THEN DO END
 %token IF UNLESS ELSE ELSEIF
 %token WHILE UNTIL LOOP BREAK CONTINUE
 
@@ -36,16 +36,36 @@ Body
     }
     ;
 
-Statement
-    : Expression                      { $$ = $1; }
-    | SelectionStatement              { $$ = $1; }
-    | IterationStatement              { $$ = $1; }
-    | JumpStatement                   { $$ = $1; }
-    ;
-
 TerminatedStatement
     : Terminator
-    | Statement Terminator            { $$ = $1; }
+    | Statement Terminator               { $$ = $1; }
+    ;
+
+Statement
+    : FunctionStatement                  { $$ = $1; }
+    | Expression                         { $$ = $1; }
+    | SelectionStatement                 { $$ = $1; }
+    | IterationStatement                 { $$ = $1; }
+    | JumpStatement                      { $$ = $1; }
+    ;
+
+FunctionStatement
+    : DEF IDENTIFIER ArgumentDeclaration Body END {
+        $$ = [ "def", $2, $3, $4 ];
+    }
+    ;
+
+ArgumentDeclaration
+    : '(' ')'                            { $$ = []; }
+    | '(' ArgumentList ')'               { $$ = $2; }
+    | ArgumentList Terminator            { $$ = $1; }
+    | Terminator                         { $$ = []; }
+    ;
+
+ArgumentList
+    : IDENTIFIER                         { $$ = [ "ident", $1 ]; }
+    | IDENTIFIER '=' PrimaryExpression   { $$ = [ "assign", "=", $1, $3 ]; }
+    | ArgumentList ',' IDENTIFIER        { $1.push($3); $$ = $1; }
     ;
 
 PrimaryExpression
@@ -147,17 +167,17 @@ AssignmentExpression
     ;
 
 AssignmentOperator
-	: '='           { $$ = $1; }
-	| MUL_ASSIGN    { $$ = $1; }
-	| DIV_ASSIGN    { $$ = $1; }
-	| MOD_ASSIGN    { $$ = $1; }
-	| ADD_ASSIGN    { $$ = $1; }
-	| SUB_ASSIGN    { $$ = $1; }
-	| LEFT_ASSIGN   { $$ = $1; }
-	| RIGHT_ASSIGN  { $$ = $1; }
-	| AND_ASSIGN    { $$ = $1; }
-	| XOR_ASSIGN    { $$ = $1; }
-	| OR_ASSIGN     { $$ = $1; }
+	: '='                   { $$ = $1; }
+	| MUL_ASSIGN            { $$ = $1; }
+	| DIV_ASSIGN            { $$ = $1; }
+	| MOD_ASSIGN            { $$ = $1; }
+	| ADD_ASSIGN            { $$ = $1; }
+	| SUB_ASSIGN            { $$ = $1; }
+	| LEFT_ASSIGN           { $$ = $1; }
+	| RIGHT_ASSIGN          { $$ = $1; }
+	| AND_ASSIGN            { $$ = $1; }
+	| XOR_ASSIGN            { $$ = $1; }
+	| OR_ASSIGN             { $$ = $1; }
 	;
 
 Expression
@@ -173,11 +193,11 @@ Array
     ;
 
 DeclarationList
-    : Expression                            { $$ = [ $1 ]; }
-    | DeclarationList ',' Expression        { $1.push($3); $$ = $1; }
-    | DeclarationList ',' LF Expression     { $1.push($4); $$ = $1; }
-    | DeclarationList LF ',' LF Expression  { $1.push($5); $$ = $1; }
-    | DeclarationList LF ',' Expression     { $1.push($4); $$ = $1; }
+    : Expression                                        { $$ = [ $1 ]; }
+    | DeclarationList ',' Expression                    { $1.push($3); $$ = $1; }
+    | DeclarationList ',' LF Expression                 { $1.push($4); $$ = $1; }
+    | DeclarationList LF ',' LF Expression              { $1.push($5); $$ = $1; }
+    | DeclarationList LF ',' Expression                 { $1.push($4); $$ = $1; }
     ;
 
 Object
@@ -216,32 +236,32 @@ SelectionStatement
     ;
 
 ElsifStatement
-    : ELSIF Expression Then Body                 { $$ = [ [ "elsif", $2, $4 ] ]; }
-    | ElsifStatement ELSIF Expression Then Body  { $1.push([ "elsif", $3, $5 ]); $$ = $1; }
+    : ELSIF Expression Then Body                        { $$ = [ [ "elsif", $2, $4 ] ]; }
+    | ElsifStatement ELSIF Expression Then Body         { $1.push([ "elsif", $3, $5 ]); $$ = $1; }
     ;
 
 ElseStatement
-    : ELSE Body  { $$ = [ "else", $2 ]; }
+    : ELSE Body                                         { $$ = [ "else", $2 ]; }
     ;
 
 WhenStatement
-    : WHEN DeclarationList Then Body                { $$ = [ [ "when", $2, $4 ] ]; }
-    | WhenStatement WHEN DeclarationList Then Body  { $1.push([ "when", $3, $5 ]); $$ = $1; } }
-    | WhenStatement ElseStatement                   { $1.push($2); $$ = $1; }
-    | ElseStatement                                 { $$ = [ $1 ]; }
+    : WHEN DeclarationList Then Body                    { $$ = [ [ "when", $2, $4 ] ]; }
+    | WhenStatement WHEN DeclarationList Then Body      { $1.push([ "when", $3, $5 ]); $$ = $1; } }
+    | WhenStatement ElseStatement                       { $1.push($2); $$ = $1; }
+    | ElseStatement                                     { $$ = [ $1 ]; }
     ;
 
 IterationStatement
-    : WHILE Expression Do Body END            { $$ = [ "while", $2, $4 ]; }
-    | UNTIL Expression Do Body END            { $$ = [ "until", $2, $4 ]; }
-    | Statement WHILE Expression              { $$ = [ "while", $3, [ $1 ] ]; }
-    | Statement UNTIL Expression              { $$ = [ "until", $3, [ $1 ] ]; }
-    | LOOP Do Body END                        { $$ = [ "loop", $3 ]; }
+    : WHILE Expression Do Body END   { $$ = [ "while", $2, $4 ]; }
+    | UNTIL Expression Do Body END   { $$ = [ "until", $2, $4 ]; }
+    | Statement WHILE Expression     { $$ = [ "while", $3, [ $1 ] ]; }
+    | Statement UNTIL Expression     { $$ = [ "until", $3, [ $1 ] ]; }
+    | LOOP Do Body END               { $$ = [ "loop", $3 ]; }
     ;
 
 JumpStatement
-    : BREAK                  { $$ = [ "keyword", "break" ]; }
-    | CONTINUE               { $$ = [ "keyword", "continue" ]; }
+    : BREAK                          { $$ = [ "keyword", "break" ]; }
+    | CONTINUE                       { $$ = [ "keyword", "continue" ]; }
     ;
 
 Then
