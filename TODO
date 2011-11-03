@@ -1,0 +1,112 @@
+# TODO
+
+## Methods
+
+- dot access and invoke:
+
+    hsh = { a: 2 }              |     hsh = { a: 2 };
+    x = hsh.a                   |     x = hsh.a;
+    body.appendChild()          |     body.appendChild();
+
+- method argument splats:
+
+    def m1(*args)               |     function m1() {
+    end                         |       var args = arguments;
+                                |     }
+                                |
+    def m2(a, b, *args)         |     function m2(a, b) {
+    end                         |       var args = Array.prototype.slice.call(arguments, 2);
+                                |     }
+                                |
+    args = [1, 2, 3]            |     var args = [ 1, 2, 3 ];
+    m1(*args)                   |     m1.apply(null, args);
+                                |
+    args = [3, 4]               |     var args = [ 3, 4 ];
+    m2(1, 2, *args)             |     m2.apply(null, [1, 2].concat(args));
+
+- methods must always return their latest expression:
+
+    def m1(a, b)                |     function m1(a, b) {
+      a || b                    |       return a || b;
+    end                         |     }
+                                |
+    def m1(a, b, c)             |     function m1(a, b, c) {
+      if a                      |       if (a) {
+        a                       |         return a;
+      elsif b                   |       } else if (b) {
+        b                       |         return b;
+      else                      |       } else {
+        c                       |         return c;
+      end                       |       }
+    end                         |     }
+
+## Anonymous methods
+
+- regular:
+
+    m1() ->                     |     m1(function () {
+    end                         |     });
+                                |
+    a.forEach -> |item|         |     a.forEach(function (item) {
+    end                         |     });
+                                |
+    m2(a, b) -> |x, y|          |     m2(a, b, function (x, y) {
+    end                         |     });
+                                |
+    elm.on('click') -> |e|      |     elm.on('click', function (event) {
+      e.preventDefault()        |       e.preventDefault();
+    end                         |     });
+
+- inline:
+
+    elm.click -> |e| e.stop()   |     elm.click(function (e) {
+                                |       e.stop();
+                                |     });
+                                |
+    elm.on('click') -> cb()     |     elm.on('click', function () {
+                                |       cb();
+                                |     });
+
+## Prototypes
+
+- definition:
+
+    proto UI.Widget             |     if (typeof UI.Widget == "undefined") {
+      def init(name)            |       UI.Widget = function () {};
+        this.widget = $(name)   |       UI.createWidget = function(name) {
+      end                       |         var o = new UI.Widget();
+                                |         o.initWidget.apply(null, arguments);
+      def show                  |         return o;
+      end                       |       }
+                                |     }
+      def hide                  |     UI.Widget.prototype.initWidget = function(name) {
+      end                       |       this.widget = $(name);
+    end                         |     }
+                                |     UI.Widget.prototype.init = UI.Widget.prototype.initWidget;
+                                |     UI.Widget.prototype.show = function () {
+                                |     }
+                                |     UI.Widget.prototype.hide = function () {
+                                |     }
+                                |
+    proto UI.Picker < UI.Widget |     if (typeof UI.Widget == "undefined") {
+      def init(name)            |       UI.Picker = function () {};
+        this.initWidget(name)   |       UI.Picker.prototype = new UI.Widget();
+        this.show()             |       UI.createPicker = function(name) {
+      end                       |         var o = new UI.Picker();
+    end                         |         o.initPicker.apply(null, arguments);
+                                |         return o;
+                                |       }
+                                |     }
+                                |     UI.Picker.prototype.initPicker = function(name) {
+                                |       this.initWidget.call(this, name);
+                                |       this.show();
+                                |     }
+                                |     UI.Picker.prototype.init = UI.Widget.prototype.initPicker;
+
+- "::" shortcut:
+
+    UI.Widget::init             | UI.Widget.prototype.init;
+    UI.Widget::init()           | UI.Widget.prototype.init.call(this);
+    UI.Widget::init(name)       | UI.Widget.prototype.init.call(this, 'name');
+    UI.Widget::init.call(o)     | UI.Widget.prototype.init.call(o);
+
