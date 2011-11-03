@@ -276,6 +276,8 @@ IterationStatement
 JumpStatement
     : BREAK                          { $$ = [ "keyword", "break" ]; }
     | CONTINUE                       { $$ = [ "keyword", "continue" ]; }
+    | RETURN                         { $$ = [ "return" ]; }
+    | RETURN Expression              { $$ = [ "return", $2 ]; }
     ;
 
 Then

@@ -19,6 +19,7 @@ E  [eE][-+]?{D}+
 \'(\\.|[^\\'])*\'                    return 'STRING';
 
 "def"                                return 'DEF';
+"return"                             return 'RETURN';
 "then"                               return 'THEN';
 "do"                                 return 'DO';
 "end"                                return 'END';

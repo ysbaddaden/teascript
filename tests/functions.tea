@@ -15,13 +15,16 @@ end
 
 def funcWithArgs a, b
   c = a || b
+  return c
 end
 
 def incr a, by = 1
-  a + by
+  return a + by
 end
 
 def decr(a, by = 1)
-  a + by
+  return (
+    a - by
+  )
 end
 
