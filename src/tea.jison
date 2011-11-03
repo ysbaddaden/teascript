@@ -29,6 +29,8 @@ Body
     | Body Statement {
         if (typeof $2 != "string") {
             $1.push($2);
+        } else if ($1.length && $1[$1.length - 1][0] != "linefeed" ) {
+            $$.push([ "linefeed" ]);
         }
         $$ = $1;
     }
