@@ -16,43 +16,36 @@
 %%
 
 Program
-    : Body EOF                   { return $1; }
+    : Body EOF  { return $1; }
     ;
 
 Body
-    : Statement {
+    : TerminatedStatement {
         $$ = [];
         if (typeof $1 != "string") {
             $$.push($1);
         }
     }
-    | Body Statement {
+    | Body TerminatedStatement {
         if (typeof $2 != "string") {
             $1.push($2);
-        } else if ($1.length && $1[$1.length - 1][0] != "linefeed" ) {
-            $$.push([ "linefeed" ]);
+//        } else if ($1.length && $1[$1.length - 1][0] != "linefeed" ) {
+//            $$.push([ "linefeed" ]);
         }
         $$ = $1;
     }
     ;
 
 Statement
-    : ExpressionStatement             { $$ = $1; }
+    : Expression                      { $$ = $1; }
     | SelectionStatement              { $$ = $1; }
     | IterationStatement              { $$ = $1; }
     | JumpStatement                   { $$ = $1; }
     ;
 
-UnterminatedStatement
-    : Expression                      { $$ = $1; }
-//    | UnterminatedSelectionStatement  { $$ = $1; }
-//    | UnterminatedIterationStatement  { $$ = $1; }
-    | Jump       { $$ = $1; }
-    ;
-
-ExpressionStatement
+TerminatedStatement
     : Terminator
-    | Expression Terminator           { $$ = $1; }
+    | Statement Terminator            { $$ = $1; }
     ;
 
 PrimaryExpression
@@ -69,15 +62,15 @@ PrimaryExpression
 
 PostfixExpression
     : PrimaryExpression                                  { $$ = $1; }
-//    | PostfixExpression '[' Expression ']'               { $$ = [ "access", $1, $3 ]; }
-//    | PostfixExpression '(' ')'                          { $$ = [ "invoke", $1 ]; }
-//    | PostfixExpression '(' ArgumentExpressionList ')'   { $$ = [ "invoke", $1, $3 ]; }
+    | PostfixExpression '[' Expression ']'               { $$ = [ "access", $1, $3 ]; }
+    | PostfixExpression '(' ')'                          { $$ = [ "invoke", $1 ]; }
+    | PostfixExpression '(' ArgumentExpressionList ')'   { $$ = [ "invoke", $1, $3 ]; }
     ;
 
-//ArgumentExpressionList
-//    : AssignmentExpression                               { $$ = []; }
-//    | ArgumentExpressionList ',' AssignmentExpression    { $1.push($3); $$ = $1; }
-//    ;
+ArgumentExpressionList
+    : AssignmentExpression                               { $$ = []; }
+    | ArgumentExpressionList ',' AssignmentExpression    { $1.push($3); $$ = $1; }
+    ;
 
 UnaryExpression
     : PostfixExpression                                  { $$ = $1; }
@@ -217,10 +210,8 @@ SelectionStatement
     | IF Expression Then Body ElsifStatement ElseStatement END  { $5.push($6); $$ = [ "if", $2, $4, $5 ]; }
     | UNLESS Expression Then Body END                           { $$ = [ "unless", $2, $4 ]; }
     | UNLESS Expression Then Body ElseStatement END             { $$ = [ "unless", $2, $4, [ $5 ] ]; }
-//    | Statement IF Expression Terminator                        { $$ = [ "if", $3, [ $1 ] ]; }
-//    | Statement UNLESS Expression Terminator                    { $$ = [ "unless", $3, [ $1 ] ]; }
-    | UnterminatedStatement IF Expression Terminator                       { $$ = [ "if", $3, [ $1 ] ]; }
-    | UnterminatedStatement UNLESS Expression Terminator                   { $$ = [ "unless", $3, [ $1 ] ]; }
+    | Statement IF Expression                                   { $$ = [ "if", $3, [ $1 ] ]; }
+    | Statement UNLESS Expression                               { $$ = [ "unless", $3, [ $1 ] ]; }
     | CASE Expression Terminator WhenStatement END              { $$ = [ "case", $2, $4 ]; }
     ;
 
@@ -243,18 +234,12 @@ WhenStatement
 IterationStatement
     : WHILE Expression Do Body END            { $$ = [ "while", $2, $4 ]; }
     | UNTIL Expression Do Body END            { $$ = [ "until", $2, $4 ]; }
-//    | Statement WHILE Expression Terminator   { $$ = [ "while", $3, [ $1 ] ]; }
-//    | Statement UNTIL Expression Terminator   { $$ = [ "until", $3, [ $1 ] ]; }
-    | UnterminatedStatement WHILE Expression Terminator  { $$ = [ "while", $3, [ $1 ] ]; }
-    | UnterminatedStatement UNTIL Expression Terminator  { $$ = [ "until", $3, [ $1 ] ]; }
+    | Statement WHILE Expression              { $$ = [ "while", $3, [ $1 ] ]; }
+    | Statement UNTIL Expression              { $$ = [ "until", $3, [ $1 ] ]; }
     | LOOP Do Body END                        { $$ = [ "loop", $3 ]; }
     ;
 
 JumpStatement
-    : Jump Terminator    { $$ = $1; }
-    ;
-
-Jump
     : BREAK                  { $$ = [ "keyword", "break" ]; }
     | CONTINUE               { $$ = [ "keyword", "continue" ]; }
     ;
@@ -262,11 +247,13 @@ Jump
 Then
     : THEN
     | Terminator
+    | Terminator THEN
     ;
 
 Do
     : DO
     | Terminator
+    | Terminator DO
     ;
 
 Terminator
