@@ -50,7 +50,10 @@ Statement
     ;
 
 FunctionStatement
-    : DEF IDENTIFIER ArgumentDeclaration Body END {
+    : DEF IDENTIFIER ArgumentDeclaration END {
+        $$ = [ "def", $2, $3, [] ];
+    }
+    | DEF IDENTIFIER ArgumentDeclaration Body END {
         $$ = [ "def", $2, $3, $4 ];
     }
     ;
@@ -63,13 +66,24 @@ ArgumentDeclaration
     ;
 
 ArgumentList
-    : IDENTIFIER                         { $$ = [ "ident", $1 ]; }
-    | IDENTIFIER '=' PrimaryExpression   { $$ = [ "assign", "=", $1, $3 ]; }
-    | ArgumentList ',' IDENTIFIER        { $1.push($3); $$ = $1; }
+    : Identifier {
+        $$ = [ $1 ];
+    }
+    | ArgumentList ',' Identifier {
+        $1.push($3);
+        $$ = $1;
+    }
+    | ArgumentList ',' Identifier '=' PrimaryExpression {
+        $1.push([ "assign", "=", $3, $5 ]);
+    }
+    ;
+
+Identifier
+    : IDENTIFIER { $$ = [ "ident", $1 ]; }
     ;
 
 PrimaryExpression
-    : IDENTIFIER                                         { $$ = [ "ident",  $1 ]; }
+    : Identifier                                         { $$ = $1 }
     | CONSTANT                                           { $$ = [ "const",  $1 ]; }
     | STRING                                             { $$ = [ "string", $1 ]; }
     | Array                                              { $$ = $1; }
