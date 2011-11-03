@@ -50,7 +50,7 @@ PrimaryExpression
 
 PostfixExpression
     : PrimaryExpression                                  { $$ = $1; }
-//    | PostfixExpression '[' Expression ']'               { $$ = [ "access", $1, $3 ]; }
+    | PostfixExpression '[' Expression ']'               { $$ = [ "access", $1, $3 ]; }
 //    | PostfixExpression '(' ')'                          { $$ = [ "invoke", $1 ]; }
 //    | PostfixExpression '(' ArgumentExpressionList ')'   { $$ = [ "invoke", $1, $3 ]; }
     ;
