@@ -20,20 +20,37 @@ Program
     ;
 
 Body
-    : Statement                  { $$ = [ $1 ]; }
-    | Body Statement             { $1.push($2); $$ = $1; }
+    : Statement {
+        $$ = [];
+        if (typeof $1 != "string") {
+            $$.push($1);
+        }
+    }
+    | Body Statement {
+        if (typeof $2 != "string") {
+            $1.push($2);
+        }
+        $$ = $1;
+    }
     ;
 
 Statement
-    : ExpressionStatement        { $$ = $1; }
-    | SelectionStatement         { $$ = $1; }
-    | IterationStatement         { $$ = $1; }
-    | JumpStatement              { $$ = $1; }
+    : ExpressionStatement             { $$ = $1; }
+    | SelectionStatement              { $$ = $1; }
+    | IterationStatement              { $$ = $1; }
+    | JumpStatement                   { $$ = $1; }
+    ;
+
+UnterminatedStatement
+    : Expression                      { $$ = $1; }
+//    | UnterminatedSelectionStatement  { $$ = $1; }
+//    | UnterminatedIterationStatement  { $$ = $1; }
+    | Jump       { $$ = $1; }
     ;
 
 ExpressionStatement
     : Terminator
-    | Expression Terminator      { $$ = $1; }
+    | Expression Terminator           { $$ = $1; }
     ;
 
 PrimaryExpression
@@ -43,14 +60,14 @@ PrimaryExpression
     | Array                                              { $$ = $1; }
     | Object                                             { $$ = $1; }
     | '(' Expression ')'                                 { $$ = [ "paren",  $2 ]; }
-    | '(' LF Expression ')'                              { $$ = [ "paren",  $3 ]; }
-    | '(' LF Expression LF ')'                           { $$ = [ "paren",  $3 ]; }
     | '(' Expression LF ')'                              { $$ = [ "paren",  $2 ]; }
+    | '(' LF Expression LF ')'                           { $$ = [ "paren",  $3 ]; }
+    | '(' LF Expression ')'                              { $$ = [ "paren",  $3 ]; }
     ;
 
 PostfixExpression
     : PrimaryExpression                                  { $$ = $1; }
-    | PostfixExpression '[' Expression ']'               { $$ = [ "access", $1, $3 ]; }
+//    | PostfixExpression '[' Expression ']'               { $$ = [ "access", $1, $3 ]; }
 //    | PostfixExpression '(' ')'                          { $$ = [ "invoke", $1 ]; }
 //    | PostfixExpression '(' ArgumentExpressionList ')'   { $$ = [ "invoke", $1, $3 ]; }
     ;
@@ -192,20 +209,22 @@ ObjectDeclaration
     ;
 
 SelectionStatement
-    : IF Expression Then Body END                               { $$ = [ "if", $2, $3 ]; }
-    | IF Expression Then Body ElseStatement END                 { $$ = [ "if", $2, $3, [ $4 ] ]; }
-    | IF Expression Then Body ElsifStatement END                { $$ = [ "if", $2, $3, $4 ]; }
-    | IF Expression Then Body ElsifStatement ElseStatement END  { $4.push($5); $$ = [ "if", $2, $3, $4 ]; }
-    | UNLESS Expression Then Body END                           { $$ = [ "unless", $2, $3 ]; }
-    | UNLESS Expression Then Body ElseStatement END             { $$ = [ "unless", $2, $3, [ $4 ] ]; }
+    : IF Expression Then Body END                               { $$ = [ "if", $2, $4 ]; }
+    | IF Expression Then Body ElseStatement END                 { $$ = [ "if", $2, $4, [ $5 ] ]; }
+    | IF Expression Then Body ElsifStatement END                { $$ = [ "if", $2, $4, $5 ]; }
+    | IF Expression Then Body ElsifStatement ElseStatement END  { $5.push($6); $$ = [ "if", $2, $4, $5 ]; }
+    | UNLESS Expression Then Body END                           { $$ = [ "unless", $2, $4 ]; }
+    | UNLESS Expression Then Body ElseStatement END             { $$ = [ "unless", $2, $4, [ $5 ] ]; }
 //    | Statement IF Expression Terminator                        { $$ = [ "if", $3, [ $1 ] ]; }
 //    | Statement UNLESS Expression Terminator                    { $$ = [ "unless", $3, [ $1 ] ]; }
+    | UnterminatedStatement IF Expression Terminator                       { $$ = [ "if", $3, [ $1 ] ]; }
+    | UnterminatedStatement UNLESS Expression Terminator                   { $$ = [ "unless", $3, [ $1 ] ]; }
     | CASE Expression Terminator WhenStatement END              { $$ = [ "case", $2, $4 ]; }
     ;
 
 ElsifStatement
-    : ELSIF Expression Then Body                 { $$ = [ [ "elsif", $2, $3 ] ]; }
-    | ELSIF Expression Then Body ElsifStatement  { $4.unshift([ "elsif", $2, $3 ]); $$ = $4; }
+    : ELSIF Expression Then Body                 { $$ = [ [ "elsif", $2, $4 ] ]; }
+    | ElsifStatement ELSIF Expression Then Body  { $1.push([ "elsif", $3, $5 ]); $$ = $1; }
     ;
 
 ElseStatement
@@ -220,16 +239,22 @@ WhenStatement
     ;
 
 IterationStatement
-    : WHILE Expression Do Body END      { $$ = [ "while", $2, $3 ]; }
-    | UNTIL Expression Do Body END      { $$ = [ "until", $2, $3 ]; }
-//    | Statement WHILE Expression Terminator  { $$ = [ "while", $3, [ $1 ] ]; }
-//    | Statement UNTIL Expression Terminator  { $$ = [ "until", $3, [ $1 ] ]; }
-    | LOOP Do Body END                  { $$ = [ "loop", $2 ]; }
+    : WHILE Expression Do Body END            { $$ = [ "while", $2, $4 ]; }
+    | UNTIL Expression Do Body END            { $$ = [ "until", $2, $4 ]; }
+//    | Statement WHILE Expression Terminator   { $$ = [ "while", $3, [ $1 ] ]; }
+//    | Statement UNTIL Expression Terminator   { $$ = [ "until", $3, [ $1 ] ]; }
+    | UnterminatedStatement WHILE Expression Terminator  { $$ = [ "while", $3, [ $1 ] ]; }
+    | UnterminatedStatement UNTIL Expression Terminator  { $$ = [ "until", $3, [ $1 ] ]; }
+    | LOOP Do Body END                        { $$ = [ "loop", $3 ]; }
     ;
 
 JumpStatement
-    : BREAK Terminator                  { $$ = [ "keyword", "break" ]; }
-    | CONTINUE Terminator               { $$ = [ "keyword", "continue" ]; }
+    : Jump Terminator    { $$ = $1; }
+    ;
+
+Jump
+    : BREAK                  { $$ = [ "keyword", "break" ]; }
+    | CONTINUE               { $$ = [ "keyword", "continue" ]; }
     ;
 
 Then
