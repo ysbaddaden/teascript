@@ -51,7 +51,7 @@ Statement
 
 FunctionStatement
     : DEF IDENTIFIER ArgumentDeclaration END {
-        $$ = [ "def", $2, $3, [] ];
+        $$ = [ "def", $2, $3 ];
     }
     | DEF IDENTIFIER ArgumentDeclaration Body END {
         $$ = [ "def", $2, $3, $4 ];

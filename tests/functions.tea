@@ -4,6 +4,7 @@ end
 def emptyFunction
 end
 
+my_empty_func()
 emptyFunction()
 
 def emptyFunctionWithParens() end
@@ -15,13 +16,9 @@ def funcWithArg arg
   arg
 end
 
-def funcWithArgs a, b
-  c = a || b
-  return c
-end
-
 def incr a, by = 1
-  return a + by
+  c = a + by
+  return c
 end
 
 def decr(a, by = 1)
