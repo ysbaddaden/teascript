@@ -97,12 +97,12 @@ PrimaryExpression
 PostfixExpression
     : PrimaryExpression                                  { $$ = $1; }
     | PostfixExpression '[' Expression ']'               { $$ = [ "access", $1, $3 ]; }
-    | PostfixExpression '(' ')'                          { $$ = [ "invoke", $1 ]; }
+    | PostfixExpression '(' ')'                          { $$ = [ "invoke", $1, [] ]; }
     | PostfixExpression '(' ArgumentExpressionList ')'   { $$ = [ "invoke", $1, $3 ]; }
     ;
 
 ArgumentExpressionList
-    : AssignmentExpression                               { $$ = []; }
+    : AssignmentExpression                               { $$ = [ $1 ]; }
     | ArgumentExpressionList ',' AssignmentExpression    { $1.push($3); $$ = $1; }
     ;
 

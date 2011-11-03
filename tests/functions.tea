@@ -4,6 +4,8 @@ end
 def emptyFunction
 end
 
+emptyFunction()
+
 def emptyFunctionWithParens() end
 
 def anotherEmptyFunctionWithParens()
@@ -27,4 +29,9 @@ def decr(a, by = 1)
     a - by
   )
 end
+
+a = 1
+b = incr(a)
+b = incr(b, 4)
+d = decr(c = a, 2)
 
