@@ -3,9 +3,7 @@ L  [a-zA-Z_]
 E  [eE][-+]?{D}+
 
 %{
-
 // put some javascript here if needed
-
 %}
 
 %%
@@ -17,18 +15,18 @@ E  [eE][-+]?{D}+
 "null"                               return 'CONSTANT';
 [-+~]?{D}+(\.{D}+)?({E})?            return 'CONSTANT';
 [-+~]?\.{D}+({E})?                   return 'CONSTANT';
-\"(\\.|[^\\"])*\"	                   return 'STRING_LITERAL';
-\'(\\.|[^\\'])*\'	                   return 'STRING';
+\"(\\.|[^\\"])*\"                    return 'STRING';
+\'(\\.|[^\\'])*\'                    return 'STRING';
 
+"then"                               return 'THEN';
+"do"                                 return 'DO';
 "end"                                return 'END';
-
 "if"                                 return 'IF';
 "unless"                             return 'UNLESS';
 "else"                               return 'ELSE';
 "elsif"                              return 'ELSIF';
 "case"                               return 'CASE';
 "when"                               return 'WHEN';
-
 "while"                              return 'WHILE';
 "until"                              return 'UNTIL';
 "loop"                               return 'LOOP';
@@ -54,7 +52,7 @@ E  [eE][-+]?{D}+
 "&&"                                 return 'AND_OP';
 "or"                                 return 'OR_OP';
 "||"                                 return 'OR_OP';
-[-+*%/&|^]                           return yytext;
+[-+*%/&|^\?]                         return yytext;
 ">>"                                 return 'RIGHT_OP';
 "<<"                                 return 'LEFT_OP';
 "!="                                 return 'NEQ_OP';

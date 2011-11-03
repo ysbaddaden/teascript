@@ -1,150 +1,156 @@
 %token LF EOF
-%token CONSTANT STRING_LITERAL IDENTIFIER
+%token CONSTANT STRING IDENTIFIER
 %token EQ_OP NE_OP LT_OP LE_OP GT_OP GE_OP AND_OP OR_OP
 %token END
 %token IF UNLESS ELSE ELSEIF
 %token WHILE UNTIL LOOP BREAK CONTINUE
 
-%right '=' ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN MOD_ASSIGN AND_ASSIGN OR_ASSIGN XOR_ASSIGN
-%left  '+' '-' '*' '/' '%'
-%left  '&' '|' '^'
-%right EQ_OP NE_OP LT_OP LE_OP GT_OP GE_OP AND_OP OR_OP NOT_OP
-%right TYPEOF
+//%right '=' ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN MOD_ASSIGN AND_ASSIGN OR_ASSIGN XOR_ASSIGN
+//%left  '+' '-' '*' '/' '%'
+//%left  '&' '|' '^'
+//%right EQ_OP NE_OP LT_OP LE_OP GT_OP GE_OP AND_OP OR_OP NOT_OP
+//%right TYPEOF
 
 %start Program
 
 %%
 
 Program
-    : Body EOF {
-        return $1
-    }
+    : Body EOF                   { return $1; }
     ;
 
 Body
-    : Body Terminator
-    | Body Statement Terminator {
-        // pushes the statement ($2) to the current body ($1)
-        $1.push($2);
-        $$ = $1;
-    }
-    | {
-        // empty body => new body!
-        $$ = [];
-    }
+    : Statement                  { $$ = [ $1 ]; }
+    | Body Statement             { $1.push($2); $$ = $1; }
+    |                            { $$ = []; }
     ;
 
 Statement
-    : PrimaryExpression     { $$ = $1; }
-    | ConditionalStatement  { $$ = $1; }
-    | CaseStatement         { $$ = $1; }
-    | LoopStatement         { $$ = $1; }
-    | BREAK                 { $$ = [ "keyword", "break" ]; }
-    | CONTINUE              { $$ = [ "keyword", "continue" ]; }
+    : ExpressionStatement        { $$ = $1; }
+    | SelectionStatement         { $$ = $1; }
+    | IterationStatement         { $$ = $1; }
+    | JumpStatement              { $$ = $1; }
     ;
 
-CaseStatement
-    : CASE Expression LF WhenStatement END {
-        $$ = [ "case", $2, $4 ];
-    }
-    ;
-
-WhenStatement
-    : WHEN DeclarationList LF Body {
-        $$ = [ [ "when", $2, $4 ] ];
-    }
-    | WhenStatement WHEN DeclarationList LF Body {
-        $1.push([ "when", $3, $5 ]);
-        $$ = $1;
-    }
-    | WhenStatement ELSE Body {
-        $1.push([ "else", $3 ]);
-        $$ = $1;
-    }
-    | ELSE Body {
-        $$ = [ [ "else", $2 ] ];
-    }
-    ;
-
-ConditionalStatement
-    : IF PrimaryExpression Body END {
-        $$ = [ "if", $2, $3 ];
-    }
-    | IF PrimaryExpression Body ElseStatement END {
-        $$ = [ "if", $2, $3, [ $4 ] ];
-    }
-    | IF PrimaryExpression Body ElsifStatement END {
-        $$ = [ "if", $2, $3, $4 ];
-    }
-    | IF PrimaryExpression Body ElsifStatement ElseStatement END {
-        $4.push($5);
-        $$ = [ "if", $2, $3, $4 ];
-    }
-    | UNLESS PrimaryExpression Body END {
-        $$ = [ "unless", $2, $3 ];
-    }
-    | Statement IF PrimaryExpression {
-        $$ = [ "if", $3, [ $1 ] ];
-    }
-    | Statement UNLESS PrimaryExpression {
-        $$ = [ "unless", $3, [ $1 ] ];
-    }
-    ;
-
-ElseStatement
-    : ELSE Body {
-        $$ = [ "else", $2 ];
-    }
-    ;
-
-ElsifStatement
-    : ELSIF PrimaryExpression Body {
-        $$ = [ [ "elsif", $2, $3 ] ];
-    }
-    | ELSIF PrimaryExpression Body ElsifStatement {
-        $4.unshift([ "elsif", $2, $3 ])
-        $$ = $4;
-    }
-    ;
-
-LoopStatement
-    : WHILE PrimaryExpression Body END {
-        $$ = [ "while", $2, $3 ];
-    }
-    | UNTIL PrimaryExpression Body END {
-        $$ = [ "until", $2, $3 ];
-    }
-    | Statement WHILE PrimaryExpression {
-        $$ = [ "while", $3, [ $1 ] ];
-    }
-    | Statement UNTIL PrimaryExpression {
-        $$ = [ "until", $3, [ $1 ] ];
-    }
-    | LOOP Body END {
-        $$ = [ "loop", $2 ];
-    }
+ExpressionStatement
+    : Terminator
+    | Expression Terminator      { $$ = $1; }
     ;
 
 PrimaryExpression
-    : Expression                { $$ = $1; }
-    | AssignExpression          { $$ = $1; }
+    : IDENTIFIER                                         { $$ = [ "ident",  $1 ]; }
+    | CONSTANT                                           { $$ = [ "const",  $1 ]; }
+    | STRING                                             { $$ = [ "string", $1 ]; }
+    | Array                                              { $$ = $1; }
+    | Object                                             { $$ = $1; }
+    | '(' Expression ')'                                 { $$ = [ "paren",  $2 ]; }
+    | '(' LF Expression ')'                              { $$ = [ "paren",  $3 ]; }
+    | '(' LF Expression LF ')'                           { $$ = [ "paren",  $3 ]; }
+    | '(' Expression LF ')'                              { $$ = [ "paren",  $2 ]; }
     ;
 
+PostfixExpression
+    : PrimaryExpression                                  { $$ = $1; }
+//    | PostfixExpression '[' Expression ']'               { $$ = [ "access", $1, $3 ]; }
+//    | PostfixExpression '(' ')'                          { $$ = [ "invoke", $1 ]; }
+//    | PostfixExpression '(' ArgumentExpressionList ')'   { $$ = [ "invoke", $1, $3 ]; }
+    ;
+
+//ArgumentExpressionList
+//    : AssignmentExpression                               { $$ = []; }
+//    | ArgumentExpressionList ',' AssignmentExpression    { $1.push($3); $$ = $1; }
+//    ;
+
+UnaryExpression
+    : PostfixExpression                                  { $$ = $1; }
+    | NOT_OP UnaryExpression                             { $$ = [ "not", $2 ]; }
+    | TYPEOF UnaryExpression                             { $$ = [ "typeof", $2 ]; }
+    ;
+
+MultiplicativeExpression
+	: UnaryExpression                                    { $$ = $1; }
+	| MultiplicativeExpression '*' UnaryExpression       { $$ = [ "op", "*", $1, $3 ]; }
+	| MultiplicativeExpression '/' UnaryExpression       { $$ = [ "op", "/", $1, $3 ]; }
+	| MultiplicativeExpression '%' UnaryExpression       { $$ = [ "op", "%", $1, $3 ]; }
+	;
+
+AdditiveExpression
+	: MultiplicativeExpression                           { $$ = $1; }
+	| AdditiveExpression '+' MultiplicativeExpression    { $$ = [ "op", "+", $1, $3 ]; }
+	| AdditiveExpression '-' MultiplicativeExpression    { $$ = [ "op", "-", $1, $3 ]; }
+	;
+
+ShiftExpression
+	: AdditiveExpression                                 { $$ = $1; }
+	| ShiftExpression LEFT_OP  AdditiveExpression        { $$ = [ "op", "<<", $1, $3 ]; }
+	| ShiftExpression RIGHT_OP AdditiveExpression        { $$ = [ "op", ">>", $1, $3 ]; }
+	;
+
+RelationalExpression
+	: ShiftExpression                                    { $$ = $1; }
+	| RelationalExpression LT_OP ShiftExpression         { $$ = [ "op", "<", $1, $3 ]; }
+	| RelationalExpression GT_OP ShiftExpression         { $$ = [ "op", ">", $1, $3 ]; }
+	| RelationalExpression LE_OP ShiftExpression         { $$ = [ "op", "<=", $1, $3 ]; }
+	| RelationalExpression GE_OP ShiftExpression         { $$ = [ "op", ">=", $1, $3 ]; }
+	;
+
+EqualityExpression
+	: RelationalExpression                               { $$ = $1; }
+	| EqualityExpression EQ_OP RelationalExpression      { $$ = [ "op", "===", $1, $3 ]; }
+	| EqualityExpression NE_OP RelationalExpression      { $$ = [ "op", "!==", $1, $3 ]; }
+	;
+
+AndExpression
+	: EqualityExpression                                 { $$ = $1; }
+	| AndExpression '&' EqualityExpression               { $$ = [ "op", "&", $1, $3 ]; }
+	;
+
+ExclusiveOrExpression
+	: AndExpression                                      { $$ = $1; }
+	| ExclusiveOrExpression '^' AndExpression            { $$ = [ "op", "^", $1, $3 ]; }
+	;
+
+InclusiveOrExpression
+	: ExclusiveOrExpression                              { $$ = $1; }
+	| InclusiveOrExpression '|' ExclusiveOrExpression    { $$ = [ "op", "|", $1, $3 ]; }
+	;
+
+LogicalAndExpression
+	: InclusiveOrExpression                              { $$ = $1; }
+	| LogicalAndExpression AND_OP InclusiveOrExpression  { $$ = [ "op", "&&", $1, $3 ]; }
+	;
+
+LogicalOrExpression
+	: LogicalAndExpression                               { $$ = $1; }
+	| LogicalOrExpression OR_OP LogicalAndExpression     { $$ = [ "op", "||", $1, $3 ]; }
+	;
+
+ConditionalExpression
+    : LogicalOrExpression                                          { $$ = $1; }
+    | LogicalOrExpression '?' Expression ':' ConditionalExpression { $$ = [ "cond", $1, $3, $5 ]; }
+    ;
+
+AssignmentExpression
+    : ConditionalExpression                                        { $$ = $1; }
+    | PostfixExpression AssignmentOperator AssignmentExpression    { $$ = [ "assign", $2, $1, $3 ] }
+    ;
+
+AssignmentOperator
+	: '='           { $$ = $1; }
+	| MUL_ASSIGN    { $$ = $1; }
+	| DIV_ASSIGN    { $$ = $1; }
+	| MOD_ASSIGN    { $$ = $1; }
+	| ADD_ASSIGN    { $$ = $1; }
+	| SUB_ASSIGN    { $$ = $1; }
+	| LEFT_ASSIGN   { $$ = $1; }
+	| RIGHT_ASSIGN  { $$ = $1; }
+	| AND_ASSIGN    { $$ = $1; }
+	| XOR_ASSIGN    { $$ = $1; }
+	| OR_ASSIGN     { $$ = $1; }
+	;
+
 Expression
-    : CONSTANT                  { $$ = [ "const", $1 ]; }
-    | IDENTIFIER                { $$ = [ "ident", $1 ]; }
-    | Array                     { $$ = $1; }
-    | Object                    { $$ = $1; }
-    | STRING_LITERAL            { $$ = [ "string", $1 ]; }
-    | STRING                    { $$ = [ "string", $1 ]; }
-    | MathExpression            { $$ = $1; }
-    | BitwiseExpression         { $$ = $1; }
-    | LogicalExpression         { $$ = $1; }
-    | TYPEOF Expression         { $$ = [ "typeof", $2 ]; }
-    | '(' Expression ')'        { $$ = [ "paren",  $2 ]; }
-    | '(' Expression LF ')'     { $$ = [ "paren",  $2 ]; }
-    | '(' LF Expression LF ')'  { $$ = [ "paren",  $3 ]; }
-    | '(' LF Expression ')'     { $$ = [ "paren",  $3 ]; }
+    : AssignmentExpression  { $$ = $1; }
     ;
 
 Array
@@ -156,11 +162,11 @@ Array
     ;
 
 DeclarationList
-    : PrimaryExpression                                 { $$ = [ $1 ]; }
-    | DeclarationList ',' PrimaryExpression             { $1.push($3); $$ = $1; }
-    | DeclarationList ',' LF PrimaryExpression          { $1.push($4); $$ = $1; }
-    | DeclarationList LF ',' LF PrimaryExpression       { $1.push($5); $$ = $1; }
-    | DeclarationList LF ',' PrimaryExpression          { $1.push($4); $$ = $1; }
+    : Expression                            { $$ = [ $1 ]; }
+    | DeclarationList ',' Expression        { $1.push($3); $$ = $1; }
+    | DeclarationList ',' LF Expression     { $1.push($4); $$ = $1; }
+    | DeclarationList LF ',' LF Expression  { $1.push($5); $$ = $1; }
+    | DeclarationList LF ',' Expression     { $1.push($4); $$ = $1; }
     ;
 
 Object
@@ -186,43 +192,55 @@ ObjectDeclaration
     | Expression LF ':' Expression                      { $$ = [ "assoc", $1, $4 ]; }
     ;
 
-AssignExpression
-    : IDENTIFIER '=' PrimaryExpression           { $$ = [ "assign",  "=",  [ "var", $1 ], $3 ]; }
-    | IDENTIFIER ADD_ASSIGN   PrimaryExpression  { $$ = [ "assign", "+=",  [ "var", $1 ], $3 ]; }
-    | IDENTIFIER SUB_ASSIGN   PrimaryExpression  { $$ = [ "assign", "-=",  [ "var", $1 ], $3 ]; }
-    | IDENTIFIER MUL_ASSIGN   PrimaryExpression  { $$ = [ "assign", "*=",  [ "var", $1 ], $3 ]; }
-    | IDENTIFIER MOD_ASSIGN   PrimaryExpression  { $$ = [ "assign", "%=",  [ "var", $1 ], $3 ]; }
-    | IDENTIFIER AND_ASSIGN   PrimaryExpression  { $$ = [ "assign", "&=",  [ "var", $1 ], $3 ]; }
-    | IDENTIFIER OR_ASSIGN    PrimaryExpression  { $$ = [ "assign", "|=",  [ "var", $1 ], $3 ]; }
-    | IDENTIFIER XOR_ASSIGN   PrimaryExpression  { $$ = [ "assign", "^=",  [ "var", $1 ], $3 ]; }
-    | IDENTIFIER RIGHT_ASSIGN PrimaryExpression  { $$ = [ "assign", ">>=", [ "var", $1 ], $3 ]; }
-    | IDENTIFIER LEFT_ASSIGN  PrimaryExpression  { $$ = [ "assign", "<<=", [ "var", $1 ], $3 ]; }
+SelectionStatement
+    : IF Expression Then Body END                               { $$ = [ "if", $2, $3 ]; }
+    | IF Expression Then Body ElseStatement END                 { $$ = [ "if", $2, $3, [ $4 ] ]; }
+    | IF Expression Then Body ElsifStatement END                { $$ = [ "if", $2, $3, $4 ]; }
+    | IF Expression Then Body ElsifStatement ElseStatement END  { $4.push($5); $$ = [ "if", $2, $3, $4 ]; }
+    | UNLESS Expression Then Body END                           { $$ = [ "unless", $2, $3 ]; }
+    | UNLESS Expression Then Body ElseStatement END             { $$ = [ "unless", $2, $3, [ $4 ] ]; }
+    | Statement IF Expression Terminator                        { $$ = [ "if", $3, [ $1 ] ]; }
+    | Statement UNLESS Expression Terminator                    { $$ = [ "unless", $3, [ $1 ] ]; }
+    | CASE Expression Terminator WhenStatement END              { $$ = [ "case", $2, $4 ]; }
     ;
 
-MathExpression
-    : Expression '+' Expression           { $$ = [ "op", "+", $1, $3 ]; }
-    | Expression '-' Expression           { $$ = [ "op", "-", $1, $3 ]; }
-    | Expression '*' Expression           { $$ = [ "op", "*", $1, $3 ]; }
-    | Expression '/' Expression           { $$ = [ "op", "/", $1, $3 ]; }
-    | Expression '%' Expression           { $$ = [ "op", "%", $1, $3 ]; }
+ElsifStatement
+    : ELSIF Expression Then Body                 { $$ = [ [ "elsif", $2, $3 ] ]; }
+    | ELSIF Expression Then Body ElsifStatement  { $4.unshift([ "elsif", $2, $3 ]); $$ = $4; }
     ;
 
-BitwiseExpression
-    : Expression '&' Expression           { $$ = [ "op", "&", $1, $3 ]; }
-    | Expression '|' Expression           { $$ = [ "op", "|", $1, $3 ]; }
-    | Expression '^' Expression           { $$ = [ "op", "^", $1, $3 ]; }
+ElseStatement
+    : ELSE Body  { $$ = [ "else", $2 ]; }
     ;
 
-LogicalExpression
-    : Expression EQ_OP  Expression        { $$ = [ "op", "===", $1, $3 ]; }
-    | Expression NE_OP  Expression        { $$ = [ "op", "!==", $1, $3 ]; }
-    | Expression LT_OP  Expression        { $$ = [ "op", "<",   $1, $3 ]; }
-    | Expression LE_OP  Expression        { $$ = [ "op", "<=",  $1, $3 ]; }
-    | Expression GT_OP  Expression        { $$ = [ "op", ">",   $1, $3 ]; }
-    | Expression GE_OP  Expression        { $$ = [ "op", ">=",  $1, $3 ]; }
-    | Expression OR_OP  Expression        { $$ = [ "op", "||",  $1, $3 ]; }
-    | Expression AND_OP Expression        { $$ = [ "op", "&&",  $1, $3 ]; }
-    | NOT_OP Expression                   { $$ = [ "not", $2 ]; }
+WhenStatement
+    : WHEN DeclarationList Then Body                { $$ = [ [ "when", $2, $4 ] ]; }
+    | WhenStatement WHEN DeclarationList Then Body  { $1.push([ "when", $3, $5 ]); $$ = $1; } }
+    | WhenStatement ElseStatement                   { $1.push($2); $$ = $1; }
+    | ElseStatement                                 { $$ = [ $1 ]; }
+    ;
+
+IterationStatement
+    : WHILE Expression Do Body END      { $$ = [ "while", $2, $3 ]; }
+    | UNTIL Expression Do Body END      { $$ = [ "until", $2, $3 ]; }
+    | Body WHILE Expression Terminator  { $$ = [ "while", $3, [ $1 ] ]; }
+    | Body UNTIL Expression Terminator  { $$ = [ "until", $3, [ $1 ] ]; }
+    | LOOP Do Body END                  { $$ = [ "loop", $2 ]; }
+    ;
+
+JumpStatement
+    : BREAK Terminator                  { $$ = [ "keyword", "break" ]; }
+    | CONTINUE Terminator               { $$ = [ "keyword", "continue" ]; }
+    ;
+
+Then
+    : THEN
+    | Terminator
+    ;
+
+Do
+    : DO
+    | Terminator
     ;
 
 Terminator
