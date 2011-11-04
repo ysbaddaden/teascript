@@ -2,12 +2,6 @@
 
 ## Methods
 
-- dot access and invoke:
-
-    hsh = { a: 2 }              |     hsh = { a: 2 };
-    x = hsh.a                   |     x = hsh.a;
-    body.appendChild()          |     body.appendChild();
-
 - method argument splats:
 
     def m1(*args)               |     function m1() {
