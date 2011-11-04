@@ -63,7 +63,7 @@ E  [eE][-+]?{D}+
 ">="                                 return 'GE_OP';
 ">"                                  return 'GT_OP';
 "=="                                 return 'EQ_OP';
-[()=;,:\[\]\{\}]                     return yytext;
+[()=;,\.:\[\]\{\}]                   return yytext;
 
 {L}({L}|{D})*                        return 'IDENTIFIER';
 
