@@ -69,12 +69,19 @@ ArgumentList
     : Identifier {
         $$ = [ $1 ];
     }
+    | '*' Identifier {
+        $$ = [ [ "splat", $2 ] ];
+    }
     | ArgumentList ',' Identifier {
         $1.push($3);
         $$ = $1;
     }
     | ArgumentList ',' Identifier '=' PrimaryExpression {
         $1.push([ "assign", "=", $3, $5 ]);
+    }
+    | ArgumentList ',' '*' Identifier {
+        $1.push([ "splat", $4 ]);
+        $$ = $1;
     }
     ;
 
