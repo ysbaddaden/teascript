@@ -95,10 +95,7 @@ PrimaryExpression
     | STRING                                             { $$ = [ "string", $1 ]; }
     | Array                                              { $$ = $1; }
     | Object                                             { $$ = $1; }
-    | '(' Expression ')'                                 { $$ = [ "paren",  $2 ]; }
-    | '(' Expression LF ')'                              { $$ = [ "paren",  $2 ]; }
-    | '(' LF Expression LF ')'                           { $$ = [ "paren",  $3 ]; }
-    | '(' LF Expression ')'                              { $$ = [ "paren",  $3 ]; }
+    | '(' OptLF Expression OptLF ')'                           { $$ = [ "paren",  $3 ]; }
     ;
 
 PostfixExpression
@@ -208,10 +205,9 @@ Expression
 
 Array
     : '[' ']'                                           { $$ = [ "array" ]; }
-    | '[' DeclarationList ']'                           { $$ = [ "array", $2 ]; }
-    | '[' DeclarationList LF ']'                        { $$ = [ "array", $2 ]; }
-    | '[' LF DeclarationList LF ']'                     { $$ = [ "array", $3 ]; }
-    | '[' LF DeclarationList ']'                        { $$ = [ "array", $3 ]; }
+    | '[' OptLF DeclarationList OptLF ']'               { $$ = [ "array", $3 ]; }
+    | '[' OptLF DeclarationList ',' OptLF ']'           { $$ = [ "array", $3 ]; }
+    | '[' OptLF DeclarationList LF ',' OptLF ']'        { $$ = [ "array", $3 ]; }
     ;
 
 DeclarationList
@@ -224,10 +220,9 @@ DeclarationList
 
 Object
     : '{' '}'                                           { $$ = [ "object" ]; }
-    | '{' ObjectDeclarationList '}'                     { $$ = [ "object", $2 ]; }
-    | '{' ObjectDeclarationList LF '}'                  { $$ = [ "object", $2 ]; }
-    | '{' LF ObjectDeclarationList LF '}'               { $$ = [ "object", $3 ]; }
-    | '{' LF ObjectDeclarationList '}'                  { $$ = [ "object", $3 ]; }
+    | '{' OptLF ObjectDeclarationList OptLF '}'         { $$ = [ "object", $3 ]; }
+    | '{' OptLF ObjectDeclarationList ',' OptLF '}'     { $$ = [ "object", $3 ]; }
+    | '{' OptLF ObjectDeclarationList LF ',' OptLF '}'  { $$ = [ "object", $3 ]; }
     ;
 
 ObjectDeclarationList
@@ -235,14 +230,11 @@ ObjectDeclarationList
     | ObjectDeclarationList ',' ObjectDeclaration       { $1.push($3); $$ = $1; }
     | ObjectDeclarationList ',' LF ObjectDeclaration    { $1.push($4); $$ = $1; }
     | ObjectDeclarationList LF ',' LF ObjectDeclaration { $1.push($5); $$ = $1; }
-    | ObjectDeclarationList LF ',' ObjectDeclaration    { $1.push($4); $$ = $1; }
+    | ObjectDeclarationList LF ',' ObjectDeclaration    { $1.push($3); $$ = $1; }
     ;
 
 ObjectDeclaration
-    : Expression ':' Expression                         { $$ = [ "assoc", $1, $3 ]; }
-    | Expression ':' LF Expression                      { $$ = [ "assoc", $1, $4 ]; }
-    | Expression LF ':' LF Expression                   { $$ = [ "assoc", $1, $5 ]; }
-    | Expression LF ':' Expression                      { $$ = [ "assoc", $1, $4 ]; }
+    : Expression OptLF ':' OptLF Expression             { $$ = [ "assoc", $1, $5 ]; }
     ;
 
 SelectionStatement
@@ -299,6 +291,16 @@ Do
     | Terminator
     | Terminator DO
     ;
+
+OptLF
+    : LF
+    | 
+    ;
+
+//OptComma
+//    : ','
+//    | 
+//    ;
 
 Terminator
     : LF
