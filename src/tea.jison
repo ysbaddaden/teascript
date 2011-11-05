@@ -59,8 +59,8 @@ FunctionStatement
     ;
 
 ArgumentDeclaration
-    : '(' ')'                            { $$ = []; }
-    | '(' ArgumentList ')'               { $$ = $2; }
+    : '(' OptLF ')'                      { $$ = []; }
+    | '(' OptLF ArgumentList OptLF ')'   { $$ = $3; }
     | ArgumentList Terminator            { $$ = $1; }
     | Terminator                         { $$ = []; }
     ;
@@ -72,132 +72,151 @@ ArgumentList
     | '*' Identifier {
         $$ = [ [ "splat", $2 ] ];
     }
-    | ArgumentList ',' Identifier {
-        $1.push($3);
+    | ArgumentList ',' OptLF Identifier {
+        $1.push($4);
         $$ = $1;
     }
-    | ArgumentList ',' Identifier '=' PrimaryExpression {
-        $1.push([ "assign", "=", $3, $5 ]);
+    | ArgumentList ',' OptLF Identifier '=' OptLF PrimaryExpression {
+        $1.push([ "assign", "=", $4, $7 ]);
     }
-    | ArgumentList ',' '*' Identifier {
-        $1.push([ "splat", $4 ]);
+    | ArgumentList ',' OptLF '*' Identifier {
+        $1.push([ "splat", $5 ]);
         $$ = $1;
     }
     ;
 
 Identifier
-    : IDENTIFIER { $$ = [ "ident", $1 ]; }
+    : IDENTIFIER                      { $$ = [ "ident", $1 ]; }
     ;
 
 PrimaryExpression
-    : Identifier                                         { $$ = $1 }
-    | CONSTANT                                           { $$ = [ "const",  $1 ]; }
-    | STRING                                             { $$ = [ "string", $1 ]; }
-    | Array                                              { $$ = $1; }
-    | Object                                             { $$ = $1; }
-    | '(' OptLF Expression OptLF ')'                           { $$ = [ "paren",  $3 ]; }
+    : Identifier                      { $$ = $1 }
+    | CONSTANT                        { $$ = [ "const",  $1 ]; }
+    | STRING                          { $$ = [ "string", $1 ]; }
+    | Array                           { $$ = $1; }
+    | Object                          { $$ = $1; }
+    | '(' OptLF Expression OptLF ')'  { $$ = [ "paren",  $3 ]; }
     ;
 
 PostfixExpression
-    : PrimaryExpression                                  { $$ = $1; }
-    | PostfixExpression '.' IDENTIFIER                   { $$ = [ "dot",    $1, $3 ]; }
-    | PostfixExpression '[' Expression ']'               { $$ = [ "access", $1, $3 ]; }
-    | PostfixExpression '(' ')'                          { $$ = [ "invoke", $1, [] ]; }
-    | PostfixExpression '(' ArgumentExpressionList ')'   { $$ = [ "invoke", $1, $3 ]; }
+    : PrimaryExpression {
+        $$ = $1;
+    }
+    | PostfixExpression '.' IDENTIFIER {
+        $$ = [ "dot",    $1, $3 ];
+    }
+    | PostfixExpression '[' OptLF Expression OptLF ']' {
+        $$ = [ "access", $1, $4 ];
+    }
+    | PostfixExpression '(' OptLF ')' {
+        $$ = [ "invoke", $1, [] ];
+    }
+    | PostfixExpression '(' OptLF ArgumentExpressionList OptLF ')' {
+        $$ = [ "invoke", $1, $4 ];
+    }
     ;
 
 ArgumentExpressionList
-    : AssignmentExpression                               { $$ = [ $1 ]; }
-    | ArgumentExpressionList ',' AssignmentExpression    { $1.push($3); $$ = $1; }
+    : AssignmentExpression {
+        $$ = [ $1 ];
+    }
+    | ArgumentExpressionList OptLF ',' OptLF AssignmentExpression {
+        $1.push($5);
+        $$ = $1;
+    }
     ;
 
 UnaryExpression
-    : PostfixExpression                                  { $$ = $1; }
-    | NOT_OP UnaryExpression                             { $$ = [ "not", $2 ]; }
-    | TYPEOF UnaryExpression                             { $$ = [ "typeof", $2 ]; }
+    : PostfixExpression                                     { $$ = $1; }
+    | NOT_OP UnaryExpression                                { $$ = [ "not", $2 ]; }
+    | TYPEOF UnaryExpression                                { $$ = [ "typeof", $2 ]; }
     ;
 
 MultiplicativeExpression
-	: UnaryExpression                                    { $$ = $1; }
-	| MultiplicativeExpression '*' UnaryExpression       { $$ = [ "op", "*", $1, $3 ]; }
-	| MultiplicativeExpression '/' UnaryExpression       { $$ = [ "op", "/", $1, $3 ]; }
-	| MultiplicativeExpression '%' UnaryExpression       { $$ = [ "op", "%", $1, $3 ]; }
-	;
+    : UnaryExpression                                       { $$ = $1; }
+    | MultiplicativeExpression '*' OptLF UnaryExpression    { $$ = [ "op", "*", $1, $4 ]; }
+    | MultiplicativeExpression '/' OptLF UnaryExpression    { $$ = [ "op", "/", $1, $4 ]; }
+    | MultiplicativeExpression '%' OptLF UnaryExpression    { $$ = [ "op", "%", $1, $4 ]; }
+    ;
 
 AdditiveExpression
-	: MultiplicativeExpression                           { $$ = $1; }
-	| AdditiveExpression '+' MultiplicativeExpression    { $$ = [ "op", "+", $1, $3 ]; }
-	| AdditiveExpression '-' MultiplicativeExpression    { $$ = [ "op", "-", $1, $3 ]; }
-	;
+    : MultiplicativeExpression                              { $$ = $1; }
+    | AdditiveExpression '+' OptLF MultiplicativeExpression { $$ = [ "op", "+", $1, $4 ]; }
+    | AdditiveExpression '-' OptLF MultiplicativeExpression { $$ = [ "op", "-", $1, $4 ]; }
+    ;
 
 ShiftExpression
-	: AdditiveExpression                                 { $$ = $1; }
-	| ShiftExpression LEFT_OP  AdditiveExpression        { $$ = [ "op", "<<", $1, $3 ]; }
-	| ShiftExpression RIGHT_OP AdditiveExpression        { $$ = [ "op", ">>", $1, $3 ]; }
-	;
+    : AdditiveExpression                                    { $$ = $1; }
+    | ShiftExpression LEFT_OP  OptLF AdditiveExpression     { $$ = [ "op", "<<", $1, $4 ]; }
+    | ShiftExpression RIGHT_OP OptLF AdditiveExpression     { $$ = [ "op", ">>", $1, $4 ]; }
+    ;
 
 RelationalExpression
-	: ShiftExpression                                    { $$ = $1; }
-	| RelationalExpression LT_OP ShiftExpression         { $$ = [ "op", "<", $1, $3 ]; }
-	| RelationalExpression GT_OP ShiftExpression         { $$ = [ "op", ">", $1, $3 ]; }
-	| RelationalExpression LE_OP ShiftExpression         { $$ = [ "op", "<=", $1, $3 ]; }
-	| RelationalExpression GE_OP ShiftExpression         { $$ = [ "op", ">=", $1, $3 ]; }
-	;
+    : ShiftExpression                                       { $$ = $1; }
+    | RelationalExpression LT_OP OptLF ShiftExpression      { $$ = [ "op", "<", $1, $4 ]; }
+    | RelationalExpression GT_OP OptLF ShiftExpression      { $$ = [ "op", ">", $1, $4 ]; }
+    | RelationalExpression LE_OP OptLF ShiftExpression      { $$ = [ "op", "<=", $1, $4 ]; }
+    | RelationalExpression GE_OP OptLF ShiftExpression      { $$ = [ "op", ">=", $1, $4 ]; }
+    ;
 
 EqualityExpression
-	: RelationalExpression                               { $$ = $1; }
-	| EqualityExpression EQ_OP RelationalExpression      { $$ = [ "op", "===", $1, $3 ]; }
-	| EqualityExpression NE_OP RelationalExpression      { $$ = [ "op", "!==", $1, $3 ]; }
-	;
+    : RelationalExpression                                  { $$ = $1; }
+    | EqualityExpression EQ_OP OptLF RelationalExpression   { $$ = [ "op", "===", $1, $4 ]; }
+    | EqualityExpression NE_OP OptLF RelationalExpression   { $$ = [ "op", "!==", $1, $4 ]; }
+    ;
 
 AndExpression
-	: EqualityExpression                                 { $$ = $1; }
-	| AndExpression '&' EqualityExpression               { $$ = [ "op", "&", $1, $3 ]; }
-	;
+    : EqualityExpression                                    { $$ = $1; }
+    | AndExpression '&' OptLF EqualityExpression            { $$ = [ "op", "&", $1, $4 ]; }
+    ;
 
 ExclusiveOrExpression
-	: AndExpression                                      { $$ = $1; }
-	| ExclusiveOrExpression '^' AndExpression            { $$ = [ "op", "^", $1, $3 ]; }
-	;
+    : AndExpression                                         { $$ = $1; }
+    | ExclusiveOrExpression '^' OptLF AndExpression         { $$ = [ "op", "^", $1, $4 ]; }
+    ;
 
 InclusiveOrExpression
-	: ExclusiveOrExpression                              { $$ = $1; }
-	| InclusiveOrExpression '|' ExclusiveOrExpression    { $$ = [ "op", "|", $1, $3 ]; }
-	;
+    : ExclusiveOrExpression                                 { $$ = $1; }
+    | InclusiveOrExpression '|' OptLF ExclusiveOrExpression { $$ = [ "op", "|", $1, $4 ]; }
+    ;
 
 LogicalAndExpression
-	: InclusiveOrExpression                              { $$ = $1; }
-	| LogicalAndExpression AND_OP InclusiveOrExpression  { $$ = [ "op", "&&", $1, $3 ]; }
-	;
+    : InclusiveOrExpression                                 { $$ = $1; }
+    | LogicalAndExpression AND_OP OptLF InclusiveOrExpression { $$ = [ "op", "&&", $1, $4 ]; }
+    ;
 
 LogicalOrExpression
-	: LogicalAndExpression                               { $$ = $1; }
-	| LogicalOrExpression OR_OP LogicalAndExpression     { $$ = [ "op", "||", $1, $3 ]; }
-	;
+    : LogicalAndExpression                                 { $$ = $1; }
+    | LogicalOrExpression OR_OP OptLF LogicalAndExpression { $$ = [ "op", "||", $1, $4 ]; }
+    ;
 
 ConditionalExpression
-    : LogicalOrExpression                                          { $$ = $1; }
-    | LogicalOrExpression '?' Expression ':' ConditionalExpression { $$ = [ "cond", $1, $3, $5 ]; }
+    : LogicalOrExpression                                  { $$ = $1; }
+    | LogicalOrExpression '?' OptLF Expression OptLF ':' OptLF ConditionalExpression {
+        $$ = [ "cond", $1, $4, $8 ];
+    }
     ;
 
 AssignmentExpression
-    : ConditionalExpression                                        { $$ = $1; }
-    | PostfixExpression AssignmentOperator AssignmentExpression    { $$ = [ "assign", $2, $1, $3 ] }
+    : ConditionalExpression                                { $$ = $1; }
+    | PostfixExpression AssignmentOperator OptLF AssignmentExpression {
+        $$ = [ "assign", $2, $1, $4 ];
+    }
     ;
 
 AssignmentOperator
-	: '='                   { $$ = $1; }
-	| MUL_ASSIGN            { $$ = $1; }
-	| DIV_ASSIGN            { $$ = $1; }
-	| MOD_ASSIGN            { $$ = $1; }
-	| ADD_ASSIGN            { $$ = $1; }
-	| SUB_ASSIGN            { $$ = $1; }
-	| LEFT_ASSIGN           { $$ = $1; }
-	| RIGHT_ASSIGN          { $$ = $1; }
-	| AND_ASSIGN            { $$ = $1; }
-	| XOR_ASSIGN            { $$ = $1; }
-	| OR_ASSIGN             { $$ = $1; }
-	;
+    : '='                   { $$ = $1; }
+    | MUL_ASSIGN            { $$ = $1; }
+    | DIV_ASSIGN            { $$ = $1; }
+    | MOD_ASSIGN            { $$ = $1; }
+    | ADD_ASSIGN            { $$ = $1; }
+    | SUB_ASSIGN            { $$ = $1; }
+    | LEFT_ASSIGN           { $$ = $1; }
+    | RIGHT_ASSIGN          { $$ = $1; }
+    | AND_ASSIGN            { $$ = $1; }
+    | XOR_ASSIGN            { $$ = $1; }
+    | OR_ASSIGN             { $$ = $1; }
+    ;
 
 Expression
     : AssignmentExpression  { $$ = $1; }
