@@ -2,23 +2,7 @@
 
 ## Methods
 
-- method argument splats:
-
-    def m1(*args)               |     function m1() {
-    end                         |       var args = arguments;
-                                |     }
-                                |
-    def m2(a, b, *args)         |     function m2(a, b) {
-    end                         |       var args = Array.prototype.slice.call(arguments, 2);
-                                |     }
-                                |
-    args = [1, 2, 3]            |     var args = [ 1, 2, 3 ];
-    m1(*args)                   |     m1.apply(null, args);
-                                |
-    args = [3, 4]               |     var args = [ 3, 4 ];
-    m2(1, 2, *args)             |     m2.apply(null, [1, 2].concat(args));
-
-- methods must always return their latest expression:
+- methods should always return their latest expression:
 
     def m1(a, b)                |     function m1(a, b) {
       a || b                    |       return a || b;
