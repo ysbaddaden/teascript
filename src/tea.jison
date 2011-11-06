@@ -38,15 +38,15 @@ Body
 
 TerminatedStatement
     : Terminator
-    | Statement Terminator               { $$ = $1; }
+    | Statement Terminator                   { $$ = $1; }
     ;
 
 Statement
-    : FunctionStatement                  { $$ = $1; }
-    | Expression                         { $$ = $1; }
-    | SelectionStatement                 { $$ = $1; }
-    | IterationStatement                 { $$ = $1; }
-    | JumpStatement                      { $$ = $1; }
+    : FunctionStatement                      { $$ = $1; }
+    | Expression                             { $$ = $1; }
+    | SelectionStatement                     { $$ = $1; }
+    | IterationStatement                     { $$ = $1; }
+    | JumpStatement                          { $$ = $1; }
     ;
 
 FunctionStatement
@@ -59,30 +59,31 @@ FunctionStatement
     ;
 
 ArgumentDeclaration
-    : '(' OptLF ')'                      { $$ = []; }
-    | '(' OptLF ArgumentList OptLF ')'   { $$ = $3; }
-    | ArgumentList Terminator            { $$ = $1; }
-    | Terminator                         { $$ = []; }
+    : '(' OptLF ')'                          { $$ = []; }
+    | '(' OptLF ArgumentList OptLF ')'       { $$ = $3; }
+    | ArgumentList Terminator                { $$ = $1; }
+    | Terminator                             { $$ = []; }
     ;
 
 ArgumentList
-    : Identifier {
-        $$ = [ $1 ];
-    }
-    | '*' Identifier {
-        $$ = [ [ "splat", $2 ] ];
-    }
-    | ArgumentList ',' OptLF Identifier {
-        $1.push($4);
-        $$ = $1;
-    }
-    | ArgumentList ',' OptLF Identifier '=' OptLF PrimaryExpression {
-        $1.push([ "assign", "=", $4, $7 ]);
-    }
-    | ArgumentList ',' OptLF '*' Identifier {
-        $1.push([ "splat", $5 ]);
-        $$ = $1;
-    }
+    : Arguments                              { $$ = $1; }
+    | Arguments ',' OptLF ArgumentSplat      { $1.push($4); $$ = $1; }
+    | ArgumentSplat                          { $$ = [ $1 ]; }
+    ;
+
+Arguments
+    : Identifier                             { $$ = [ $1 ]; }
+    | ArgumentAssignment                     { $$ = [ $1 ]; }
+    | Arguments ',' OptLF Identifier         { $1.push($4); $$ = $1; }
+    | Arguments ',' OptLF ArgumentAssignment { $1.push($4); $$ = $1; }
+    ;
+
+ArgumentSplat
+    : '*' Identifier                         { $$ = [ "splat", $2 ]; }
+    ;
+
+ArgumentAssignment
+    : Identifier '=' OptLF PostfixExpression { $$ = [ "assign", "=", $1, $4 ]; }
     ;
 
 Identifier
@@ -103,7 +104,7 @@ PostfixExpression
         $$ = $1;
     }
     | PostfixExpression '.' IDENTIFIER {
-        $$ = [ "dot",    $1, $3 ];
+        $$ = [ "dot", $1, $3 ];
     }
     | PostfixExpression '[' OptLF Expression OptLF ']' {
         $$ = [ "access", $1, $4 ];
