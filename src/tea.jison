@@ -109,21 +109,26 @@ PostfixExpression
         $$ = [ "access", $1, $4 ];
     }
     | PostfixExpression '(' OptLF ')' {
-        $$ = [ "invoke", $1, [] ];
+        $$ = [ "call", $1, [] ];
     }
     | PostfixExpression '(' OptLF ArgumentExpressionList OptLF ')' {
-        $$ = [ "invoke", $1, $4 ];
+        $$ = [ "call", $1, $4 ];
     }
     ;
 
 ArgumentExpressionList
-    : AssignmentExpression {
+    : ArgumentExpression {
         $$ = [ $1 ];
     }
-    | ArgumentExpressionList OptLF ',' OptLF AssignmentExpression {
+    | ArgumentExpressionList OptLF ',' OptLF ArgumentExpression {
         $1.push($5);
         $$ = $1;
     }
+    ;
+
+ArgumentExpression
+    : AssignmentExpression       { $$ = $1; }
+    | '*' ConditionalExpression  { $$ = [ "splat", $2 ]; }
     ;
 
 UnaryExpression
