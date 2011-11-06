@@ -9,13 +9,11 @@ emptyFunction()
 
 def emptyFunctionWithParens() end
 
-def anotherEmptyFunctionWithParens()
-end
-
 def funcWithArg arg
   arg
 end
 
+# default values
 def incr a, by = 1
   c = a + by
   return c
@@ -32,15 +30,11 @@ b = incr(a)
 b = incr(b, 4)
 d = decr(c = a, 2)
 
-def m1(*args)
+# nested declarations
+def parent
+  def child
+    def nestedWithArgs()
+    end
+  end
 end
-
-def m2(a, b, *args)
-end
-
-#args = [1, 2, 3]
-#m1(*args)
-
-#args = [3, 4]
-#m2(1, 2, *args)
 
