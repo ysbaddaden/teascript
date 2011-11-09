@@ -1,5 +1,5 @@
 tea:
-	jison src/tea.jison src/tea.jisonlex -o lib/tea.js
+	jison src/tea.jison src/tea.jisonlex -o lib/parser.js
 
 all: tea
 
