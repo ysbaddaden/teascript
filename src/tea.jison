@@ -148,7 +148,7 @@ ArgumentExpression
 
 UnaryExpression
     : PostfixExpression                                     { $$ = $1; }
-    | NOT_OP UnaryExpression                                { $$ = new T.UnaryExpression("not",    $2); }
+    | NOT_OP UnaryExpression                                { $$ = new T.UnaryExpression("!", $2); }
     | TYPEOF UnaryExpression                                { $$ = new T.UnaryExpression("typeof", $2); }
     ;
 
