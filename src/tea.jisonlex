@@ -3,18 +3,20 @@ L  [a-zA-Z_]
 E  [eE][-+]?{D}+
 
 %{
-// put some javascript here if needed
+    if (typeof global.T === "undefined") {
+        global.T = require("./tea");
+    }
 %}
 
 %%
 
 "#".*                                ; // skip comments
 
-"true"                               return 'CONSTANT';
-"false"                              return 'CONSTANT';
-"null"                               return 'CONSTANT';
-[-+~]?{D}+(\.{D}+)?({E})?            return 'CONSTANT';
-[-+~]?\.{D}+({E})?                   return 'CONSTANT';
+"true"                               return 'BOOLEAN';
+"false"                              return 'BOOLEAN';
+"null"                               return 'NULL';
+[-+~]?{D}+(\.{D}+)?({E})?            return 'NUMBER';
+[-+~]?\.{D}+({E})?                   return 'NUMBER';
 \"(\\.|[^\\"])*\"                    return 'STRING';
 \'(\\.|[^\\'])*\'                    return 'STRING';
 
@@ -63,6 +65,8 @@ E  [eE][-+]?{D}+
 ">="                                 return 'GE_OP';
 ">"                                  return 'GT_OP';
 "=="                                 return 'EQ_OP';
+"..."                                return 'RANGE_EXCL';
+".."                                 return 'RANGE_INCL';
 [()=;,\.:\[\]\{\}]                   return yytext;
 
 {L}({L}|{D})*                        return 'IDENTIFIER';
