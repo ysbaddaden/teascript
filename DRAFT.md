@@ -10,71 +10,18 @@ Definition:
     [<expression>..<expression>]    # up or down to the last element (included)
     [<expression>...<expression>]   # up to the n-1 or down to n+1 element
 
-NOTE: expressions are expected to return integers.
+Notes:
+
+- expressions are expected to return integers;
+- ranges aren't expressions by themselves, but used within certain statements,
+  which means you can't have a statement like `x = [0..10]`.
 
 Examples:
 
-    [0..5]     # => [ 0, 1, 2, 3, 4, 5 ]
-    [0...5]    # => [ 0, 1, 2, 3, 4 ]
-    
-    [0..100]   # => __a = [];
-                    for (i = 0; i <= 100; i++) {
-                      __a.push(i))
-                    }
-    
-    [0...100]  # => __b = [];
-                    for (i = 0; i < 100; i++) {
-                      __b.push(i))
-                    }
-
-Array slice:
-
-    <enumerable>[<expression>..<expression>]
-
-Example:
-
-    $("#tags li")[2..5]    # =>  Array.prototype.slice.call($("#tags li"), 2, 5);
-    $("#tags li")[1...4]   # =>  Array.prototype.slice.call($("#tags li"), 1, 3);
+    [0..5]     # => [0, 1, 2, 3, 4, 5]
+    [0...5]    # => [0, 1, 2, 3, 4]
 
 ## FOR
-
-### Iterating within a range:
-
-    for <value> in <range> [do]
-      <statements>
-    end
-    
-    statement for <value> in <range>
-
-Examples:
-
-    for i in [0...10] do                    # => for (i = 0; i < 10; i++) {
-    end                                          }
-
-    for i in [145..9815]                    # => for (i = 145; i <= 9815; i++) {
-    end                                          }
-
-### Iterating arrays
-
-    for <value> in [0...<array>.length] [do]
-      <statements>
-    end
-
-    <array>.forEach ->(item) {
-      <statements>
-    }
-
-Examples:
-
-    for i in [0...10] do                    # => for (i = 0; i < 10; i++) {
-    end                                          }
-
-    for i in [0...ary.length] do            # => for (i = 0; i < ary.length; i++) {
-      value = ary[i]                               value = ary[i];
-    end                                          }
-
-    ary.forEach ->(item) do                 # => ary.forEach(function (item) {
-    end                                          });
 
 ### Iterating objects
 

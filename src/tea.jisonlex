@@ -34,6 +34,8 @@ E  [eE][-+]?{D}+
 "while"                              return 'WHILE';
 "until"                              return 'UNTIL';
 "loop"                               return 'LOOP';
+"for"                                return 'FOR';
+"in"                                 return 'IN';
 "break"                              return 'BREAK';
 "next"                               return 'CONTINUE';
 "continue"                           return 'CONTINUE';

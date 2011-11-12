@@ -125,10 +125,9 @@ PostfixExpression
     ;
 
 Index
-    : Expression OptLF                                        { $$ = $1; }
-    | LF Expression OptLF                                     { $$ = $2; }
-    | ConditionalExpression RANGE_INCL ConditionalExpression  { $$ = new T.Range("inclusive", $1, $3); }
-    | ConditionalExpression RANGE_EXCL ConditionalExpression  { $$ = new T.Range("exclusive", $1, $3); }
+    : Expression OptLF           { $$ = $1; }
+    | LF Expression OptLF        { $$ = $2; }
+    | Range                      { $$ = $1; }
     ;
 
 ArgumentExpressionList
@@ -305,11 +304,18 @@ WhenStatement
     ;
 
 IterationStatement
-    : WHILE Expression Do Body END   { $$ = new T.WhileStatement($2, $4); }
-    | UNTIL Expression Do Body END   { $$ = new T.UntilStatement($2, $4); }
-    | Statement WHILE Expression     { $$ = new T.WhileStatement($3, new T.Body($1)); }
-    | Statement UNTIL Expression     { $$ = new T.UntilStatement($3, new T.Body($1)); }
-    | LOOP Do Body END               { $$ = new T.LoopStatement($3); }
+    : WHILE Expression Do Body END                      { $$ = new T.WhileStatement($2, $4); }
+    | UNTIL Expression Do Body END                      { $$ = new T.UntilStatement($2, $4); }
+    | FOR Identifier IN '[' Range ']' Do Body END       { $$ = new T.ForStatement($2, $5, $8); }
+    | LOOP Do Body END                                  { $$ = new T.LoopStatement($3); }
+    | Statement WHILE Expression                        { $$ = new T.WhileStatement($3, new T.Body($1)); }
+    | Statement UNTIL Expression                        { $$ = new T.UntilStatement($3, new T.Body($1)); }
+    | Statement FOR Identifier IN '[' Range ']'         { $$ = new T.ForStatement($3, $6, new T.Body($1)); }
+    ;
+
+Range
+    : ConditionalExpression RANGE_INCL ConditionalExpression  { $$ = new T.Range("inclusive", $1, $3); }
+    | ConditionalExpression RANGE_EXCL ConditionalExpression  { $$ = new T.Range("exclusive", $1, $3); }
     ;
 
 JumpStatement
