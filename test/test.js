@@ -137,7 +137,9 @@
       }
 
       try {
-        // TODO: Setup
+        if (typeof obj.setup === "function") {
+          obj.setup();
+        }
         obj[testName]();
         this.passed += 1;
         logger.pass(testName);
@@ -153,7 +155,9 @@
           this.errors += 1;
         }
       } finally {
-        // TODO: Teardown
+        if (typeof obj.teardown === "function") {
+          obj.teardown();
+        }
       }
 
       this.results.push(result);
@@ -162,9 +166,14 @@
     report: function() {
       logger.display('');
       logger.display('Report:', 'header');
-      logger.pass('Passed: ' + this.passed);
-      logger.fail('Failed: ' + this.failed);
-      logger.error('Errors: ' + this.errors);
+
+      if (this.failed > 0 || this.errors > 0) {
+        logger.pass('Passed: ' + this.passed);
+        logger.fail('Failed: ' + this.failed);
+        logger.error('Errors: ' + this.errors);
+      } else {
+        logger.pass('All tests passed: ' + this.passed);
+      }
     },
 
     runAll: function(tests, report) {
