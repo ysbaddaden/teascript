@@ -167,19 +167,21 @@
       logger.error('Errors: ' + this.errors);
     },
 
-    runAll: function(tests) {
+    runAll: function(tests, report) {
       if (typeof TuringTest !== 'undefined' && TuringTest.isLoading) {
         setTimeout(function() { Tests.runAll(tests); }, 10);
       } else {
         run(tests);
-//        Tests.report();
+        if (report !== false) {
+          Tests.report();
+        }
       }
     },
 
     runAllFiles: function(files) {
       files.forEach(function (filename) {
         console.log("\n" + filename)
-        run(require("./" + filename));
+        run(require("./" + filename, false));
       });
 
       Tests.report();
