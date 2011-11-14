@@ -36,4 +36,3 @@ exports.testOptionalLinefeedsAndLeadingComma = function () {
 if (module === require.main) {
   require("../test").run(exports);
 }
-
