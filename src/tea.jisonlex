@@ -67,10 +67,10 @@ E  [eE][-+]?{D}+
 "=="                                 return 'EQ_OP';
 "..."                                return 'RANGE_EXCL';
 ".."                                 return 'RANGE_INCL';
-[()=;,\.:\[\]\{\}]                   return yytext;
 "typeof"                             return 'TYPEOF';
 "!"                                  return 'NOT_OP';
 "not"                                return 'NOT_OP';
+[()=;,\.:\[\]\{\}]                   return yytext;
 
 {L}({L}|{D})*                        return 'IDENTIFIER';
 
