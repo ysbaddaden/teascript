@@ -43,6 +43,7 @@ E  [eE][-+]?{D}+
 "+="                                 return 'ADD_ASSIGN';
 "-="                                 return 'SUB_ASSIGN';
 "*="                                 return 'MUL_ASSIGN';
+"/="                                 return 'DIV_ASSIGN';
 "%="                                 return 'MOD_ASSIGN';
 "&="                                 return 'AND_ASSIGN';
 "|="                                 return 'OR_ASSIGN';
@@ -51,9 +52,6 @@ E  [eE][-+]?{D}+
 ">>="                                return 'RIGHT_ASSIGN';
 "<<="                                return 'LEFT_ASSIGN';
 
-"typeof"                             return 'TYPEOF';
-"!"                                  return 'NOT_OP';
-"not"                                return 'NOT_OP';
 "and"                                return 'AND_OP';
 "&&"                                 return 'AND_OP';
 "or"                                 return 'OR_OP';
@@ -61,7 +59,7 @@ E  [eE][-+]?{D}+
 [-+*%/&|^\?]                         return yytext;
 ">>"                                 return 'RIGHT_OP';
 "<<"                                 return 'LEFT_OP';
-"!="                                 return 'NEQ_OP';
+"!="                                 return 'NE_OP';
 "<="                                 return 'LE_OP';
 "<"                                  return 'LT_OP';
 ">="                                 return 'GE_OP';
@@ -70,6 +68,9 @@ E  [eE][-+]?{D}+
 "..."                                return 'RANGE_EXCL';
 ".."                                 return 'RANGE_INCL';
 [()=;,\.:\[\]\{\}]                   return yytext;
+"typeof"                             return 'TYPEOF';
+"!"                                  return 'NOT_OP';
+"not"                                return 'NOT_OP';
 
 {L}({L}|{D})*                        return 'IDENTIFIER';
 
