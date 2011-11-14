@@ -3,6 +3,6 @@ parser:
 
 all: parser
 
-test: test/*
-	node test/all.js
+test:
+	cd test && node all.js `find * -iname "*_test.js"`
 

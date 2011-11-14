@@ -242,7 +242,7 @@ Expression
     ;
 
 Array
-    : '[' ']'                                           { $$ = new T.Array(); }
+    : '[' OptLF ']'                                     { $$ = new T.Array(); }
     | '[' OptLF DeclarationList OptLF ']'               { $$ = new T.Array($3); }
     | '[' OptLF DeclarationList ',' OptLF ']'           { $$ = new T.Array($3); }
     | '[' OptLF DeclarationList LF ',' OptLF ']'        { $$ = new T.Array($3); }
@@ -257,7 +257,7 @@ DeclarationList
     ;
 
 Object
-    : '{' '}'                                           { $$ = new T.Object(); }
+    : '{' OptLF '}'                                     { $$ = new T.Object(); }
     | '{' OptLF ObjectDeclarationList OptLF '}'         { $$ = new T.Object($3); }
     | '{' OptLF ObjectDeclarationList ',' OptLF '}'     { $$ = new T.Object($3); }
     | '{' OptLF ObjectDeclarationList LF ',' OptLF '}'  { $$ = new T.Object($3); }
