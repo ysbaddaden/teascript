@@ -287,6 +287,7 @@ SelectionStatement
     | IF Expression Then Body ElsifStatement ElseStatement END      { $5.push($6); $$ = new T.IfStatement($2, $4, $5); }
     | UNLESS Expression Then END                                    { $$ = new T.UnlessStatement($2); }
     | UNLESS Expression Then Statement END                          { $$ = new T.UnlessStatement($2, new T.Body($4)); }
+    | UNLESS Expression Then Statement ElseStatement END            { $$ = new T.UnlessStatement($2, new T.Body($4), $5); }
     | UNLESS Expression Then Body END                               { $$ = new T.UnlessStatement($2, $4); }
     | UNLESS Expression Then Body ElseStatement END                 { $$ = new T.UnlessStatement($2, $4, $5); }
     | Statement IF Expression                                       { $$ = new T.IfStatement($3, new T.Body($1)); }

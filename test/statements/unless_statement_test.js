@@ -35,6 +35,24 @@ exports.testUnlessModifier = function () {
     T.toJavaScript("x = true unless y unless !z"));
 }
 
+exports.testElseStatement = function () {
+  assert.equal("var x, y;\n" +
+    "if (!(y === true)) {\n" +
+    "    x = false;\n" +
+    "} else {\n" +
+    "    x = true;\n" +
+    "}",
+    T.toJavaScript("unless y == true then x = false else x = true end"));
+  
+  assert.equal("var x, y;\n" +
+    "if (!(y === true)) {\n" +
+    "    x = false;\n" +
+    "} else {\n" +
+    "    x = true;\n" +
+    "}",
+    T.toJavaScript("unless y == true\n  x = false\nelse\nx = true\nend"));
+}
+
 if (module === require.main) {
   require("../test").run(exports);
 }
