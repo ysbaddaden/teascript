@@ -276,28 +276,33 @@ ObjectDeclaration
     ;
 
 SelectionStatement
-    : IF Expression Then END                                    { $$ = new T.IfStatement($2); }
-    | IF Expression Then Statement END                          { $$ = new T.IfStatement($2, new T.Body($4)); }
-    | IF Expression Then Body END                               { $$ = new T.IfStatement($2, $4); }
-    | IF Expression Then Body ElseStatement END                 { $$ = new T.IfStatement($2, $4, [ $5 ]); }
-    | IF Expression Then Body ElsifStatement END                { $$ = new T.IfStatement($2, $4, $5); }
-    | IF Expression Then Body ElsifStatement ElseStatement END  { $5.push($6); $$ = new T.IfStatement($2, $4, $5); }
-    | UNLESS Expression Then END                                { $$ = new T.UnlessStatement($2); }
-    | UNLESS Expression Then Statement END                      { $$ = new T.UnlessStatement($2, new T.Body($4)); }
-    | UNLESS Expression Then Body END                           { $$ = new T.UnlessStatement($2, $4); }
-    | UNLESS Expression Then Body ElseStatement END             { $$ = new T.UnlessStatement($2, $4, $5); }
-    | Statement IF Expression                                   { $$ = new T.IfStatement($3, new T.Body($1)); }
-    | Statement UNLESS Expression                               { $$ = new T.UnlessStatement($3, new T.Body($1)); }
-    | CASE Expression Terminator WhenStatement END              { $$ = new T.CaseStatement($2, $4); }
+    : IF Expression Then END                                        { $$ = new T.IfStatement($2); }
+    | IF Expression Then Statement END                              { $$ = new T.IfStatement($2, new T.Body($4)); }
+    | IF Expression Then Statement ElseStatement END                { $$ = new T.IfStatement($2, new T.Body($4), [ $5 ]); }
+    | IF Expression Then Statement ElsifStatement END               { $$ = new T.IfStatement($2, new T.Body($4), $5); }
+    | IF Expression Then Statement ElsifStatement ElseStatement END { $5.push($6); $$ = new T.IfStatement($2, $4, $5); }
+    | IF Expression Then Body END                                   { $$ = new T.IfStatement($2, $4); }
+    | IF Expression Then Body ElseStatement END                     { $$ = new T.IfStatement($2, $4, [ $5 ]); }
+    | IF Expression Then Body ElsifStatement END                    { $$ = new T.IfStatement($2, $4, $5); }
+    | IF Expression Then Body ElsifStatement ElseStatement END      { $5.push($6); $$ = new T.IfStatement($2, $4, $5); }
+    | UNLESS Expression Then END                                    { $$ = new T.UnlessStatement($2); }
+    | UNLESS Expression Then Statement END                          { $$ = new T.UnlessStatement($2, new T.Body($4)); }
+    | UNLESS Expression Then Body END                               { $$ = new T.UnlessStatement($2, $4); }
+    | UNLESS Expression Then Body ElseStatement END                 { $$ = new T.UnlessStatement($2, $4, $5); }
+    | Statement IF Expression                                       { $$ = new T.IfStatement($3, new T.Body($1)); }
+    | Statement UNLESS Expression                                   { $$ = new T.UnlessStatement($3, new T.Body($1)); }
+    | CASE Expression Terminator WhenStatement END                  { $$ = new T.CaseStatement($2, $4); }
     ;
 
 ElsifStatement
     : ELSIF Expression Then Body                        { $$ = [ new T.ElsifStatement($2, $4) ]; }
+    | ELSIF Expression Then Statement                   { $$ = [ new T.ElsifStatement($2, new T.Body($4)) ]; }
     | ElsifStatement ELSIF Expression Then Body         { $1.push(new T.ElsifStatement($3, $5)); $$ = $1; }
     ;
 
 ElseStatement
     : ELSE Body                                         { $$ = new T.ElseStatement($2); }
+    | ELSE Statement                                    { $$ = new T.ElseStatement(new T.Body($2)); }
     ;
 
 WhenStatement
