@@ -95,7 +95,7 @@ Identifier
     ;
 
 PrimaryExpression
-    : Identifier                      { $$ = $1 }
+    : Identifier                      { $$ = $1; }
     | NULL                            { $$ = new T.Keyword("null"); }
     | BOOLEAN                         { $$ = new T.Keyword($1); }
     | NUMBER                          { $$ = new T.Number($1); }
