@@ -10,6 +10,11 @@ var T = require("../../lib/tea");
   }
 });
 
+exports.testAssignmentChaining = function () {
+  assert.equal("var a, b, c, d;\na = b = c = d * 4 + 3;", T.toJavaScript("a = b = c = d * 4 + 3"));
+  assert.equal("var a, b, c, d;\na = b = c = d * 4 + 3;", T.toJavaScript("a =\nb =\nc =\nd * 4 +\n3"));
+}
+
 if (module === require.main) {
   require("../test").run(exports);
 }
