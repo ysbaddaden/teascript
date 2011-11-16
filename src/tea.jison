@@ -292,6 +292,7 @@ SelectionStatement
     | UNLESS Expression Then Body ElseStatement END                 { $$ = new T.UnlessStatement($2, $4, $5); }
     | Statement IF Expression                                       { $$ = new T.IfStatement($3, new T.Body($1)); }
     | Statement UNLESS Expression                                   { $$ = new T.UnlessStatement($3, new T.Body($1)); }
+    | CASE Expression Terminator END                                { $$ = new T.CaseStatement($2); }
     | CASE Expression Terminator WhenStatement END                  { $$ = new T.CaseStatement($2, $4); }
     ;
 
