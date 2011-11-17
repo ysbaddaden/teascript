@@ -6,7 +6,23 @@ exports.testEmptyCaseStatement = function () {
   assert.equal("switch (true) {\n}", T.toJavaScript("case true;end"));
 }
 
-exports.testElseCaseStatement = function () {
+exports.testCaseStatement = function () {
+  assert.equal("var x;\n" +
+    "switch (true) {\n" +
+    "case 1:\n" +
+    "    x = false;\n" +
+    "    break;\n" +
+    "}",
+    T.toJavaScript("case true\nwhen 1 then x = false\nend"));
+  
+  assert.equal("var x;\n" +
+    "switch (true) {\n" +
+    "case 1:\n" +
+    "    x = false;\n" +
+    "    break;\n" +
+    "}",
+    T.toJavaScript("case true\nwhen 1\nx = false\nend"));
+  
   assert.equal("var x;\n" +
     "switch (true) {\n" +
     "default:\n" +
