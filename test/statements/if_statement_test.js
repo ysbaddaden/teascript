@@ -2,10 +2,10 @@ var assert = require("assert");
 var T = require("../../lib/tea");
 
 exports.testEmptyIfStatement = function () {
-  assert.equal("if (true) {\n\n}", T.toJavaScript("if true then end"));
-  assert.equal("if (true) {\n\n}", T.toJavaScript("if true\nend"));
-  assert.equal("var x, y;\nif (x === y) {\n\n}", T.toJavaScript("if x == y then\nend"));
-}
+  assert.equal("if (true) {}", T.toJavaScript("if true then end"));
+  assert.equal("if (true) {}", T.toJavaScript("if true\nend"));
+  assert.equal("var x, y;\nif (x === y) {}", T.toJavaScript("if x == y then\nend"));
+};
 
 exports.testIfStatement = function () {
   assert.equal("var x, y;\nif (true) {\n    x = !y;\n}",
@@ -17,7 +17,7 @@ exports.testIfStatement = function () {
     "    y = x;\n" +
     "}",
     T.toJavaScript("if true\nx = !y\ny = x\nend"));
-}
+};
 
 exports.testIfModifier = function () {
   assert.equal("var x, y;\n" +
@@ -33,7 +33,7 @@ exports.testIfModifier = function () {
     "    }\n" +
     "}",
     T.toJavaScript("x = true if y if !z"));
-}
+};
 
 exports.testElseStatement = function () {
   assert.equal("var x, y;\n" +
@@ -61,7 +61,7 @@ exports.testElseStatement = function () {
     "    x = true;\n" +
     "}",
     T.toJavaScript("if y == true\n  x = false\nelsif !y\na = b\nelse\nx = true\nend"));
-}
+};
 
 exports.testElsifStatement = function () {
   assert.equal("var x, y;\n" +
@@ -79,7 +79,7 @@ exports.testElsifStatement = function () {
     "    x = true;\n" +
     "}",
     T.toJavaScript("if y == true\n  x = false\nelsif !y\nx = true\nend"));
-}
+};
 
 if (module === require.main) {
   require("../test").run(exports);

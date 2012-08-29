@@ -2,8 +2,8 @@ var assert = require("assert");
 var T = require("../../lib/tea");
 
 exports.testEmptyLoopStatement = function () {
-  assert.equal("while (true) {\n\n}", T.toJavaScript("loop do\nend"));
-  assert.equal("while (true) {\n\n}", T.toJavaScript("loop do;end"));
+  assert.equal("while (true) {}", T.toJavaScript("loop do\nend"));
+  assert.equal("while (true) {}", T.toJavaScript("loop do;end"));
 }
 
 exports.testLoopStatement = function () {

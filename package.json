@@ -1,0 +1,24 @@
+{
+  "name": "teascript",
+  "description": "Another language that compiles down to JavaScript.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Julien Portalier",
+    "email": "julien@portalier.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ysbaddaden/teascript.git"
+  },
+  "main": "lib/tea",
+  "bin": {
+    "teascript": "lib/teascript.js"
+  },
+  "dependencies": {
+    "jison":       "0.3.x",
+    "js-beautify": "0.2.x"
+  },
+  "devDependencies": {
+  },
+  "engine": "node >= 0.4.0"
+}

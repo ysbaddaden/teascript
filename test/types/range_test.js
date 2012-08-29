@@ -2,7 +2,7 @@ var assert = require("assert");
 var T = require("../../lib/tea");
 
 exports.testExclusiveSlice = function () {
-  assert.equal("Array.prototype.slice.call([ 1, 2, 3 ], 1, 4);",
+  assert.equal("Array.prototype.slice.call([1, 2, 3], 1, 4);",
     T.toJavaScript("[1, 2, 3][1...4]"));
   
   assert.equal("var ary;\nArray.prototype.slice.call(ary, 0, 4);",
@@ -13,7 +13,7 @@ exports.testExclusiveSlice = function () {
 };
 
 exports.testInclusiveSlice = function () {
-  assert.equal("Array.prototype.slice.call([ 1, 2, 3 ], 1, 5);",
+  assert.equal("Array.prototype.slice.call([1, 2, 3], 1, 5);",
     T.toJavaScript("[1, 2, 3][1..4]"));
   
   assert.equal("var ary;\nArray.prototype.slice.call(ary, 0, 5);",

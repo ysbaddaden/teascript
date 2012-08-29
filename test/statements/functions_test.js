@@ -2,15 +2,15 @@ var assert = require("assert");
 var T = require("../../lib/tea");
 
 exports.testEmptyFunctionStatement = function () {
-  assert.equal("function fn() {\n}", T.toJavaScript("def fn\nend"));
-  assert.equal("function fn() {\n}", T.toJavaScript("def fn()\nend"));
-  assert.equal("function test(a) {\n}", T.toJavaScript("def test(a);end"));
+  assert.equal("function fn() {}", T.toJavaScript("def fn\nend"));
+  assert.equal("function fn() {}", T.toJavaScript("def fn()\nend"));
+  assert.equal("function test(a) {}", T.toJavaScript("def test(a);end"));
 };
 
 exports.testArguments = function () {
-  assert.equal("function test(a) {\n}", T.toJavaScript("def test(a);end"));
-  assert.equal("function test(b) {\n}", T.toJavaScript("def test b;end"));
-  assert.equal("function test(a, b, c, d) {\n}", T.toJavaScript("def test a, b, c, d;end"));
+  assert.equal("function test(a) {}", T.toJavaScript("def test(a);end"));
+  assert.equal("function test(b) {}", T.toJavaScript("def test b;end"));
+  assert.equal("function test(a, b, c, d) {}", T.toJavaScript("def test a, b, c, d;end"));
 };
 
 exports.testDefaultArguments = function () {
@@ -60,72 +60,72 @@ exports.testSplatArguments = function () {
 };
 
 exports.testEmptyLambda = function () {
-  assert.equal("function () {\n}", T.toJavaScript("->() {}"));
-  assert.equal("function () {\n}", T.toJavaScript("->()\n{\n}"));
-  assert.equal("function () {\n}", T.toJavaScript("-> () {}"));
-  assert.equal("function () {\n}", T.toJavaScript("-> ()\n{\n}"));
-  assert.equal("function () {\n}", T.toJavaScript("-> {}"));
-  assert.equal("function () {\n}", T.toJavaScript("->\n{\n}"));
+  assert.equal("var l;\nl = function () {};", T.toJavaScript("l = ->() {}"));
+  assert.equal("var l;\nl = function () {};", T.toJavaScript("l = ->()\n{\n}"));
+  assert.equal("var l;\nl = function () {};", T.toJavaScript("l = -> () {}"));
+  assert.equal("var l;\nl = function () {};", T.toJavaScript("l = -> ()\n{\n}"));
+  assert.equal("var l;\nl = function () {};", T.toJavaScript("l = -> {}"));
+  assert.equal("var l;\nl = function () {};", T.toJavaScript("l = ->\n{\n}"));
 };
 
 exports.testEmptyLambdaWithArguments = function () {
-  assert.equal('function (a, b, c, d) {\n}',
+  assert.equal('function (a, b, c, d) {};',
                T.toJavaScript('->(a, b, c, d) {\n}'));
 
   assert.equal('function () {\n' +
                '    var emails = Array.prototype.slice.call(arguments, 0) || [];\n' +
-               '}',
+               '};',
                T.toJavaScript('->(*emails) {\n}'));
 };
 
 exports.testLambdaWithStatement = function () {
   assert.equal('function () {\n' +
                '    return "something";\n' +
-               '}',
+               '};',
                T.toJavaScript('-> { return "something"; }')
   );
   assert.equal('function () {\n' +
                '    return "something";\n' +
-               '}',
+               '};',
                T.toJavaScript('->(\n) { return "something"; }')
   );
   assert.equal('function (x, y) {\n' +
                '    return x + y;\n' +
-               '}',
+               '};',
                T.toJavaScript('->(x, y) { return x + y; }')
   );
 };
 
 exports.testLambdaWithBody = function () {
   assert.equal('var obj;\n' +
-               'obj = require("graphics");\n' +
+               'obj = require("graphics");\n\n' +
                'function () {\n' +
                '    var x, y;\n' +
                '    x = obj.getX();\n' +
                '    y = obj.getY();\n' +
                '    return x + y;\n' +
-               '}',
+               '};',
                T.toJavaScript('obj = require("graphics")\n' +
                               '-> {\n  x = obj.getX()\n  y = obj.getY()\n  return x + y\n}')
   );
   assert.equal('var obj;\n' +
-               'obj = require("graphics");\n' +
+               'obj = require("graphics");\n\n' +
                'function () {\n' +
                '    var x, y;\n' +
                '    x = obj.getX();\n' +
                '    y = obj.getY();\n' +
                '    return x + y;\n' +
-               '}',
+               '};',
                T.toJavaScript('obj = require("graphics")\n' +
                               '->() {\n  x = obj.getX()\n  y = obj.getY()\n  return x + y\n}')
   );
   assert.equal('var obj;\n' +
-               'obj = require("graphics");\n' +
+               'obj = require("graphics");\n\n' +
                'function (x) {\n' +
                '    var y;\n' +
                '    y = obj.getY();\n' +
                '    return x + y;\n' +
-               '}',
+               '};',
                T.toJavaScript('obj = require("graphics")\n' +
                               '->(x) {\n  y = obj.getY()\n  return x + y\n}')
   );

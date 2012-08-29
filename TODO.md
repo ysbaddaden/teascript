@@ -1,5 +1,8 @@
 # TODO
 
+- write tests for function calls;
+- support lambdas in function calls (like in Ruby : the last argument ?);
+
 ## Ranges
 
 ## FOR
