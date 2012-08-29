@@ -45,6 +45,7 @@ TerminatedStatement
 
 Statement
     : FunctionStatement                      { $$ = $1; }
+    | LambdaStatement                        { $$ = $1; }
     | Expression                             { $$ = new T.Expression($1); }
     | SelectionStatement                     { $$ = $1; }
     | IterationStatement                     { $$ = $1; }
@@ -57,6 +58,36 @@ FunctionStatement
     }
     | DEF Identifier ArgumentDeclaration Body END {
         $$ = new T.Function($2, $3, $4);
+    }
+    ;
+
+LambdaStatement
+    : ARROW OptLF '{' '}' {
+        $$ = new T.Function(null, [], new T.Body());
+    }
+    | ARROW OptLF '{' Body '}' {
+        $$ = new T.Function(null, [], $4);
+    }
+    | ARROW OptLF '{' Statement '}' {
+        $$ = new T.Function(null, [], new T.Body($4));
+    }
+    | ARROW '(' OptLF ')' OptLF '{' '}' {
+        $$ = new T.Function(null, [], new T.Body());
+    }
+    | ARROW '(' OptLF ')' OptLF '{' Body '}' {
+        $$ = new T.Function(null, [], $7);
+    }
+    | ARROW '(' OptLF ')' OptLF '{' Statement '}' {
+        $$ = new T.Function(null, [], new T.Body($7));
+    }
+    | ARROW '(' OptLF ArgumentList OptLF ')' OptLF '{' '}' {
+        $$ = new T.Function(null, $4, new T.Body());
+    }
+    | ARROW '(' OptLF ArgumentList OptLF ')' OptLF '{' Body '}' {
+        $$ = new T.Function(null, $4, $9);
+    }
+    | ARROW '(' OptLF ArgumentList OptLF ')' OptLF '{' Statement '}' {
+        $$ = new T.Function(null, $4, new T.Body($9));
     }
     ;
 

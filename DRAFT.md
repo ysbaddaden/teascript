@@ -10,7 +10,7 @@ Definitions:
     ->[(<arguments>)] {                        |     function (arg1, arg2, ..., argN) {
       <statements>                             |     }
     }                                          | 
-    
+
     -> &<expression>                           |     function (x) {
                                                |       return x.expression;
                                                |     }

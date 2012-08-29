@@ -40,6 +40,7 @@ E  [eE][-+]?{D}+
 "next"                               return 'CONTINUE';
 "continue"                           return 'CONTINUE';
 
+"->"                                 return 'ARROW';
 "+="                                 return 'ADD_ASSIGN';
 "-="                                 return 'SUB_ASSIGN';
 "*="                                 return 'MUL_ASSIGN';
