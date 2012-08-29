@@ -1,3 +1,6 @@
+.PHONY: test
+.IGNORE: test
+
 parser:
 	jison src/tea.jison src/tea.jisonlex -o lib/parser.js
 

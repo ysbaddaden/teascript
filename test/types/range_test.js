@@ -10,7 +10,7 @@ exports.testExclusiveSlice = function () {
   
   assert.equal("var ary;\nArray.prototype.slice.call(ary, 3, ary.length);",
     T.toJavaScript("ary[3...ary.length]"));
-}
+};
 
 exports.testInclusiveSlice = function () {
   assert.equal("Array.prototype.slice.call([ 1, 2, 3 ], 1, 5);",
@@ -21,7 +21,7 @@ exports.testInclusiveSlice = function () {
   
   assert.equal("var ary;\nArray.prototype.slice.call(ary, ary[0], ary.length + 1);",
     T.toJavaScript("ary[ary[0]..ary.length]"));
-}
+};
 
 if (module === require.main) {
   require("../test").run(exports);
