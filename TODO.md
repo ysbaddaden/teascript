@@ -2,26 +2,15 @@
 
 ## Ranges
 
-### Array slice: [DONE]
-
-    <enumerable>[<expression>..<expression>]
-
-Example:
-
-    ary = buildSomeArray();
-    ary[1...4]             # =>  Array.prototype.slice.call(ary, 1, 4);
-    
-    $("#tags li")[2..5]    # =>  Array.prototype.slice.call($("#tags li"), 2, 6);
-
 ## FOR
 
 ### Iterating within a range:
 
     for <value> in <range> [do]
-      <statements>
+      [statements]
     end
     
-    statement for <value> in <range>
+    <statement> for <value> in <range>
 
 Examples:
 
@@ -33,25 +22,50 @@ Examples:
 
 ### Iterating arrays
 
-    for <value> in [0...<array>.length] [do]
-      <statements>
+    for <value> in <array> [do]
+      [statements]
     end
 
+    # using a lambda:
     <array>.forEach ->(item) {
-      <statements>
+      [statements]
     }
 
 Examples:
 
-    for i in [0...10] do                    # => for (i = 0; i < 10; i++) {
+    for item in ary do                      # => for (__r1 = 0; __r1 < ary.length; __r1++) {
+    end                                            item = ary[__r1];
+                                                 }
+
+    ary.forEach ->(item) {                  # => ary.forEach(function (item) {
+    }                                            });
+
+### Iterating objects
+
+    for [own] <key>, [value] in <object> [do]
+      [statements]
+    end
+
+Examples:
+
+    for key, value in hash do               # => for (key in hash) {
+    end                                            value = hash[key];
+                                                 }
+
+    for own name, type in columns           # => for (name in columns) {
+    end                                            if (columns.hasOwnProperty(key)) {
+                                                     type = columns[name];
+                                                   }
+                                                 }
+
+    for name, in columns                    # => for (name in columns) {
     end                                          }
 
-    for i in [0...ary.length] do            # => for (i = 0; i < ary.length; i++) {
-      value = ary[i]                               value = ary[i];
-    end                                          }
+    for own name, in columns                # => for (name in columns) {
+    end                                            if (columns.hasOwnProperty(name)) {
+                                                   }
+                                                 }
 
-    ary.forEach ->(item) do                 # => ary.forEach(function (item) {
-    end                                          });
 
 ## Methods
 
@@ -71,34 +85,39 @@ Examples:
         end                       |       }
       end                         |     }
 
-## Anonymous methods
+## Lambdas (anonymous methods)
 
 - regular:
 
-      m1() ->                     |     m1(function () {
-      end                         |     });
+      m1() -> {                   |     m1(function () {
+      }                           |     });
                                   |
-      a.forEach -> |item|         |     a.forEach(function (item) {
-      end                         |     });
+      a.forEach ->(item) {        |     a.forEach(function (item) {
+      }                           |     });
                                   |
-      m2(a, b) -> |x, y|          |     m2(a, b, function (x, y) {
-      end                         |     });
+      m2(a, b) ->(x, y) {         |     m2(a, b, function (x, y) {
+      }                           |     });
                                   |
-      elm.on('click') -> |e|      |     elm.on('click', function (event) {
-        e.preventDefault()        |       e.preventDefault();
-      end                         |     });
+      elm.on('click') ->(e) {     |     elm.on('click', function (e) {
+        e.preventDefault()        |       return e.preventDefault();
+      }                           |     });
+
+      elm.on 'click', ->(e) {
+        e.preventDefault();
+        // ...
+      }
 
 - inline:
 
-      elm.click -> |e| e.stop()   |     elm.click(function (e) {
-                                  |       e.stop();
+      elm.click ->(e) e.stop()    |     elm.click(function (e) {
+                                  |       return e.stop();
                                   |     });
                                   |
       elm.on('click') -> cb()     |     elm.on('click', function () {
-                                  |       cb();
+                                  |       return cb();
                                   |     });
                                   |
-      ary.map -> &toString        |     ary.map(function (x) {
-                                  |       return x.toString();
+      ary.map -> &toString        |     ary.map(function (__r1) {
+                                  |       return __r1.toString();
                                   |     });
 
