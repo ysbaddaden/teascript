@@ -346,9 +346,12 @@ WhenStatement
     ;
 
 IterationStatement
-    : WHILE Expression Do Body END                      { $$ = new T.WhileStatement($2, $4); }
+    : WHILE Expression Do END                           { $$ = new T.WhileStatement($2, new T.Body()); }
+    | WHILE Expression Do Body END                      { $$ = new T.WhileStatement($2, $4); }
+    | UNTIL Expression Do END                           { $$ = new T.UntilStatement($2, new T.Body()); }
     | UNTIL Expression Do Body END                      { $$ = new T.UntilStatement($2, $4); }
     | FOR Identifier IN '[' Range ']' Do Body END       { $$ = new T.ForStatement($2, $5, $8); }
+    | FOR Identifier IN '[' Range ']' Do END            { $$ = new T.ForStatement($2, $5, new T.Body()); }
     | LOOP Do Body END                                  { $$ = new T.LoopStatement($3); }
     | Statement WHILE Expression                        { $$ = new T.WhileStatement($3, new T.Body($1)); }
     | Statement UNTIL Expression                        { $$ = new T.UntilStatement($3, new T.Body($1)); }
