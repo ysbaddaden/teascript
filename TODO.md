@@ -5,24 +5,6 @@
 
 ## Ranges
 
-## FOR
-
-### Iterating within a range:
-
-    for <value> in <range> [do]
-      [statements]
-    end
-    
-    <statement> for <value> in <range>
-
-Examples:
-
-    for i in [0...10] do                    # => for (i = 0; i < 10; i++) {
-    end                                          }
-
-    for i in [145..9815]                    # => for (i = 145; i <= 9815; i++) {
-    end                                          }
-
 ### Iterating arrays
 
     for <value> in <array> [do]

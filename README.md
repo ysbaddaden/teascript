@@ -132,6 +132,29 @@ Please note you may exit any iteration at will with the `break` keyword.
       <statements>
     end
 
+#### FOR
+
+Iterating within a range:
+
+    for <identifier> in <range> [do]
+      <statements>
+    end
+
+    <statement> for <identifier> in <range>
+
+Examples:
+
+    j += Math.pow(i) for i in [0...100]
+
+    for i in [0..ary.length]
+      item = ary[i]
+    end
+
+    for i in [ary.length..0]
+      item = ary[i]
+    end
+
+
 ### Functions
 
 Definition:
