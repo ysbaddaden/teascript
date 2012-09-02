@@ -11,7 +11,7 @@ exports.testLoopStatement = function () {
     "    doSomething();\n" +
     "}", T.toJavaScript("loop\ndoSomething()\nend"));
   
-  assert.equal("var x;\n" +
+  assert.equal(
     "while (true) {\n" +
     "    if (x > 1) {\n" +
     "        break;\n" +

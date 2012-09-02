@@ -8,8 +8,8 @@ exports.testEmptyDeclaration = function () {
 
 exports.testDeclaration = function () {
   assert.equal("{\n    a: 1,\n    b: 2\n};", T.toJavaScript("{a:1,b:2}"));
-  assert.equal("var a, b; {\n    (a + b): 1,\n    c: 2\n};", T.toJavaScript("{(a+b):1,c:2}"));
-  assert.equal("var c; {\n    x: c.x,\n    y: c.y,\n    z: c.z\n};",
+  assert.equal("{\n    (a + b): 1,\n    c: 2\n};", T.toJavaScript("{(a+b):1,c:2}"));
+  assert.equal("{\n    x: c.x,\n    y: c.y,\n    z: c.z\n};",
     T.toJavaScript(" { \nx:\n c.x,\n y:\n c.y\n,\n z:\n c.z\n } "));
 };
 

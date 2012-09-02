@@ -12,7 +12,7 @@ exports.testArrayDeclaration = function () {
   assert.equal("[1 + 4.51, 2 - 45 / 2, 3];",
     T.toJavaScript("[1 + 4.51,2 - 45 / 2,   3]"));
   
-  assert.equal("var coords;\n[coords.x(), coords.y()];",
+  assert.equal("[coords.x(), coords.y()];",
     T.toJavaScript("[coords.x(), coords.y()]"));
   
   assert.equal("var matrix;\nmatrix = [\n    [1, 2, 3],\n    [4, 5, 6],\n    [7, 8, 9]\n];",
@@ -26,10 +26,10 @@ exports.testArrayDeclaration = function () {
 };
 
 exports.testOptionalLinefeedsAndLeadingComma = function () {
-  assert.equal("var a;\n[0, a, 2];",
+  assert.equal("[0, a, 2];",
     T.toJavaScript(" [ 0 \n, a\n,\n    2\n ] "));
   
-  assert.equal("var a, azeazuey, b;\n[a, b, azeazuey];",
+  assert.equal("[a, b, azeazuey];",
     T.toJavaScript(" [ a, b, azeazuey, \n ] "));
 };
 

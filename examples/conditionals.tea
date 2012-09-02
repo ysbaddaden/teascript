@@ -1,4 +1,4 @@
-if type == 'boolean'
+if type == 'boolean' then
   a = 1
   b = 2
 end
@@ -40,10 +40,10 @@ when 2
   e = c
 end
 
-case bool
-else
-  other_bool = true
-end
+# case bool
+# else
+#   other_bool = true
+# end
 
 case bool
 when true, 1 then other_bool = false
@@ -53,3 +53,6 @@ end unless false
 a = a ? b : c
 a = (a == 2) ? a + 45 : a + 67
 
+rs = test ?
+  "first" :
+  "second"

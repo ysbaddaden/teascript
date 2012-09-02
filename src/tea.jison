@@ -1,401 +1,279 @@
-%token LF EOF
-%token CONSTANT STRING IDENTIFIER
-%token EQ_OP NE_OP LT_OP LE_OP GT_OP GE_OP AND_OP OR_OP
-%token DEF THEN DO END
-%token IF UNLESS ELSE ELSEIF
-%token WHILE UNTIL LOOP BREAK CONTINUE
+%right and or not typeof instanceof
+%right '=' OP_ASGN
+%right '..' '...'
+%left  '+' '-' '|' '^' '&'
+%right '*' '/' '%'
+%left  '>' '>=' '<' '<=' '==' '!='
+%right '<<' '>>'
+%left  '&&' '||'
+%left  '?' ':'
 
-//%right '=' ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN MOD_ASSIGN AND_ASSIGN OR_ASSIGN XOR_ASSIGN
-//%left  '+' '-' '*' '/' '%'
-//%left  '&' '|' '^'
-//%right EQ_OP NE_OP LT_OP LE_OP GT_OP GE_OP AND_OP OR_OP NOT_OP
-//%right TYPEOF
-
-%start Program
+%start PROGRAM
 
 %%
 
-Program
-    : Body EOF  {
-        return new T.Program($1);
-    }
+PROGRAM
+    : COMPSTMT EOF    { return new T.Program($1); }
     ;
 
-Body
-    : TerminatedStatement {
+ASTMT
+    : STMT            { $$ = new T.Body($1); }
+    | COMPSTMT        -> $1
+    | COMPSTMT STMT   {
+        if (typeof $2 !== "string") {
+          $1.push($2);
+        }
+        $$ = $1;
+    }
+    |                 { $$ = new T.Body(); }
+    ;
+
+COMPSTMT
+    : TSTMT           {
         $$ = new T.Body();
         if (typeof $1 !== "string") {
             $$.push($1);
         }
     }
-    | Body TerminatedStatement {
+    | COMPSTMT TSTMT  {
         if (typeof $2 !== "string") {
-            $1.push($2);
-//        } else if ($1.length && $1[$1.length - 1][0] !== "linefeed" ) {
-//            $$.push([ "linefeed" ]);
+          $1.push($2);
         }
         $$ = $1;
     }
     ;
 
-TerminatedStatement
-    : Terminator
-    | Statement Terminator                   { $$ = $1; }
+TSTMT
+    : LF
+    | STMT LF          -> $1
     ;
 
-Statement
-    : FunctionStatement                      { $$ = $1; }
-    | Expression                             { $$ = new T.Expression($1); }
-    | SelectionStatement                     { $$ = $1; }
-    | IterationStatement                     { $$ = $1; }
-    | JumpStatement                          { $$ = $1; }
-    ;
-
-FunctionStatement
-    : DEF Identifier ArgumentDeclaration END {
-        $$ = new T.Function($2, $3);
+STMT
+    : STMT if EXPR {
+        $$ = new T.IfStatement($3, new T.Body($1));
     }
-    | DEF Identifier ArgumentDeclaration Body END {
+    | STMT unless EXPR {
+        $$ = new T.UnlessStatement($3, new T.Body($1));
+    }
+    | STMT while EXPR {
+        $$ = new T.WhileStatement($3, new T.Body($1));
+    }
+    | STMT until EXPR {
+        $$ = new T.UntilStatement($3, new T.Body($1));
+    }
+    | STMT for IDENTIFIER in EXPR {
+        $$ = new T.ForStatement($3, $5, new T.Body($1));
+    }
+    | if EXPR THEN ASTMT end {
+        $$ = new T.IfStatement($2, $4);
+    }
+    | if EXPR THEN ASTMT else ASTMT end {
+        $$ = new T.IfStatement($2, $4, [ new T.ElseStatement($6) ]);
+    }
+    | if EXPR THEN ASTMT ELSIF_STMT end {
+        $$ = new T.IfStatement($2, $4, $5);
+    }
+    | if EXPR THEN ASTMT ELSIF_STMT else ASTMT end {
+        $5.push(new T.ElseStatement($7));
+        $$ = new T.IfStatement($2, $4, $5);
+    }
+    | unless EXPR THEN ASTMT end {
+        $$ = new T.UnlessStatement($2, $4);
+    }
+    | unless EXPR THEN ASTMT else ASTMT end {
+        $$ = new T.UnlessStatement($2, $4, new T.ElseStatement($6));
+    }
+    | while EXPR DO ASTMT end {
+        $$ = new T.WhileStatement($2, $4);
+    }
+    | until EXPR DO ASTMT end {
+        $$ = new T.UntilStatement($2, $4);
+    }
+    | loop DO ASTMT end {
+        $$ = new T.LoopStatement($3);
+    }
+    | case EXPR WHEN_STMT end {
+        $$ = new T.CaseStatement($2, $3);
+    }
+    | case EXPR WHEN_STMT else ASTMT end {
+        $3.push(new T.ElseStatement($5));
+        $$ = new T.CaseStatement($2, $3);
+    }
+    | for IDENTIFIER in EXPR DO ASTMT end {
+        $$ = new T.ForStatement($2, $4, $6);
+    }
+    | def IDENTIFIER ARGDECL ASTMT end {
         $$ = new T.Function($2, $3, $4);
     }
+    | return       { $$ = new T.ReturnStatement(); }
+    | return EXPR  { $$ = new T.ReturnStatement($2); }
+    | break        { $$ = new T.Expression(new T.Keyword("break")); }
+    | continue     { $$ = new T.Expression(new T.Keyword("continue")); }
+    | EXPR         { $$ = new T.Expression($1); }
     ;
 
-ArgumentDeclaration
-    : '(' OptLF ')'                          { $$ = []; }
-    | '(' OptLF ArgumentList OptLF ')'       { $$ = $3; }
-    | ArgumentList Terminator                { $$ = $1; }
-    | Terminator                             { $$ = []; }
-    ;
-
-ArgumentList
-    : Arguments                              { $$ = $1; }
-    | Arguments ',' OptLF ArgumentSplat      { $1.push($4); $$ = $1; }
-    | ArgumentSplat                          { $$ = [ $1 ]; }
-    ;
-
-Arguments
-    : Identifier                             { $$ = [ $1 ]; }
-    | ArgumentAssignment                     { $$ = [ $1 ]; }
-    | Arguments ',' OptLF Identifier         { $1.push($4); $$ = $1; }
-    | Arguments ',' OptLF ArgumentAssignment { $1.push($4); $$ = $1; }
-    ;
-
-ArgumentSplat
-    : '*' Identifier                         { $$ = new T.Splat($2); }
-    ;
-
-ArgumentAssignment
-    : Identifier '=' OptLF PostfixExpression {
-        $$ = new T.Operation("=", $1, $4);
+ELSIF_STMT
+    : elsif EXPR THEN ASTMT {
+        $$ = [ new T.ElsifStatement($2, $4) ];
     }
-    ;
-
-Identifier
-    : IDENTIFIER                      { $$ = new T.Identifier($1); }
-    ;
-
-PrimaryExpression
-    : Identifier                      { $$ = $1; }
-    | NULL                            { $$ = new T.Keyword("null"); }
-    | BOOLEAN                         { $$ = new T.Keyword($1); }
-    | NUMBER                          { $$ = new T.Number($1); }
-    | CONSTANT                        { $$ = new T.Constant($1); }
-    | STRING                          { $$ = new T.String($1); }
-    | Array                           { $$ = $1; }
-    | Object                          { $$ = $1; }
-    | '(' OptLF Expression OptLF ')'  { $$ = new T.Paren($3); }
-    | LambdaExpression                { $$ = $1; }
-    ;
-
-LambdaExpression
-    : ARROW OptLF '{' '}' {
-        $$ = new T.Function(null, []);
-    }
-    | ARROW OptLF '{' Body '}' {
-        $$ = new T.Function(null, [], $4);
-    }
-    | ARROW OptLF '{' Statement '}' {
-        $$ = new T.Function(null, [], new T.Body($4));
-    }
-    | ARROW '(' OptLF ')' OptLF '{' '}' {
-        $$ = new T.Function(null, []);
-    }
-    | ARROW '(' OptLF ')' OptLF '{' Body '}' {
-        $$ = new T.Function(null, [], $7);
-    }
-    | ARROW '(' OptLF ')' OptLF '{' Statement '}' {
-        $$ = new T.Function(null, [], new T.Body($7));
-    }
-    | ARROW '(' OptLF ArgumentList OptLF ')' OptLF '{' '}' {
-        $$ = new T.Function(null, $4);
-    }
-    | ARROW '(' OptLF ArgumentList OptLF ')' OptLF '{' Body '}' {
-        $$ = new T.Function(null, $4, $9);
-    }
-    | ARROW '(' OptLF ArgumentList OptLF ')' OptLF '{' Statement '}' {
-        $$ = new T.Function(null, $4);
-    }
-    ;
-
-PostfixExpression
-    : PrimaryExpression {
-        $$ = $1;
-    }
-    | PostfixExpression '.' IDENTIFIER {
-        $$ = new T.Dot($1, $3);
-    }
-    | PostfixExpression '[' Index ']' {
-        $$ = new T.Index($1, $3);
-    }
-    | PostfixExpression '(' OptLF ')' {
-        $$ = new T.Call($1);
-    }
-    | PostfixExpression '(' OptLF ArgumentExpressionList OptLF ')' {
-        $$ = new T.Call($1, $4);
-    }
-    ;
-
-Index
-    : Expression OptLF           { $$ = $1; }
-    | LF Expression OptLF        { $$ = $2; }
-    | Range                      { $$ = $1; }
-    ;
-
-ArgumentExpressionList
-    : ArgumentExpression {
-        $$ = [ $1 ];
-    }
-    | ArgumentExpressionList OptLF ',' OptLF ArgumentExpression {
-        $1.push($5);
+    | ELSIF_STMT elsif EXPR THEN ASTMT {
+        $1.push(new T.ElsifStatement($2, $4));
         $$ = $1;
     }
     ;
 
-ArgumentExpression
-    : AssignmentExpression       { $$ = $1; }
-    | '*' ConditionalExpression  { $$ = new T.Splat($2); }
-    ;
-
-UnaryExpression
-    : PostfixExpression                                     { $$ = $1; }
-    | NOT_OP UnaryExpression                                { $$ = new T.UnaryExpression("!", $2); }
-    | TYPEOF UnaryExpression                                { $$ = new T.UnaryExpression("typeof", $2); }
-    ;
-
-MultiplicativeExpression
-    : UnaryExpression                                       { $$ = $1; }
-    | MultiplicativeExpression '*' OptLF UnaryExpression    { $$ = new T.Operation("*", $1, $4); }
-    | MultiplicativeExpression '/' OptLF UnaryExpression    { $$ = new T.Operation("/", $1, $4); }
-    | MultiplicativeExpression '%' OptLF UnaryExpression    { $$ = new T.Operation("%", $1, $4); }
-    ;
-
-AdditiveExpression
-    : MultiplicativeExpression                              { $$ = $1; }
-    | AdditiveExpression '+' OptLF MultiplicativeExpression { $$ = new T.Operation("+", $1, $4); }
-    | AdditiveExpression '-' OptLF MultiplicativeExpression { $$ = new T.Operation("-", $1, $4); }
-    ;
-
-ShiftExpression
-    : AdditiveExpression                                    { $$ = $1; }
-    | ShiftExpression LEFT_OP  OptLF AdditiveExpression     { $$ = new T.Operation("<<", $1, $4); }
-    | ShiftExpression RIGHT_OP OptLF AdditiveExpression     { $$ = new T.Operation(">>", $1, $4); }
-    ;
-
-RelationalExpression
-    : ShiftExpression                                       { $$ = $1; }
-    | RelationalExpression LT_OP OptLF ShiftExpression      { $$ = new T.Operation("<", $1, $4); }
-    | RelationalExpression GT_OP OptLF ShiftExpression      { $$ = new T.Operation(">", $1, $4); }
-    | RelationalExpression LE_OP OptLF ShiftExpression      { $$ = new T.Operation("<=", $1, $4); }
-    | RelationalExpression GE_OP OptLF ShiftExpression      { $$ = new T.Operation(">=", $1, $4); }
-    ;
-
-EqualityExpression
-    : RelationalExpression                                  { $$ = $1; }
-    | EqualityExpression EQ_OP OptLF RelationalExpression   { $$ = new T.Operation("===", $1, $4); }
-    | EqualityExpression NE_OP OptLF RelationalExpression   { $$ = new T.Operation("!==", $1, $4); }
-    ;
-
-AndExpression
-    : EqualityExpression                                    { $$ = $1; }
-    | AndExpression '&' OptLF EqualityExpression            { $$ = new T.Operation("&", $1, $4); }
-    ;
-
-ExclusiveOrExpression
-    : AndExpression                                         { $$ = $1; }
-    | ExclusiveOrExpression '^' OptLF AndExpression         { $$ = new T.Operation("^", $1, $4); }
-    ;
-
-InclusiveOrExpression
-    : ExclusiveOrExpression                                 { $$ = $1; }
-    | InclusiveOrExpression '|' OptLF ExclusiveOrExpression { $$ = new T.Operation("|", $1, $4); }
-    ;
-
-LogicalAndExpression
-    : InclusiveOrExpression                                 { $$ = $1; }
-    | LogicalAndExpression AND_OP OptLF InclusiveOrExpression { $$ = new T.Operation("&&", $1, $4); }
-    ;
-
-LogicalOrExpression
-    : LogicalAndExpression                                 { $$ = $1; }
-    | LogicalOrExpression OR_OP OptLF LogicalAndExpression { $$ = new T.Operation("||", $1, $4); }
-    ;
-
-ConditionalExpression
-    : LogicalOrExpression                                  { $$ = $1; }
-    | LogicalOrExpression '?' OptLF Expression OptLF ':' OptLF ConditionalExpression {
-        $$ = new T.Condition($1, $4, $8);
+WHEN_STMT
+    : when ARGS THEN ASTMT {
+        $$ = [ new T.WhenStatement($2, $4) ];
+    }
+    | LF when ARGS THEN ASTMT {
+        $$ = [ new T.WhenStatement($3, $5) ];
+    }
+    | WHEN_STMT when ARGS THEN ASTMT {
+        $1.push(new T.WhenStatement($3, $5));
+        $$ = $1;
     }
     ;
 
-AssignmentExpression
-    : ConditionalExpression                                { $$ = $1; }
-    | PostfixExpression AssignmentOperator OptLF AssignmentExpression {
-        $$ = new T.Operation($2, $1, $4);
+DO   : do   | LF do   | LF ;
+THEN : then | LF then | LF ;
+
+EXPR
+    : LHS '=' EXPR            { $$ = new T.Operation("=", $1, $3); }
+    | LHS '=' LAMBDA          { $$ = new T.Operation("=", $1, $3); }
+    | LHS OP_ASGN EXPR        { $$ = new T.Operation($2.replace(/\s+$/, ""), $1, $3); }
+    | EXPR '..' EXPR          { $$ = new T.Range("inclusive", $1, $3); }
+    | EXPR '...' EXPR         { $$ = new T.Range("exclusive", $1, $3); }
+    | EXPR '+' EXPR           { $$ = new T.Operation("+", $1, $3); }
+    | EXPR '-' EXPR           { $$ = new T.Operation("-", $1, $3); }
+    | EXPR '*' EXPR           { $$ = new T.Operation("*", $1, $3); }
+    | EXPR '/' EXPR           { $$ = new T.Operation("/", $1, $3); }
+    | EXPR '%' EXPR           { $$ = new T.Operation("%", $1, $3); }
+    | EXPR '|' EXPR           { $$ = new T.Operation("|", $1, $3); }
+    | EXPR '^' EXPR           { $$ = new T.Operation("^", $1, $3); }
+    | EXPR '&' EXPR           { $$ = new T.Operation("&", $1, $3); }
+    | EXPR '>' EXPR           { $$ = new T.Operation(">", $1, $3); }
+    | EXPR '>=' EXPR          { $$ = new T.Operation(">=", $1, $3); }
+    | EXPR '<' EXPR           { $$ = new T.Operation("<", $1, $3); }
+    | EXPR '<=' EXPR          { $$ = new T.Operation("<=", $1, $3); }
+    | EXPR '==' EXPR          { $$ = new T.Operation("===", $1, $3); }
+    | EXPR '!=' EXPR          { $$ = new T.Operation("!==", $1, $3); }
+    | EXPR '<<' EXPR          { $$ = new T.Operation("<<", $1, $3); }
+    | EXPR '>>' EXPR          { $$ = new T.Operation(">>", $1, $3); }
+    | EXPR and EXPR           { $$ = new T.Operation("&&", $1, $3); }
+    | EXPR or EXPR            { $$ = new T.Operation("||", $1, $3); }
+    | not EXPR                { $$ = new T.UnaryExpression("!", $2); }
+    | typeof EXPR             { $$ = new T.UnaryExpression("typeof", $2); }
+    | instanceof EXPR         { $$ = new T.UnaryExpression("instanceof", $2); }
+    | EXPR '?' EXPR ':' EXPR  { $$ = new T.Condition($1, $3, $5); }
+    | PRIMARY                 -> $1
+    ;
+
+PRIMARY
+    : '(' EXPR ')'              { $$ = new T.Paren($2); }
+    | LITERAL                   -> $1
+    | LHS                       -> $1
+    | '[' ']'                   { $$ = new T.Array(); }
+    | '[' ARGS ']'              { $$ = ($2[0] instanceof T.Range) ? $2[0] : new T.Array($2) ; }
+    | '[' ARGS ',' ']'          { $$ = ($2[0] instanceof T.Range) ? $2[0] : new T.Array($2) ; }
+    | '{' '}'                   { $$ = new T.Object() }
+    | '{' ASSOCS '}'            { $$ = new T.Object($2) }
+    | '{' ASSOCS ',' '}'        { $$ = new T.Object($2) }
+    | PRIMARY '(' CALL_ARGS ')' { $$ = new T.Call($1, $3); }
+    | PRIMARY LAMBDA            {
+        if ($1 instanceof T.Call) {
+            $1.pushArg($2);
+            $$ = $1;
+        } else {
+            $$ = new T.Call($1, [ $2 ]);
+        }
     }
     ;
 
-AssignmentOperator
-    : '='                   { $$ = $1; }
-    | MUL_ASSIGN            { $$ = $1; }
-    | DIV_ASSIGN            { $$ = $1; }
-    | MOD_ASSIGN            { $$ = $1; }
-    | ADD_ASSIGN            { $$ = $1; }
-    | SUB_ASSIGN            { $$ = $1; }
-    | LEFT_ASSIGN           { $$ = $1; }
-    | RIGHT_ASSIGN          { $$ = $1; }
-    | AND_ASSIGN            { $$ = $1; }
-    | XOR_ASSIGN            { $$ = $1; }
-    | OR_ASSIGN             { $$ = $1; }
+LAMBDA
+    : '->' '{' ASTMT '}'                   { $$ = new T.Function(null, [], $3); }
+    | '->' '(' CALL_ARGS ')' '{' ASTMT '}' { $$ = new T.Function(null, $3, $6); }
     ;
 
-Expression
-    : AssignmentExpression  { $$ = $1; }
+LHS
+    : VARIABLE                -> $1
+    | PRIMARY '[' EXPR ']'    { $$ = new T.Index($1, $3); }
+    | PRIMARY '.' IDENTIFIER  { $$ = new T.Dot($1, $3); }
+    ; 
+
+ARGDECL
+    : '(' ARGLIST ')'         -> $2
+    | ARGLIST LF              -> $1
     ;
 
-Array
-    : '[' OptLF ']'                                     { $$ = new T.Array(); }
-    | '[' OptLF DeclarationList OptLF ']'               { $$ = new T.Array($3); }
-    | '[' OptLF DeclarationList ',' OptLF ']'           { $$ = new T.Array($3); }
-    | '[' OptLF DeclarationList LF ',' OptLF ']'        { $$ = new T.Array($3); }
+ARGLIST
+    : IDENTIFIERS                    { $$ = $1; }
+    | IDENTIFIERS ',' '*' IDENTIFIER { $1.push(new T.Splat($4)); $$ = $1; }
+    | '*' IDENTIFIER                 { $$ = [ new T.Splat($2) ]; }
+    |                                { $$ = []; }
     ;
 
-DeclarationList
-    : Expression                                        { $$ = [ $1 ]; }
-    | DeclarationList ',' Expression                    { $1.push($3); $$ = $1; }
-    | DeclarationList ',' LF Expression                 { $1.push($4); $$ = $1; }
-    | DeclarationList LF ',' LF Expression              { $1.push($5); $$ = $1; }
-    | DeclarationList LF ',' Expression                 { $1.push($4); $$ = $1; }
+IDENTIFIERS
+    : IDENTIFIER                     { $$ = [ $1 ]; }
+    | IDENTIFIER '=' EXPR            { $$ = [ new T.Operation("=", $1, $3) ]; }
+    | IDENTIFIERS ',' IDENTIFIER     { $1.push($3); $$ = $1; }
+    | IDENTIFIERS ',' IDENTIFIER '=' EXPR {
+        $1.push(new T.Operation("=", $3, $5));
+        $$ = $1;
+    }
     ;
 
-Object
-    : '{' OptLF '}'                                     { $$ = new T.Object(); }
-    | '{' OptLF ObjectDeclarationList OptLF '}'         { $$ = new T.Object($3); }
-    | '{' OptLF ObjectDeclarationList ',' OptLF '}'     { $$ = new T.Object($3); }
-    | '{' OptLF ObjectDeclarationList LF ',' OptLF '}'  { $$ = new T.Object($3); }
+CALL_ARGS
+    : EXPR                    { $$ = [ $1 ]; }
+    | '*' EXPR                { $$ = [ new T.Splat($2) ]; }
+    | LAMBDA                  { $$ = [ $1 ]; }
+    | CALL_ARGS ',' EXPR      { $1.push($3); $$ = $1; }
+    | CALL_ARGS ',' '*' EXPR  { $1.push(new T.Splat($4)); $$ = $1; }
+    | CALL_ARGS ',' LAMBDA    { $1.push($3); $$ = $1; }
+    |
     ;
 
-ObjectDeclarationList
-    : ObjectDeclaration                                 { $$ = [ $1 ]; }
-    | ObjectDeclarationList ',' ObjectDeclaration       { $1.push($3); $$ = $1; }
-    | ObjectDeclarationList ',' LF ObjectDeclaration    { $1.push($4); $$ = $1; }
-    | ObjectDeclarationList LF ',' LF ObjectDeclaration { $1.push($5); $$ = $1; }
-    | ObjectDeclarationList LF ',' ObjectDeclaration    { $1.push($3); $$ = $1; }
+ARGS
+    : EXPR                    { $$ = [ $1 ]; }
+    | ARGS ',' EXPR           { $1.push($3); $$ = $1; }
     ;
 
-ObjectDeclaration
-    : Expression OptLF ':' OptLF Expression             { $$ = new T.Assoc($1, $5); }
+ASSOCS
+    : ASSOC                   { $$ = [ $1 ]; }
+    | ASSOCS ',' ASSOC        { $1.push($3); $$ = $1; }
     ;
 
-SelectionStatement
-    : IF Expression Then END                                        { $$ = new T.IfStatement($2); }
-    | IF Expression Then Statement END                              { $$ = new T.IfStatement($2, new T.Body($4)); }
-    | IF Expression Then Statement ElseStatement END                { $$ = new T.IfStatement($2, new T.Body($4), [ $5 ]); }
-    | IF Expression Then Statement ElsifStatement END               { $$ = new T.IfStatement($2, new T.Body($4), $5); }
-    | IF Expression Then Statement ElsifStatement ElseStatement END { $5.push($6); $$ = new T.IfStatement($2, $4, $5); }
-    | IF Expression Then Body END                                   { $$ = new T.IfStatement($2, $4); }
-    | IF Expression Then Body ElseStatement END                     { $$ = new T.IfStatement($2, $4, [ $5 ]); }
-    | IF Expression Then Body ElsifStatement END                    { $$ = new T.IfStatement($2, $4, $5); }
-    | IF Expression Then Body ElsifStatement ElseStatement END      { $5.push($6); $$ = new T.IfStatement($2, $4, $5); }
-    | UNLESS Expression Then END                                    { $$ = new T.UnlessStatement($2); }
-    | UNLESS Expression Then Statement END                          { $$ = new T.UnlessStatement($2, new T.Body($4)); }
-    | UNLESS Expression Then Statement ElseStatement END            { $$ = new T.UnlessStatement($2, new T.Body($4), $5); }
-    | UNLESS Expression Then Body END                               { $$ = new T.UnlessStatement($2, $4); }
-    | UNLESS Expression Then Body ElseStatement END                 { $$ = new T.UnlessStatement($2, $4, $5); }
-    | Statement IF Expression                                       { $$ = new T.IfStatement($3, new T.Body($1)); }
-    | Statement UNLESS Expression                                   { $$ = new T.UnlessStatement($3, new T.Body($1)); }
-    | CASE Expression Terminator END                                { $$ = new T.CaseStatement($2); }
-    | CASE Expression Terminator WhenStatement END                  { $$ = new T.CaseStatement($2, $4); }
+ASSOC
+    : EXPR ':' EXPR           { $$ = new T.Assoc($1, $3); }
     ;
 
-ElsifStatement
-    : ELSIF Expression Then Body                        { $$ = [ new T.ElsifStatement($2, $4) ]; }
-    | ELSIF Expression Then Statement                   { $$ = [ new T.ElsifStatement($2, new T.Body($4)) ]; }
-    | ElsifStatement ELSIF Expression Then Body         { $1.push(new T.ElsifStatement($3, $5)); $$ = $1; }
+VARIABLE
+    : IDENTIFIER              -> $1
+    | null                    { $$ = new T.Keyword($1); }
+    | undefined               { $$ = new T.Keyword($1); }
+    | true                    { $$ = new T.Keyword($1); }
+    | false                   { $$ = new T.Keyword($1); }
     ;
 
-ElseStatement
-    : ELSE Body                                         { $$ = new T.ElseStatement($2); }
-    | ELSE Statement                                    { $$ = new T.ElseStatement(new T.Body($2)); }
+IDENTIFIER
+    : identifier              { $$ = new T.Identifier($1); }
     ;
 
-WhenStatement
-    : WHEN DeclarationList Then Body                    { $$ = [ new T.WhenStatement($2, $4) ]; }
-    | WhenStatement WHEN DeclarationList Then Body      { $1.push(new T.WhenStatement($3, $5)); $$ = $1; } }
-    | WhenStatement ElseStatement                       { $1.push($2); $$ = $1; }
-    | ElseStatement                                     { $$ = [ $1 ]; }
+LITERAL
+    : numeric                 { $$ = new T.Number($1); }
+    | STRING                  { $$ = new T.String($1); }
+    ; 
+
+OP_ASGN
+    : '+='                    -> $1
+    | '-='                    -> $1
+    | '*='                    -> $1
+    | '/='                    -> $1
+    | '%='                    -> $1
+    | '|='                    -> $1
+    | '&='                    -> $1
+    | '^='                    -> $1
+    | '>>='                   -> $1
+    | '<<='                   -> $1
     ;
-
-IterationStatement
-    : WHILE Expression Do END                           { $$ = new T.WhileStatement($2, new T.Body()); }
-    | WHILE Expression Do Body END                      { $$ = new T.WhileStatement($2, $4); }
-    | UNTIL Expression Do END                           { $$ = new T.UntilStatement($2, new T.Body()); }
-    | UNTIL Expression Do Body END                      { $$ = new T.UntilStatement($2, $4); }
-    | FOR Identifier IN '[' Range ']' Do Body END       { $$ = new T.ForStatement($2, $5, $8); }
-    | FOR Identifier IN '[' Range ']' Do END            { $$ = new T.ForStatement($2, $5, new T.Body()); }
-    | LOOP Do Body END                                  { $$ = new T.LoopStatement($3); }
-    | Statement WHILE Expression                        { $$ = new T.WhileStatement($3, new T.Body($1)); }
-    | Statement UNTIL Expression                        { $$ = new T.UntilStatement($3, new T.Body($1)); }
-    | Statement FOR Identifier IN '[' Range ']'         { $$ = new T.ForStatement($3, $6, new T.Body($1)); }
-    ;
-
-Range
-    : ConditionalExpression RANGE_INCL ConditionalExpression  { $$ = new T.Range("inclusive", $1, $3); }
-    | ConditionalExpression RANGE_EXCL ConditionalExpression  { $$ = new T.Range("exclusive", $1, $3); }
-    ;
-
-JumpStatement
-    : BREAK                          { $$ = new T.Expression(new T.Keyword("break")); }
-    | CONTINUE                       { $$ = new T.Expression(new T.Keyword("continue")); }
-    | RETURN                         { $$ = new T.ReturnStatement(); }
-    | RETURN Expression              { $$ = new T.ReturnStatement($2); }
-    ;
-
-Then
-    : THEN
-    | Terminator
-    | Terminator THEN
-    ;
-
-Do
-    : DO
-    | Terminator
-    | Terminator DO
-    ;
-
-OptLF
-    : LF
-    | 
-    ;
-
-//OptComma
-//    : ','
-//    | 
-//    ;
-
-Terminator
-    : LF
-    | ';'
-    ;
-
-%%
 

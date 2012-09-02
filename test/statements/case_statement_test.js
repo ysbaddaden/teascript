@@ -2,8 +2,8 @@ var assert = require("assert");
 var T = require("../../lib/tea");
 
 exports.testEmptyCaseStatement = function () {
-  assert.equal("switch (true) {}", T.toJavaScript("case true\nend"));
-  assert.equal("switch (true) {}", T.toJavaScript("case true;end"));
+  assert.equal("switch (true) {\ncase 1:\n    break;\n}", T.toJavaScript("case true\nwhen 1\nend"));
+  assert.equal("switch (true) {\ncase 1:\n    break;\n}", T.toJavaScript("case true;when 1;end"));
 };
 
 exports.testCaseStatement = function () {
@@ -25,9 +25,12 @@ exports.testCaseStatement = function () {
   
   assert.equal("var x;\n" +
     "switch (true) {\n" +
-    "    default: x = false;\n" +
+    "case 1:\n" +
+    "    break;\n" +
+    "default:\n" +
+    "    x = false;\n" +
     "}",
-    T.toJavaScript("case true\nelse x = false\nend"));
+    T.toJavaScript("case true\nwhen 1\nelse x = false\nend"));
   
   assert.equal("var x;\n" +
     "switch (true) {\n" +
@@ -39,7 +42,7 @@ exports.testCaseStatement = function () {
     "}",
     T.toJavaScript("case true\nwhen 1 then x = true\nelse x = false\nend"));
   
-  assert.equal("var x, y;\n" +
+  assert.equal("var x;\n" +
     "switch (true) {\n" +
     "case 1:\n" +
     "    x = true;\n" +

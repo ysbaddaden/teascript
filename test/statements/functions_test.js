@@ -61,73 +61,76 @@ exports.testSplatArguments = function () {
 
 exports.testEmptyLambda = function () {
   assert.equal("var l;\nl = function () {};", T.toJavaScript("l = ->() {}"));
-  assert.equal("var l;\nl = function () {};", T.toJavaScript("l = ->()\n{\n}"));
-  assert.equal("var l;\nl = function () {};", T.toJavaScript("l = -> () {}"));
-  assert.equal("var l;\nl = function () {};", T.toJavaScript("l = -> ()\n{\n}"));
+  assert.equal("var l;\nl = function () {};", T.toJavaScript("l = ->() {\n}"));
+  assert.equal("var l;\nl = function () {};", T.toJavaScript("l = -> (\n) {}"));
   assert.equal("var l;\nl = function () {};", T.toJavaScript("l = -> {}"));
-  assert.equal("var l;\nl = function () {};", T.toJavaScript("l = ->\n{\n}"));
 };
 
 exports.testEmptyLambdaWithArguments = function () {
-  assert.equal('function (a, b, c, d) {};',
-               T.toJavaScript('->(a, b, c, d) {\n}'));
+  assert.equal('var l;\nl = function (a, b, c, d) {};',
+               T.toJavaScript('l = ->(a, b, c, d) {\n}'));
 
-  assert.equal('function () {\n' +
+  assert.equal('var caller;\ncaller = function () {\n' +
                '    var emails = Array.prototype.slice.call(arguments, 0) || [];\n' +
                '};',
-               T.toJavaScript('->(*emails) {\n}'));
+               T.toJavaScript('caller = ->(*emails) {\n}'));
 };
 
 exports.testLambdaWithStatement = function () {
-  assert.equal('function () {\n' +
+  assert.equal('var x;\nx = function () {\n' +
                '    return "something";\n' +
                '};',
-               T.toJavaScript('-> { return "something"; }')
+               T.toJavaScript('x = -> { return "something"; }')
   );
-  assert.equal('function () {\n' +
+  assert.equal('var x;\nx = function () {\n' +
                '    return "something";\n' +
                '};',
-               T.toJavaScript('->(\n) { return "something"; }')
+               T.toJavaScript('x = ->(\n) { return "something"; }')
   );
-  assert.equal('function (x, y) {\n' +
+  assert.equal('var x;\nx = function (x, y) {\n' +
                '    return x + y;\n' +
                '};',
-               T.toJavaScript('->(x, y) { return x + y; }')
+               T.toJavaScript('x = ->(x, y) { return x + y; }')
   );
 };
 
 exports.testLambdaWithBody = function () {
-  assert.equal('var obj;\n' +
-               'obj = require("graphics");\n\n' +
-               'function () {\n' +
+  assert.equal('var obj, resize;\n' +
+               'obj = require("graphics");\n' +
+               'resize = function () {\n' +
                '    var x, y;\n' +
                '    x = obj.getX();\n' +
                '    y = obj.getY();\n' +
                '    return x + y;\n' +
                '};',
                T.toJavaScript('obj = require("graphics")\n' +
-                              '-> {\n  x = obj.getX()\n  y = obj.getY()\n  return x + y\n}')
+                              'resize = -> {\n' +
+                              '  x = obj.getX()\n' +
+                              '  y = obj.getY()\n' + 
+                              '  return x + y\n' +
+                              '}'
+                             )
   );
-  assert.equal('var obj;\n' +
-               'obj = require("graphics");\n\n' +
-               'function () {\n' +
+  assert.equal('var obj, resize;\n' +
+               'obj = require("graphics");\n' +
+               'resize = function () {\n' +
                '    var x, y;\n' +
                '    x = obj.getX();\n' +
                '    y = obj.getY();\n' +
                '    return x + y;\n' +
                '};',
                T.toJavaScript('obj = require("graphics")\n' +
-                              '->() {\n  x = obj.getX()\n  y = obj.getY()\n  return x + y\n}')
+                              'resize = ->() {\n  x = obj.getX()\n  y = obj.getY()\n  return x + y\n}')
   );
-  assert.equal('var obj;\n' +
-               'obj = require("graphics");\n\n' +
-               'function (x) {\n' +
+  assert.equal('var obj, resize;\n' +
+               'obj = require("graphics");\n' +
+               'resize = function (x) {\n' +
                '    var y;\n' +
                '    y = obj.getY();\n' +
                '    return x + y;\n' +
                '};',
                T.toJavaScript('obj = require("graphics")\n' +
-                              '->(x) {\n  y = obj.getY()\n  return x + y\n}')
+                              'resize = ->(x) {\n  y = obj.getY()\n  return x + y\n}')
   );
 };
 

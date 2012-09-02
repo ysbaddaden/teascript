@@ -10,7 +10,7 @@ exports.testProgram = function () {
     "    T = require('./tea');\n" +
     "}());",
     T.toJavaScript("T = require('./tea')", { scoped: true }));
-}
+};
 
 if (module === require.main) {
   require("./test").run(exports);

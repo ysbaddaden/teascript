@@ -190,6 +190,42 @@ Examples:
     args = [1, 2]
     concat(a, b, *args, *[3, 4, 5])
 
+### Lambdas
+
+Definition:
+
+    -> [(<arguments>)] {
+      <statements>
+    }
+
+Assignment:
+
+    <left> = -> [(arguments)] {}
+
+Assocs:
+    <expression>: -> [(arguments)] {}
+
+Method call argument:
+
+    method[(<method arguments>)] ->[(<lambda arguments>)] {
+      <statements>
+    }
+    
+    method([<method arguments>,] ->[(<lambda arguments>)] {
+      <statements>
+    }[, <method arguments>])
+    
+    method([<arguments>]) -> &statement
+    
+Examples:
+
+    ary.each ->(item) {                         # => ary.each(function (item) {
+    }                                                });
+
+    elm.click ->(e) {                           # => elm.click(function (e) {
+    }                                                });
+
+
 ## Author
 
 - Julien Portalier

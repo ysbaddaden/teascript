@@ -10,13 +10,12 @@ exports.testEmptyForStatement = function () {
 
 exports.testForStatementWithRange = function () {
   assert.equal("var i;\nfor (i = 0; i <= 10; i++) {}", T.toJavaScript("for i in [0..10]\nend"));
-  assert.equal("var i, j;\n" +
-               "for (i = 0; i < 10; i++) {\n" +
+  assert.equal("var i, j;\nfor (i = 0; i < 10; i++) {\n" +
                "    j = Math.pow(i);\n" +
                "}",
               T.toJavaScript("for i in [0...10]\n  j = Math.pow(i)\nend")
   );
-  assert.equal("var __ref1, __ref2, __ref3, a, ary, b, c, i, j;\n" +
+  assert.equal("var __ref1, __ref2, __ref3, a, ary, b, i;\n" +
                "ary = [1, 2, 3, 4, 5];\n" +
                "for (i = 0, __ref1 = ary.length; 0 > __ref1 ? i > __ref1 : i < __ref1; 0 > __ref1 ? i-- : i++) {\n" +
                "    j -= i;\n" +

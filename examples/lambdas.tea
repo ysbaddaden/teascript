@@ -2,6 +2,21 @@ getResizedWidth = ->(x, y, by = 0.5) {
   return [ x * by, y * by ]
 }
 
+resize = require("resize")
+resize(-> {})
+resize(-> () {})
+resize(-> (x, by = 2) { return x / by })
+resize(-> (x, by = 2) {
+  return x / by;
+})
+
+resize -> {}
+resize(x) -> {}
+
+$("#layout").click ->(e) {
+  e.preventDefault()
+}
+
 #var getRedizedSizes;
 #getResizedSizes = function (x, y, by) {
 #  if (typeof by === "undefined") {
