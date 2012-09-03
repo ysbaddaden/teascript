@@ -7,10 +7,6 @@ features.
 
 Definitions:
 
-    ->[(<arguments>)] {                        |     function (arg1, arg2, ..., argN) {
-      <statements>                             |     }
-    }                                          | 
-
     -> &<expression>                           |     function (x) {
                                                |       return x.expression;
                                                |     }
@@ -21,40 +17,9 @@ Definitions:
 
 Within method calls:
 
-    method[(<method arguments>)] ->[(<lambda arguments>)] {
-      <statements>
-    }
-    
-    method([<method arguments>,] ->[(<lambda arguments>)] {
-      <statements>
-    }[, <method arguments>])
-    
     method[(][<arguments>][)] -> &statement
-    
+ 
 Examples:
-
-    ary.each ->(item) {                         # => ary.each(function (item) {
-    }                                                });
-    
-    (30).downto(0, ->(i) {                      # => (30).downto(0, function (i) {
-    }, 10)                                           }, 10);
-    
-    elm.addEventListener('click', ->(event) {   # => elm.addEventListener('click', function (event) {
-    }, true)                                         }, true);
-    
-    elm.addEventListener('click') ->(event) {   # => elm.addEventListener('click', function (event) {
-    }                                                });
-
-    elm.click ->(e) {                           # => elm.click(function (e) {
-    }                                                });
-
-    users.map ->(x) { return x.name }           # => users.map(function (x) {
-                                                       return x.name;
-                                                     });
-
-    users.map ->(x) { return x.name() }         # => users.map(function (x) {
-                                                       return x.name();
-                                                     });
 
     users.map -> &name                          # => users.map(function (x) {
                                                        return (typeof x.name === "function") ? x.name() : x.name;

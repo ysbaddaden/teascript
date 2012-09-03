@@ -7,7 +7,7 @@
 
 ### Iterating arrays
 
-    for <value> in <array> [do]
+    for <value> of <array> [do]
       [statements]
     end
 
@@ -18,7 +18,7 @@
 
 Examples:
 
-    for item in ary do                      # => for (__r1 = 0; __r1 < ary.length; __r1++) {
+    for item of ary do                      # => for (__r1 = 0; __r1 < ary.length; __r1++) {
     end                                            item = ary[__r1];
                                                  }
 
@@ -27,7 +27,7 @@ Examples:
 
 ### Iterating objects
 
-    for [own] <key>, [value] in <object> [do]
+    for [own] <key> [, value] in <object> [do]
       [statements]
     end
 
@@ -43,13 +43,13 @@ Examples:
                                                    }
                                                  }
 
-    for name, in columns                    # => for (name in columns) {
-    end                                          }
+    for name in columns                    # => for (name in columns) {
+    end                                         }
 
-    for own name, in columns                # => for (name in columns) {
-    end                                            if (columns.hasOwnProperty(name)) {
-                                                   }
-                                                 }
+    for own name in columns                # => for (name in columns) {
+    end                                           if (columns.hasOwnProperty(name)) {
+                                                  }
+                                                }
 
 
 ## Methods

@@ -61,7 +61,7 @@ STMT
     | STMT until EXPR {
         $$ = new T.UntilStatement($3, new T.Body($1));
     }
-    | STMT for IDENTIFIER in EXPR {
+    | STMT for IDENTIFIER of EXPR {
         $$ = new T.ForStatement($3, $5, new T.Body($1));
     }
     | if EXPR THEN ASTMT end {
@@ -99,7 +99,7 @@ STMT
         $3.push(new T.ElseStatement($5));
         $$ = new T.CaseStatement($2, $3);
     }
-    | for IDENTIFIER in EXPR DO ASTMT end {
+    | for IDENTIFIER of EXPR DO ASTMT end {
         $$ = new T.ForStatement($2, $4, $6);
     }
     | def IDENTIFIER ARGDECL ASTMT end {

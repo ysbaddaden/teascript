@@ -2,18 +2,18 @@ var assert = require("assert");
 var T = require("../../lib/tea");
 
 exports.testEmptyForStatement = function () {
-  assert.equal("var i;\nfor (i = 0; i <= 10; i++) {}", T.toJavaScript("for i in [0..10]\nend"));
-  assert.equal("var i;\nfor (i = 0; i < 10; i++) {}",  T.toJavaScript("for i in [0...10]\nend"));
-  assert.equal("var i;\nfor (i = 10; i >= 0; i--) {}", T.toJavaScript("for i in [10..0]\nend"));
-  assert.equal("var i;\nfor (i = 10; i > 0; i--) {}",  T.toJavaScript("for i in [10...0]\nend"));
+  assert.equal("var i;\nfor (i = 0; i <= 10; i++) {}", T.toJavaScript("for i of [0..10]\nend"));
+  assert.equal("var i;\nfor (i = 0; i < 10; i++) {}",  T.toJavaScript("for i of [0...10]\nend"));
+  assert.equal("var i;\nfor (i = 10; i >= 0; i--) {}", T.toJavaScript("for i of [10..0]\nend"));
+  assert.equal("var i;\nfor (i = 10; i > 0; i--) {}",  T.toJavaScript("for i of [10...0]\nend"));
 };
 
 exports.testForStatementWithRange = function () {
-  assert.equal("var i;\nfor (i = 0; i <= 10; i++) {}", T.toJavaScript("for i in [0..10]\nend"));
+  assert.equal("var i;\nfor (i = 0; i <= 10; i++) {}", T.toJavaScript("for i of [0..10]\nend"));
   assert.equal("var i, j;\nfor (i = 0; i < 10; i++) {\n" +
                "    j = Math.pow(i);\n" +
                "}",
-              T.toJavaScript("for i in [0...10]\n  j = Math.pow(i)\nend")
+              T.toJavaScript("for i of [0...10]\n  j = Math.pow(i)\nend")
   );
   assert.equal("var __ref1, __ref2, __ref3, a, ary, b, i;\n" +
                "ary = [1, 2, 3, 4, 5];\n" +
@@ -24,10 +24,10 @@ exports.testForStatementWithRange = function () {
                "    }\n" +
                "}",
                T.toJavaScript("ary = [ 1, 2, 3, 4, 5 ]\n" +
-                              "for i in [0...ary.length]\n" +
+                              "for i of [0...ary.length]\n" +
                               "  j -= i\n" +
-                              "  for a in [x..y] do\n" +
-                              "    for b in [c.x..c.y] do\n" +
+                              "  for a of [x..y] do\n" +
+                              "    for b of [c.x..c.y] do\n" +
                               "    end\n" +
                               "  end\n" +
                               "end\n")
@@ -39,7 +39,7 @@ exports.testOneLineForStatement = function () {
                "for (i = 0; i < 10; i++) {\n" +
                "    j = Math.pow(i);\n" +
                "}",
-              T.toJavaScript("j = Math.pow(i) for i in [0...10]")
+              T.toJavaScript("j = Math.pow(i) for i of [0...10]")
   );
 };
 

@@ -136,21 +136,21 @@ Please note you may exit any iteration at will with the `break` keyword.
 
 Iterating within a range:
 
-    for <identifier> in <range> [do]
+    for <identifier> of <range> [do]
       <statements>
     end
 
-    <statement> for <identifier> in <range>
+    <statement> for <identifier> of <range>
 
 Examples:
 
-    j += Math.pow(i) for i in [0...100]
+    j += Math.pow(i) for i of [0...100]
 
-    for i in [0..ary.length]
+    for i of [0..ary.length]
       item = ary[i]
     end
 
-    for i in [ary.length..0]
+    for i of [ary.length..0]
       item = ary[i]
     end
 
@@ -198,32 +198,33 @@ Definition:
       <statements>
     }
 
-Assignment:
+    -> [(<arguments>)] { <statements> }
+
+Assignments:
 
     <left> = -> [(arguments)] {}
 
 Assocs:
+
     <expression>: -> [(arguments)] {}
 
 Method call argument:
 
-    method[(<method arguments>)] ->[(<lambda arguments>)] {
-      <statements>
-    }
-    
     method([<method arguments>,] ->[(<lambda arguments>)] {
       <statements>
     }[, <method arguments>])
     
-    method([<arguments>]) -> &statement
-    
+    method[(<method arguments>)] ->[(<lambda arguments>)] {
+      <statements>
+    }
+
 Examples:
 
-    ary.each ->(item) {                         # => ary.each(function (item) {
-    }                                                });
-
-    elm.click ->(e) {                           # => elm.click(function (e) {
-    }                                                });
+    ary.each ->(item) {
+    }
+    
+    elm.on("click", "a") ->(e) {
+    }
 
 
 ## Author
