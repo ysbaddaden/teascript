@@ -64,6 +64,12 @@ STMT
     | STMT for IDENTIFIER of EXPR {
         $$ = new T.ForStatement($3, $5, new T.Body($1));
     }
+    | STMT for IDENTIFIER in EXPR {
+        $$ = new T.ForInStatement(false, $3, null, $5, new T.Body($1));
+    }
+    | STMT for own IDENTIFIER in EXPR {
+        $$ = new T.ForInStatement(true, $4, null, $6, new T.Body($1));
+    }
     | if EXPR THEN ASTMT end {
         $$ = new T.IfStatement($2, $4);
     }
@@ -101,6 +107,18 @@ STMT
     }
     | for IDENTIFIER of EXPR DO ASTMT end {
         $$ = new T.ForStatement($2, $4, $6);
+    }
+    | for IDENTIFIER in EXPR DO ASTMT end {
+        $$ = new T.ForInStatement(false, $2, null, $4, $6);
+    }
+    | for IDENTIFIER ',' IDENTIFIER in EXPR DO ASTMT end {
+        $$ = new T.ForInStatement(false, $2, $4, $6, $8);
+    }
+    | for own IDENTIFIER in EXPR DO ASTMT end {
+        $$ = new T.ForInStatement(true, $3, null, $5, $7);
+    }
+    | for own IDENTIFIER ',' IDENTIFIER in EXPR DO ASTMT end {
+        $$ = new T.ForInStatement(true, $3, $5, $7, $9);
     }
     | def IDENTIFIER ARGDECL ASTMT end {
         $$ = new T.Function($2, $3, $4);

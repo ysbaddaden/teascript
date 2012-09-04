@@ -41,6 +41,7 @@ E  [eE][-+]?{D}+
 "loop"                      return 'loop';
 "for"                       return 'for';
 "in"                        return 'in';
+"own"                       return 'own';
 "of"                        return 'of';
 "break"                     return 'break';
 "next"                      return 'continue';
