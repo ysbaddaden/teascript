@@ -8,6 +8,20 @@ exports.testEmptyForStatement = function () {
   assert.equal("var i;\nfor (i = 10; i > 0; i--) {}",  T.toJavaScript("for i of [10...0]\nend"));
 };
 
+exports.testForStatementWithArray = function () {
+  assert.equal("var __ref1, __ref2;\n" +
+               "for (__ref1 = 0, __ref2 = ary.length; __ref1 < __ref2; __ref1++) {\n" +
+               "    var item = __ref2[__ref1];\n" +
+               "}",
+               T.toJavaScript("for item of ary\nend"));
+
+  assert.equal("var __ref1, __ref2;\n" +
+               "for (__ref1 = 0, __ref2 = elm.getElementsByTagName('div').length; __ref1 < __ref2; __ref1++) {\n" +
+               "    var item = __ref2[__ref1];\n" +
+               "}",
+               T.toJavaScript("for item of elm.getElementsByTagName('div')\nend"));
+};
+
 exports.testForStatementWithRange = function () {
   assert.equal("var i;\nfor (i = 0; i <= 10; i++) {}", T.toJavaScript("for i of [0..10]\nend"));
   assert.equal("var i, j;\nfor (i = 0; i < 10; i++) {\n" +
