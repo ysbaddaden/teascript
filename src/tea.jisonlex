@@ -26,6 +26,7 @@ E  [eE][-+]?{D}+
 "elsif"\s+                  return 'elsif';
 
 "def"                       return 'def';
+"delete"                    return 'delete';
 "return"                    return 'return';
 "then"                      return 'then';
 "do"                        return 'do';

@@ -184,6 +184,7 @@ EXPR
     | typeof EXPR             { $$ = new T.UnaryExpression("typeof", $2); }
     | instanceof EXPR         { $$ = new T.UnaryExpression("instanceof", $2); }
     | EXPR '?' EXPR ':' EXPR  { $$ = new T.Condition($1, $3, $5); }
+    | delete PRIMARY          { $$ = new T.DeleteExpression($2); }
     | PRIMARY                 -> $1
     ;
 
@@ -217,7 +218,7 @@ LHS
     : VARIABLE                -> $1
     | PRIMARY '[' EXPR ']'    { $$ = new T.Index($1, $3); }
     | PRIMARY '.' IDENTIFIER  { $$ = new T.Dot($1, $3); }
-    ; 
+    ;
 
 ARGDECL
     : '(' ARGLIST ')'         -> $2
@@ -280,7 +281,7 @@ IDENTIFIER
 LITERAL
     : numeric                 { $$ = new T.Number($1); }
     | STRING                  { $$ = new T.String($1); }
-    ; 
+    ;
 
 OP_ASGN
     : '+='                    -> $1
