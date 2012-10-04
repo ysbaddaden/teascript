@@ -20,11 +20,6 @@ E  [eE][-+]?{D}+
 \"(\\.|[^\\"])*\"           return 'STRING';
 \'(\\.|[^\\'])*\'           return 'STRING';
 
-"then"\s+                   return 'then';
-"do"\s+                     return 'do';
-"else"\s+                   return 'else';
-"elsif"\s+                  return 'elsif';
-
 "def"                       return 'def';
 "delete"                    return 'delete';
 "return"                    return 'return';
