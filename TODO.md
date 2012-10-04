@@ -7,7 +7,7 @@
 
 ### Iterating arrays
 
-    for <value> of <array> [do]
+    for <value> of <identifier> [do]
       [statements]
     end
 
