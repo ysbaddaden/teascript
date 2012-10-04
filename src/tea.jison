@@ -128,6 +128,7 @@ STMT
     | break        { $$ = new T.Expression(new T.Keyword("break")); }
     | continue     { $$ = new T.Expression(new T.Keyword("continue")); }
     | EXPR         { $$ = new T.Expression($1); }
+    | delete LHS   { $$ = new T.Expression(new T.DeleteExpression($2)); }
     ;
 
 ELSIF_STMT
@@ -184,7 +185,6 @@ EXPR
     | typeof EXPR             { $$ = new T.UnaryExpression("typeof", $2); }
     | instanceof EXPR         { $$ = new T.UnaryExpression("instanceof", $2); }
     | EXPR '?' EXPR ':' EXPR  { $$ = new T.Condition($1, $3, $5); }
-    | delete PRIMARY          { $$ = new T.DeleteExpression($2); }
     | PRIMARY                 -> $1
     ;
 
