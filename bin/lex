@@ -3,5 +3,5 @@
 cd `dirname $0`
 ROOT=`dirname $(pwd -P)`
 
-node $ROOT/lib/commands/tea.js ../$1 $2
+node $ROOT/lib/commands/lex.js ../$1 $2
 
