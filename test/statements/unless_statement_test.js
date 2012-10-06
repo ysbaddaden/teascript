@@ -10,7 +10,7 @@ exports.testEmptyUnlessStatement = function () {
 exports.testUnlessStatement = function () {
   assert.equal("var x;\nif (!(true)) {\n    x = !y;\n}",
     T.toJavaScript("unless true then x = !y end"));
-  
+
   assert.equal("var x, y;\n" +
     "if (!(true)) {\n" +
     "    x = !y;\n" +
@@ -25,7 +25,7 @@ exports.testUnlessModifier = function () {
     "    x = true;\n" +
     "}",
     T.toJavaScript("x = true unless y == true"));
-  
+
   assert.equal("var x;\n" +
     "if (!(!z)) {\n" +
     "    if (!(y)) {\n" +
@@ -35,23 +35,23 @@ exports.testUnlessModifier = function () {
     T.toJavaScript("x = true unless y unless !z"));
 };
 
-exports.testElseStatement = function () {
-  assert.equal("var x;\n" +
-    "if (!(y === true)) {\n" +
-    "    x = false;\n" +
-    "} else {\n" +
-    "    x = true;\n" +
-    "}",
-    T.toJavaScript("unless y == true then x = false else x = true end"));
-  
-  assert.equal("var x;\n" +
-    "if (!(y === true)) {\n" +
-    "    x = false;\n" +
-    "} else {\n" +
-    "    x = true;\n" +
-    "}",
-    T.toJavaScript("unless y == true\n  x = false\nelse\nx = true\nend"));
-};
+//exports.testElseStatement = function () {
+//  assert.equal("var x;\n" +
+//    "if (!(y === true)) {\n" +
+//    "    x = false;\n" +
+//    "} else {\n" +
+//    "    x = true;\n" +
+//    "}",
+//    T.toJavaScript("unless y == true then x = false else x = true end"));
+//
+//  assert.equal("var x;\n" +
+//    "if (!(y === true)) {\n" +
+//    "    x = false;\n" +
+//    "} else {\n" +
+//    "    x = true;\n" +
+//    "}",
+//    T.toJavaScript("unless y == true\n  x = false\nelse\nx = true\nend"));
+//};
 
 if (module === require.main) {
   require("../test").run(exports);

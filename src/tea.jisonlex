@@ -15,8 +15,8 @@ E  [eE][-+]?{D}+
 "true"                      return 'true';
 "false"                     return 'false';
 "null"                      return 'null';
-[-+~]?{D}+(\.{D}+)?({E})?   return 'numeric';
-[-+~]?\.{D}+({E})?          return 'numeric';
+[-+~]?{D}+(\.{D}+)?({E})?   return 'NUMBER';
+[-+~]?\.{D}+({E})?          return 'NUMBER';
 \"(\\.|[^\\"])*\"           return 'STRING';
 \'(\\.|[^\\'])*\'           return 'STRING';
 
