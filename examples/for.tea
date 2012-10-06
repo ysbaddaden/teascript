@@ -1,19 +1,16 @@
 x = j = 0
 
-for i of [0...10] do
+j -= i for i of [ 1, 2, 3 ]
+
+ary = [ 1, 2, 3, 4 ]
+for i of ary do
   j += i
 end
 
-j -= i for i of [9..0]
-
-ary = [ 1, 2, 3, 4, 5 ]
-
-for i of [0...ary.length]
-  j -= i
-  
-  for a of [x..y] do
-    for b of [c.x..c.y] do
-    end
+elements = document.getElementsByTagName("div");
+for div of elements
+  for elm of div.querySelectorAll(".hidden") do
+    elm.classList.toggle("hidden");
   end
 end
 
