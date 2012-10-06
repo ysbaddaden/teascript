@@ -1,0 +1,7 @@
+#! /usr/bin/env bash
+
+cd `dirname $0`
+ROOT=`dirname $(pwd -P)`
+
+node $ROOT/lib/commands/ast ../$1 $2
+
