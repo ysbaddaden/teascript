@@ -11,6 +11,7 @@ exports.testArguments = function () {
   assert.equal("function test(a) {}", T.toJavaScript("def test(a);end"));
   assert.equal("function test(b) {}", T.toJavaScript("def test b;end"));
   assert.equal("function test(a, b, c, d) {}", T.toJavaScript("def test a, b, c, d;end"));
+  assert.equal("function test(key) {\n    key = 'val';\n}", T.toJavaScript("def test(key);key = 'val';end"));
 };
 
 exports.testDefaultArguments = function () {
