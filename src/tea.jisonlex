@@ -15,8 +15,8 @@ E  [eE][-+]?{D}+
 "true"                      return 'true';
 "false"                     return 'false';
 "null"                      return 'null';
-[-+~]?{D}+(\.{D}+)?({E})?   return 'NUMBER';
-[-+~]?\.{D}+({E})?          return 'NUMBER';
+{D}+(\.{D}+)?({E})?         return 'NUMBER';
+\.{D}+({E})?                return 'NUMBER';
 \"(\\.|[^\\"])*\"           return 'STRING';
 \'(\\.|[^\\'])*\'           return 'STRING';
 
@@ -62,7 +62,7 @@ E  [eE][-+]?{D}+
 "or"\s*                     return 'or';
 "&&"\s*                     return 'and';
 "||"\s*                     return 'or';
-[-+*%/&|^\?]\s*             return yytext.replace(/\s+$/, "");
+[-+~*%/&|^\?]\s*            return yytext.replace(/\s+$/, "");
 ">>"\s*                     return '>>';
 "<<"\s*                     return '<<';
 "!="\s*                     return '!=';

@@ -1,7 +1,7 @@
 %right and or not typeof instanceof
 %right '=' OP_ASGN
 %right '..' '...'
-%left  '+' '-' '|' '^' '&'
+%left  '+' '-' '|' '^' '&' '~'
 %right '*' '/' '%'
 %left  '>' '>=' '<' '<=' '==' '!='
 %right '<<' '>>'
@@ -245,8 +245,20 @@ LHS
 
 UNARY
     : not EXPR                              { $$ = new T.UnaryExpression("!", $2); }
+    | '-' EXPR                              { $$ = new T.UnaryExpression("-", $2); }
+    | '+' EXPR                              { $$ = new T.UnaryExpression("+", $2); }
+    | '~' EXPR                              { $$ = new T.UnaryExpression("~", $2); }
     | typeof EXPR                           { $$ = new T.UnaryExpression("typeof", $2); }
     | instanceof EXPR                       { $$ = new T.UnaryExpression("instanceof", $2); }
+    ;
+
+UNARY_OP
+    : not
+    | '-'
+    | '+'
+    | '~'
+    | typeof
+    | instanceof
     ;
 
 ARGDECL
