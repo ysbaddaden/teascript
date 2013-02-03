@@ -136,6 +136,7 @@ STMT
     | return EXPR                                { $$ = new T.ReturnStatement($2); }
     | delete EXPR                                { $$ = new T.DeleteStatement($2); }
     | break                                      { $$ = new T.Statement(new T.Keyword("break")); }
+    | next                                       { $$ = new T.Statement(new T.Keyword("continue")); }
     | continue                                   { $$ = new T.Statement(new T.Keyword("continue")); }
     | EXPR                                       { $$ = new T.Statement($1); }
     ;
@@ -245,8 +246,19 @@ PRIMARY
 
 LHS
     : IDENTIFIER                            -> $1
-    | PRIMARY '.' IDENTIFIER                { $$ = new T.Dot($1, $3); }
+    | PRIMARY '.' DOTABLE                   { $$ = new T.Dot($1, $3); }
     | PRIMARY '[' EXPR ']'                  { $$ = new T.Index($1, $3); }
+    ;
+
+DOTABLE
+    : IDENTIFIER                            -> $1
+    | delete                                { $$ = new T.Identifier('delete'); }
+    | loop                                  { $$ = new T.Identifier('loop'); }
+    | next                                  { $$ = new T.Identifier('next'); }
+    | object                                { $$ = new T.Identifier('object'); }
+    | own                                   { $$ = new T.Identifier('own'); }
+    | then                                  { $$ = new T.Identifier('then'); }
+    | when                                  { $$ = new T.Identifier('when'); }
     ;
 
 UNARY
@@ -256,15 +268,6 @@ UNARY
     | '~' EXPR                              { $$ = new T.UnaryExpression("~", $2); }
     | typeof EXPR                           { $$ = new T.UnaryExpression("typeof", $2); }
     | instanceof EXPR                       { $$ = new T.UnaryExpression("instanceof", $2); }
-    ;
-
-UNARY_OP
-    : not
-    | '-'
-    | '+'
-    | '~'
-    | typeof
-    | instanceof
     ;
 
 ARGDECL

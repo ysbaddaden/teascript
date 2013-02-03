@@ -40,7 +40,7 @@ E  [eE][-+]?{D}+
 "own"                       return 'own';
 "of"                        return 'of';
 "break"                     return 'break';
-"next"                      return 'continue';
+"next"                      return 'next';
 "continue"                  return 'continue';
 "object"                    return 'object';
 "new"                       return 'new';

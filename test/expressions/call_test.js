@@ -39,6 +39,16 @@ exports['test call with options hash'] = function () {
       T.toJavaScript("model.clear(silent: true)"));
 };
 
+exports['test call with revserved keywords'] = function () {
+  assert.equal("req.delete('/posts/1.json');", T.toJavaScript("req.delete('/posts/1.json')"));
+  assert.equal("req.loop(function () {});", T.toJavaScript("req.loop(-> {})"));
+  assert.equal("req.next();", T.toJavaScript("req.next()"));
+  assert.equal("req.object;", T.toJavaScript("req.object"));
+  assert.equal("req.own;", T.toJavaScript("req.own"));
+  assert.equal("req.then;", T.toJavaScript("req.then"));
+  assert.equal("req.when;", T.toJavaScript("req.when"));
+};
+
 if (module === require.main) {
   require("../test").run(exports);
 }
