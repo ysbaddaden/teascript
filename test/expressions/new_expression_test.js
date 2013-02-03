@@ -30,6 +30,15 @@ exports.testWithSplatArguments = function () {
                "    return (t == 'object' || t == 'function') result || child: child;\n" +
                "}(Map, [].concat(args), function () {}));",
       T.toJavaScript("new Map(*args)"));
+
+  assert.equal("(function (fn, args, ctor) {\n" +
+               "    ctor.constructor = fn.constructor;\n" +
+               "    var child = new ctor(),\n" +
+               "        result = fn.apply(child, args),\n" +
+               "        t = typeof result;\n" +
+               "    return (t == 'object' || t == 'function') result || child: child;\n" +
+               "}(Map, [].concat(ary1, ary2, [argn]), function () {}));",
+      T.toJavaScript("new Map(*ary1, *ary2, argn)"));
 };
 
 if (module === require.main) {
