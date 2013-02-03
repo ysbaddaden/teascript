@@ -15,28 +15,25 @@ exports.testArguments = function () {
 
 exports.testDefaultArguments = function () {
   assert.equal('function test(a) {\n' +
-               '    if (typeof a === \'undefined\') {\n' +
-               '        a = "str";\n' +
-               '    }\n' +
+               '    if (a === undefined) a = "str";\n' +
                '}',
                T.toJavaScript('def test(a = "str");end'));
 
   assert.equal('function test(a, b) {\n' +
-               '    if (typeof b === \'undefined\') {\n' +
-               '        b = "str";\n' +
-               '    }\n' +
+               '    if (b === undefined) b = "str";\n' +
                '}',
                T.toJavaScript('def test(a, b = "str");end'));
 
   assert.equal('function test(a, b) {\n' +
-               '    if (typeof a === \'undefined\') {\n' +
-               '        a = "test";\n' +
-               '    }\n' +
-               '    if (typeof b === \'undefined\') {\n' +
-               '        b = "suite";\n' +
-               '    }\n' +
+               '    if (a === undefined) a = "test";\n' +
+               '    if (b === undefined) b = "suite";\n' +
                '}',
                T.toJavaScript('def test(a = "test", b = "suite");end'));
+
+  assert.equal('function render(error, status) {\n' +
+               '    if (status === undefined) status = error;\n' +
+               '}',
+               T.toJavaScript('def render(error, status = error);end'));
 };
 
 exports.testSplatArguments = function () {
@@ -51,9 +48,7 @@ exports.testSplatArguments = function () {
                T.toJavaScript('def send(from, *to)\nend'));
 
   assert.equal('function send(from) {\n' +
-               '    if (typeof from === \'undefined\') {\n' +
-               '        from = Config.default_from;\n' +
-               '    }\n' +
+               '    if (from === undefined) from = Config.default_from;\n' +
                '    var to = Array.prototype.slice.call(arguments, 1) || [];\n' +
                '}',
                T.toJavaScript('def send(from = Config.default_from, *to)\nend'));
@@ -106,7 +101,7 @@ exports.testLambdaWithBody = function () {
                T.toJavaScript('obj = require("graphics")\n' +
                               'resize = -> {\n' +
                               '  x = obj.getX()\n' +
-                              '  y = obj.getY()\n' + 
+                              '  y = obj.getY()\n' +
                               '  return x + y\n' +
                               '}'
                              )
