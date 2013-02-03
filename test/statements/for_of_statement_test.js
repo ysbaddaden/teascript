@@ -1,7 +1,7 @@
 var assert = require("assert");
 var T = require("../../lib/tea");
 
-exports.testEmptyForStatement = function () {
+exports['test empty for of statement'] = function () {
   assert.equal("var __ref1, __ref2, i;\nfor (__ref1 = 0, __ref2 = ary.length; __ref1 < __ref2; __ref1++) {\n    i = ary[__ref1];\n}", T.toJavaScript("for i of ary\nend"));
   assert.equal("var __ref1, __ref2, i;\nfor (__ref1 = 0, __ref2 = elements.length; __ref1 < __ref2; __ref1++) {\n    i = elements[__ref1];\n}", T.toJavaScript("for i of elements do end"));
 //  assert.equal("var i;\nfor (i = 0; i < 10; i++) {}",  T.toJavaScript("for i of ary\nend"));
@@ -10,7 +10,7 @@ exports.testEmptyForStatement = function () {
 //  assert.equal("var i;\nfor (i = 10; i > 0; i--) {}",  T.toJavaScript("for i of ary\nend"));
 };
 
-exports.testForStatementWithArray = function () {
+exports['test for of statement with array like objects'] = function () {
   assert.equal("var __ref1, __ref2, item;\n" +
                "for (__ref1 = 0, __ref2 = ary.length; __ref1 < __ref2; __ref1++) {\n" +
                "    item = ary[__ref1];\n" +
@@ -25,7 +25,15 @@ exports.testForStatementWithArray = function () {
                T.toJavaScript("for item of elm.getElementsByTagName('div')\nend"));
 };
 
-//exports.testForStatementWithRange = function () {
+exports['test for of statement with index'] = function () {
+  assert.equal("var __ref1, item;\n" +
+               "for (index = 0, __ref1 = ary.length; index < __ref1; index++) {\n" +
+               "    item = ary[index];\n" +
+               "}",
+               T.toJavaScript("for item, index of ary\nend"));
+};
+
+//exports['test for of statement with range'] = function () {
 //  assert.equal("var i;\nfor (i = 0; i <= 10; i++) {}", T.toJavaScript("for i of [0..10]\nend"));
 //  assert.equal("var i, j;\nfor (i = 0; i < 10; i++) {\n" +
 //               "    j = Math.pow(i);\n" +

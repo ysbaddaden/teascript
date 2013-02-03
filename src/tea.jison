@@ -62,7 +62,10 @@ STMT
         $$ = new T.UntilStatement($3, new T.Body($1));
     }
     | STMT for IDENTIFIER of EXPR {
-        $$ = new T.ForOfStatement($3, $5, new T.Body($1));
+        $$ = new T.ForOfStatement($3, null, $5, new T.Body($1));
+    }
+    | STMT for IDENTIFIER ',' IDENTIFIER of EXPR {
+        $$ = new T.ForOfStatement($3, $5, $7, new T.Body($1));
     }
     | STMT for IDENTIFIER in EXPR {
         $$ = new T.ForInStatement(false, $3, null, $5, new T.Body($1));
@@ -109,7 +112,10 @@ STMT
         $$ = new T.CaseStatement($2, $3);
     }
     | for IDENTIFIER of EXPR DO ASTMT end {
-        $$ = new T.ForOfStatement($2, $4, $6);
+        $$ = new T.ForOfStatement($2, null, $4, $6);
+    }
+    | for IDENTIFIER ',' IDENTIFIER of EXPR DO ASTMT end {
+        $$ = new T.ForOfStatement($2, $4, $6, $8);
     }
     | for IDENTIFIER in EXPR DO ASTMT end {
         $$ = new T.ForInStatement(false, $2, null, $4, $6);
