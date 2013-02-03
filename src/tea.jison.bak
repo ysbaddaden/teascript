@@ -123,8 +123,8 @@ STMT
     | for own IDENTIFIER ',' IDENTIFIER in EXPR DO ASTMT end {
         $$ = new T.ForInStatement(true, $3, $5, $7, $9);
     }
-    | object LHS OSTMT end                { $$ = new T.Prototype($2, null, $3); }
-    | object LHS '<' LHS OSTMT end { $$ = new T.Prototype($2, $4, $5); }
+    | object IDENTIFIER OSTMT end                { $$ = new T.Prototype($2, null, $3); }
+    | object IDENTIFIER '<' IDENTIFIER OSTMT end { $$ = new T.Prototype($2, $4, $5); }
     | FUNCTION                                   -> $1
     | return                                     { $$ = new T.ReturnStatement(); }
     | return EXPR                                { $$ = new T.ReturnStatement($2); }
@@ -141,18 +141,8 @@ OSTMT
     ;
 
 COMPFUNC
-    : TFUNC {
-        $$ = [];
-        if (typeof $1 !== "string") {
-            $$.push($1);
-        }
-    }
-    | COMPFUNC TFUNC {
-        if (typeof $2 !== "string") {
-            $1.push($2);
-        }
-        $$ = $1;
-    }
+    : TFUNC                                 { $$ = [ $1 ]; }
+    | COMPFUNC TFUNC                        { $1.push($2); $$ = $1; }
     ;
 
 TFUNC

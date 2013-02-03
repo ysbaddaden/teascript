@@ -42,6 +42,8 @@ E  [eE][-+]?{D}+
 "break"                     return 'break';
 "next"                      return 'continue';
 "continue"                  return 'continue';
+"object"                    return 'object';
+"new"                       return 'new';
 
 "->"\s*                     return '->';
 "+="\s*                     return '+=';
