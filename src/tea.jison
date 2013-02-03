@@ -285,8 +285,8 @@ SUBARGLIST
 
 CALL_ARGS
     : SUB_CALL_ARGS                         -> $1
-    | SUB_CALL_ARGS ',' ASSOCS              { $1.push($3); $$ = $1; }
-    | ASSOCS                                { $$ = [ $1 ]; }
+    | SUB_CALL_ARGS ',' ASSOCS              { $1.push(new T.Object($3)); $$ = $1; }
+    | ASSOCS                                { $$ = [ new T.Object($1) ]; }
     |
     ;
 
