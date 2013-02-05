@@ -44,8 +44,13 @@ E  [eE][-+]?{D}+
 "continue"                  return 'continue';
 "object"                    return 'object';
 "new"                       return 'new';
+"throw"                     return 'throw';
+"begin"                     return 'begin';
+"rescue"                    return 'rescue';
+"ensure"                    return 'ensure';
 
 "->"\s*                     return '->';
+"=>"\s*                     return '=>';
 "+="\s*                     return '+=';
 "-="\s*                     return '-=';
 "*="\s*                     return '*=';

@@ -129,8 +129,8 @@ STMT
     | for own IDENTIFIER ',' IDENTIFIER in EXPR DO ASTMT end {
         $$ = new T.ForInStatement(true, $3, $5, $7, $9);
     }
-    | object LHS OSTMT end                { $$ = new T.Prototype($2, null, $3); }
-    | object LHS '<' LHS OSTMT end { $$ = new T.Prototype($2, $4, $5); }
+    | object LHS OSTMT end                       { $$ = new T.Prototype($2, null, $3); }
+    | object LHS '<' LHS OSTMT end               { $$ = new T.Prototype($2, $4, $5); }
     | FUNCTION                                   -> $1
     | return                                     { $$ = new T.ReturnStatement(); }
     | return EXPR                                { $$ = new T.ReturnStatement($2); }
@@ -139,6 +139,26 @@ STMT
     | next                                       { $$ = new T.Statement(new T.Keyword("continue")); }
     | continue                                   { $$ = new T.Statement(new T.Keyword("continue")); }
     | EXPR                                       { $$ = new T.Statement($1); }
+    | throw EXPR                                 { $$ = new T.ThrowStatement($2); }
+    | begin LF ASTMT RESCUE end                  { $$ = new T.BeginStatement($3, $4); }
+    | begin LF ASTMT RESCUE ensure LF ASTMT end  { $$ = new T.BeginStatement($3, $4, $7); }
+    | begin LF ASTMT ensure LF ASTMT end         { $$ = new T.BeginStatement($3, null, $6); }
+    ;
+
+RESCUE
+    : rescue LF ASTMT                                    { $$ = [ new T.RescueStatement([], null, $3) ]; }
+    | rescue '=>' IDENTIFIER LF ASTMT                    { $$ = [ new T.RescueStatement([], $3, $5) ]; }
+    | rescue RESCUE_ARGS LF ASTMT                        { $$ = [ new T.RescueStatement($2, null, $4) ]; }
+    | rescue RESCUE_ARGS '=>' IDENTIFIER LF ASTMT        { $$ = [ new T.RescueStatement($2, $4, $6) ]; }
+    | RESCUE rescue LF ASTMT                             { $1.push(new T.RescueStatement([], null, $4)); $$ = $1; }
+    | RESCUE rescue '=>' IDENTIFIER LF ASTMT             { $1.push(new T.RescueStatement([], $4, $6));   $$ = $1; }
+    | RESCUE rescue RESCUE_ARGS LF ASTMT                 { $1.push(new T.RescueStatement($3, null, $5)); $$ = $1; }
+    | RESCUE rescue RESCUE_ARGS '=>' IDENTIFIER LF ASTMT { $1.push(new T.RescueStatement($3, $5, $7));   $$ = $1; }
+    ;
+
+RESCUE_ARGS
+    : IDENTIFIER                            { $$ = [ $1 ]; }
+    | RESCUE_ARGS ',' IDENTIFIER            { $1.push($3); $$ = $1; }
     ;
 
 OSTMT
