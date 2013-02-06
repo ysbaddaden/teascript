@@ -1,5 +1,5 @@
 D  [0-9]
-L  [a-zA-Z_$]
+//L  [a-zA-Z_$]
 E  [eE][-+]?{D}+
 
 %{
@@ -63,9 +63,9 @@ E  [eE][-+]?{D}+
 ">>="\s*                    return '>>=';
 "<<="\s*                    return '<<=';
 
-"and"\s*                    return 'and';
-"or"\s*                     return 'or';
+"and"\s+                    return 'and';
 "&&"\s*                     return 'and';
+"or"\s+                     return 'or';
 "||"\s*                     return 'or';
 [-+~*%/&|^\?]\s*            return yytext.replace(/\s+$/, "");
 ">>"\s*                     return '>>';
@@ -78,10 +78,12 @@ E  [eE][-+]?{D}+
 "=="\s*                     return '==';
 "..."\s*                    return '...';
 ".."\s*                     return '..';
-"typeof"\s*                 return 'typeof';
-"instanceof"\s*             return 'instanceof';
-"!"\s*                      return 'not';
+
+"typeof"\s+                 return 'typeof';
+"instanceof"\s+             return 'instanceof';
 "not"\s*                    return 'not';
+"!"\s*                      return 'not';
+
 [(=,\.:\[\{]\s*             return yytext.replace(/\s+$/, "");
 [)\]\}]                     return yytext;
 \s+/[)=,\.:\]\}]            ; // skips insignificant LF
