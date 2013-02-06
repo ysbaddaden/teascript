@@ -61,6 +61,10 @@ exports.testConditional = function () {
     T.toJavaScript("(2 + 1 == 1 +\n2) ?\n12\n:\n34 \n"));
 };
 
+exports.testConditionalAssign = function () {
+  assert.equal("if (!x) x = 1;", T.toJavaScript("x ||= 1"));
+};
+
 if (module === require.main) {
   require("../test").run(exports);
 }

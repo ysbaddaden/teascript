@@ -59,7 +59,7 @@ E  [eE][-+]?{D}+
 "&="\s*                     return '&=';
 "|="\s*                     return '|=';
 "^="\s*                     return '^=';
-//"||="\s*                    return '||=';
+"||="\s*                    return '||=';
 ">>="\s*                    return '>>=';
 "<<="\s*                    return '<<=';
 
