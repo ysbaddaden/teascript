@@ -1,0 +1,14 @@
+object TDot
+  def init(left, right)
+    self.left  = left
+    self.right = right
+    return self
+  end
+
+  def compile
+    return self.left.compile() + '.' + self.right.compile()
+  end
+end
+
+module.exports = TDot
+

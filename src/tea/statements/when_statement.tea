@@ -1,0 +1,19 @@
+object WhenStatement
+  def init(tests, body)
+    self.tests = tests
+    self.body = body
+    return self
+  end
+
+  # NOTE: check wether there is a good reason to generate the body before the tests
+  def compile
+    body = self.body.compile() + 'break;'
+    rs = self.tests.map(->(expr) {
+      return 'case ' + expr.compile() + ':'
+    })
+    return rs.join('') + body
+  end
+end
+
+module.exports = WhenStatement
+

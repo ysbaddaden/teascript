@@ -1,0 +1,12 @@
+object TParen
+  def init(expression)
+    self.expression = expression
+  end
+
+  def compile
+    return '(' + self.expression.compile() + ')'
+  end
+end
+
+module.exports = TParen
+

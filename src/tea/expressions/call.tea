@@ -1,0 +1,46 @@
+TSplat = require('splat')
+
+object TCall
+  def init(expression, args)
+    self.expression = expression
+    self.args = args || []
+    return self
+  end
+
+  def callerName
+    return self.expression.compile()
+  end
+
+  def pushArg(arg)
+    self.args.push(arg)
+  end
+
+  def compile
+    args  = [];
+    splat = [];
+
+    for decl of self.args
+      if decl.constructor == TSplat
+        splat.push('[' + args.join(', ') + ']') if args.length > 0
+        splat.push(decl.compile())
+        args = []
+      else
+        args.push(decl.compile())
+      end
+    end
+
+    if splat.length == 1 && args.length == 0
+      return self.callerName() + '.apply(null, ' + splat[0] + ')'
+    end
+
+    if splat.length > 0
+      splat.push('[' + args.join(', ') + ']') if args.length > 0
+      return self.callerName() + '.apply(null, Array.prototype.concat.call(' + splat.join(', ') + '))'
+    end
+
+    return self.callerName() + '(' + args.join(', ') + ')'
+  end
+end
+
+module.exports = TCall
+

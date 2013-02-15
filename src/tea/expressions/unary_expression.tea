@@ -1,0 +1,18 @@
+object UnaryExpression
+  def init(operator, right)
+    self.operator = operator
+    self.right = right
+    return self
+  end
+
+  def compile
+    if ['typeof', 'instanceof'].indexOf(self.operator) == -1
+      return self.operator + self.right.compile()
+    else
+      return self.operator + ' ' + self.right.compile()
+    end
+  end
+end
+
+module.exports = UnaryExpression
+

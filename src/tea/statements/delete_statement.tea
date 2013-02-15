@@ -1,0 +1,12 @@
+object DeleteStatement
+  def init(primary)
+    self.primary = primary
+    return self
+  end
+
+  def compile
+    return 'delete ' + self.primary.compile() + ';'
+  end
+end
+
+module.exports = DeleteStatement

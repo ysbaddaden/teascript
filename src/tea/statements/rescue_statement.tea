@@ -1,0 +1,33 @@
+scopes = require('scopes')
+
+object RescueStatement
+  def init(names, identifier, body)
+    self.names = names || []
+    self.identifier = identifier
+    self.body = body
+    return self
+  end
+
+  def compile(ref)
+    rs = []
+
+    if self.names.length > 0
+      names = self.names.map(->(name) {
+        return ref + ' instanceof ' + name.compile()
+      })
+      rs.push('if (' + names.join(' || ') + ') {')
+    end
+
+    if self.identifier and self.identifier.value != ref
+      scopes.pushIdentifier(ref)
+      rs.push(self.identifier.compile() + ' = ' + ref + ';')
+    end
+
+    rs.push(self.body.compile())
+    rs.push('}') if self.names.length > 0
+    return rs.join('\n')
+  end
+end
+
+module.exports = RescueStatement
+

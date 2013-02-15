@@ -1,0 +1,24 @@
+scopes      = require('scopes')
+TIdentifier = require('identifier')
+
+object TOperation
+  def init(operator, left, right)
+    self.operator = operator
+    self.left     = left
+    self.right    = right
+  end
+
+  def compile
+    case self.operator.trim()
+    when '||='
+      left = self.left.compile()
+      return 'if (!' + left + ') ' + left + ' = ' + self.right.compile()
+    when '='
+      scopes.pushIdentifier(self.left.value) if self.left instanceof TIdentifier
+    end
+    return self.left.compile() + ' ' + self.operator + ' ' + self.right.compile()
+  end
+end
+
+module.exports = TOperation
+

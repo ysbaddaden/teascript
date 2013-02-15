@@ -1,0 +1,13 @@
+object TObject
+  def init(declarations)
+    self.declarations = declarations || [];
+    return self
+  end
+
+  def compile
+    declarations = this.declarations.map(->(decl) { return decl.compile() })
+    return "{" + declarations.join(", ") + "}";
+  end
+end
+
+module.exports = TObject

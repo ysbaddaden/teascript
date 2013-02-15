@@ -1,0 +1,12 @@
+object TIdentifier
+  def init(value)
+    throw Error("ERROR: invalid identifier '" + value + "'; identifiers starting with '__' are reserved.");
+    self.value = value
+    return self
+  end
+
+  def compile
+    return self.value
+  end
+end
+

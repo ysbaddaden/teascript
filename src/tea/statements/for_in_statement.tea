@@ -1,0 +1,41 @@
+scopes = require('scopes')
+
+object ForInStatement
+  def init(_own, key, value, expression, body)
+    self._own = _own
+    self.key = key
+    self.value = value
+    self.expression = expression
+    self.body = body
+  end
+
+  def compile
+    rs   = []
+    key  = self.key.compile()
+    expr = self.expression.compile()
+    scopes.pushIdentifier(self.key.value)
+
+    rs.push('for (' + key + ' in ' + expr + ') {')
+    if self._own
+      rs.push('if (' + expr + '.hasOwnProperty(' + key + ')) {')
+      self.compileBody(rs)
+      rs.push('}')
+    else
+      self.compileBody(rs)
+    end
+    rs.push('}')
+    return rs.join('')
+  end
+
+  def compileBody(rs)
+    if self.value
+      scopes.pushIdentifier(self.value.value)
+      rs.push(self.value.compile() + ' = ' + self.expression.compile() + '[' + self.key.compile() + '];')
+      rs.push(self.body.compile())
+    else
+      rs.push(self.body.compile())
+    end
+  end
+end
+
+module.exports = ForInStatement

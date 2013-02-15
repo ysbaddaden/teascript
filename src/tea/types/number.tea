@@ -1,0 +1,15 @@
+object TNumber
+  def init(value)
+    self.value = value
+    return self
+  end
+
+  def compile
+    # disambiguates float numbers like .125
+    return '0' + self.value if self.value.charAt(0) == '.'
+    return self.value
+  end
+end
+
+module.exports = TNumber
+

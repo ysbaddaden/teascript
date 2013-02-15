@@ -1,0 +1,17 @@
+TIdentifier = require('identifier')
+
+object TAssoc
+  def init(left, right)
+    self.left  = left
+    self.right = right
+    return self
+  end
+
+  def compile
+    left = self.left instanceof TIdentifier ? self.left.value : self.left.compile()
+    return left + ": " + self.right.compile()
+  end
+end
+
+module.exports = TAssoc
+

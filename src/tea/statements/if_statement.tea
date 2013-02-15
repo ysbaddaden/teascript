@@ -1,0 +1,24 @@
+object IfStatement
+  def init(test, body, alternatives)
+    self.test = test
+    self.body = body
+    self.alternatives = alternatives || []
+    return self
+  end
+
+  def compile
+    rs = []
+    rs.push('if (' + self.test.compile() + ') {')
+    rs.push(self.body.compile()) if self.body
+
+    for alt of self.alternatives
+      rs = rs.concat(alternative.compile());
+    end
+
+    rs.push('}')
+    return rs.join('')
+  end
+end
+
+module.exports = IfStatement
+

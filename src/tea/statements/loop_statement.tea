@@ -1,0 +1,13 @@
+object LoopStatement
+  def init(body)
+    self.body = body
+    return self
+  end
+
+  def compile
+    return 'while (true) {' + self.body.compile() + '}'
+  end
+end
+
+module.exports = LoopStatement
+

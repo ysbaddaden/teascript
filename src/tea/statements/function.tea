@@ -1,0 +1,65 @@
+scopes     = require('scopes')
+TOperation = require('expressions/operation')
+TSplat     = require('expressions/splat')
+
+object TFunction
+  def init(name, args, body)
+    self.name = name
+    self.args = args || []
+    self.body = body
+    return self
+  end
+
+  def compile(options = {})
+    return scopes.withScope(-> { return self.compileFunction() })
+  end
+
+  def compileFunction
+    rs   = []
+    a    = []
+    b    = []
+    body = []
+
+    # arguments
+    for arg of self.args
+      case arg.constructor
+      when TOperation
+        ident = arg.left.compile()
+        a.push(ident)
+        b.push('if (' + ident + ' === undefined) ' + arg.compile() + ';')
+      when TSplat
+        scopes.pushIdentifier(ident = arg.compile())
+        v = 'Array.prototype.slice.call(arguments, ' + a.length + ') || []'
+        b.push('var ' + ident + ' = ' + v + ';')
+      else
+        scopes.pushIdentifier(arg.compile())
+        a.push(arg.compile())
+      end
+    end
+
+    if options.objectName
+      name = self.name.compile()
+      rs.push(options.objectName + '.prototype.' + name + ' = function (' + a.join(', ') + ') {')
+      rs.push('var self = self;')
+    elsif options.prefix
+      name = self.name.compile()
+      rs.push(options.prefix + '.' + name + ' = function (' + a.join(', ') + ') {')
+    else
+      name = self.name ? self.name.compile() : ''
+      rs.push('function ' + name + '(' + a.join(', ') + ') {')
+    end
+
+    body = self.body.compile(scope: true) if self.body != undefined
+
+    if body.length > 0 || b.length > 0
+      rs.push(b.join(''))
+      rs.push(body)
+    end
+
+    rs.push('}')
+    return rs.join('')
+  end
+end
+
+module.exports = TFunction
+

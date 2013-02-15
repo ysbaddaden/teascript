@@ -1,0 +1,22 @@
+#TRange = require('types/range')
+
+object TIndex
+  def init(left, index)
+    self.left  = left
+    self.index = index
+    return self
+  end
+
+  def compile
+    #if self.index.constructor === TRange
+    #  return 'Array.prototype.slice.call(' +
+    #    self.left.compile() + ', ' +
+    #    self.index.from() + ', ' +
+    #    self.index.to() + ')'
+    #end
+    return self.left.compile() + '[' + self.index.compile() + ']'
+  end
+end
+
+module.exports = TIndex
+

@@ -1,0 +1,14 @@
+object WhileStatement
+  def init(test, body)
+    self.test = test
+    self.body = body
+    return self
+  end
+
+  def compile
+    return 'while (' + self.test.compile() + ') {' + self.body.compile() + '}';
+  end
+end
+
+module.exports = WhileStatement
+

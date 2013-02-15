@@ -1,0 +1,82 @@
+scopes = []
+ref = 0
+
+globals = [
+  'arguments',
+  'console',
+  'exports', 'module', 'require',
+  'global', 'window', 'document',
+  'Array', 'Boolean', 'Date', 'Function', 'Iterator', 'Number', 'Object',
+  'RegExp', 'String', 'JSON', 'Math',
+  'ArrayBuffer', 'Float32Array', 'Float64Array', 'Int16Array', 'Int32Array',
+  'Int8Array', 'Uint16Array', 'Uint32Array', 'Uint8Array', 'Uint8ClampedArray',
+  'Error', 'EvalError', 'InternalError', 'RangeError', 'ReferenceError',
+  'StopIteration', 'SyntaxError', 'TypeError', 'URIError',
+  'Infinity', 'NaN', 'undefined',
+  'QName', 'XML', 'XMLList'
+]
+
+def push
+  scopes.push([])
+end
+
+def pull
+  return scopes.pop()
+end
+
+def current
+  return scopes[scopes.length - 1];
+end
+
+def withScope(callback)
+  push()
+  callback()
+  return pull()
+end
+
+def isDefined(ident)
+  i = scopes.length
+  while i -= 1
+    return true if scopes[i].indexOf(ident) != -1
+  end
+  return false
+end
+
+def isGlobal(ident)
+  return globals.indexOf(ident);
+end
+
+def pushIdentifier(ident)
+  current().push(ident) unless isGlobal(ident) or isDefined(ident)
+end
+
+def reference(options = {})
+  ident = '__ref' + (ref += 1)
+  pushIdentifier(ident) unless options.push == false
+  return ident
+end
+
+def clear
+  scopes = []
+  ref = 0
+end
+
+def run(callback)
+  clear()
+  ret = callback()
+  clear()
+  return ret
+end
+
+module.exports = {
+  push: push,
+  pull: pull,
+  current: current,
+  withScope: withScope,
+  isDefined: isDefined,
+  isGlobal: isGlobal,
+  pushIdentifier: pushIdentifier,
+  reference: reference,
+  clear: clear,
+  run: run,
+}

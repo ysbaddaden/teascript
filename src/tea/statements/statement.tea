@@ -1,0 +1,13 @@
+object TStatement
+  def init(value)
+    self.value = value
+    return self
+  end
+
+  def compile
+    return self.value.compile() + ';'
+  end
+end
+
+module.exports = TStatement
+

@@ -1,0 +1,13 @@
+object RequireStatement
+  def init(expression)
+    self.expression = expression
+    return self
+  end
+
+  def compile
+    return 'require(' + self.expression.compile() + ')';
+  end
+end
+
+module.exports = RequireStatement
+

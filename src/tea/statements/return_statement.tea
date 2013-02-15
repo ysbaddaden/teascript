@@ -1,0 +1,14 @@
+object ReturnStatement
+  def init(expression)
+    self.expression = expression
+    return self
+  end
+
+  def compile
+    return 'return;' if self.expression == 'undefined'
+    return 'return ' + self.expression.compile() + ';'
+  end
+end
+
+module.exports = ReturnStatement
+

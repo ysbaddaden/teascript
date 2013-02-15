@@ -1,0 +1,12 @@
+object ThrowStatement
+  def init(expression)
+    self.expression = expression
+    return self
+  end
+
+  def compile
+    return 'throw ' + self.expression.compile() + ';'
+  end
+end
+
+module.exports = ThrowStatement

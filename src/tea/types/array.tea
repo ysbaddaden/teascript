@@ -1,0 +1,14 @@
+object TArray
+  def init(declaration)
+    self.declaration = declaration || []
+    return self
+  end
+
+  def compile
+    declaration = self.declaration.map(->(decl) { return decl.compile() })
+    return "[" + declaration.join(", ") + "]"
+  end
+end
+
+module.exports = TArray
+

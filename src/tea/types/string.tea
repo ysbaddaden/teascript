@@ -1,0 +1,12 @@
+object TString
+  def init(value)
+    self.value = value
+    return self
+  end
+
+  def compile
+    return this.value.replace(new RegExp('\n', 'g'), '\\n')
+  end
+end
+
+module.exports = TString

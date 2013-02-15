@@ -1,0 +1,30 @@
+TNumber = require('types/number');
+
+object TRange
+  def init(type, left, right)
+    self.exclusive = !(self.inclusive = type == 'inclusive')
+    self.left  = left
+    self.right = right
+  end
+
+  def numbers
+    return (self.left.constructor == TNumber and self.right.constructor == TNumber)
+  end
+
+  def up
+    return (self.numbers() and parseInt(self.left.value, 10) <= parseInt(self.right.value, 10))
+  end
+
+  def from
+    return self.left.compile()
+  end
+
+  def to
+    return self.right.compile() unless self.inclusive
+    return self.right.compile() + " + 1" unless self.right.constructor == TNumber
+    return (parseInt(self.right.value, 10) + 1).toString()
+  end
+end
+
+module.exports = TRange
+

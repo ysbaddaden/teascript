@@ -1,0 +1,51 @@
+scopes = require('scopes')
+
+object BeginStatement
+  def init(body, rescues, _ensure)
+    self.body = body
+    self.rescues = rescues || []
+    self._ensure = _ensure
+    return self
+  end
+
+  def compile
+    rs = []
+    rs.push('try {')
+    rs.push(self.body.compile())
+
+    if self.rescues.length > 0
+      ref = self.findReference() || scopes.reference(push: false)
+      rs.push('} catch (' + ref + ') {')
+
+      for _rescue, i of self.rescues
+        if i == 0
+          rs.push(_rescue.compile(ref))
+        else
+          rs.push('else ' + _rescue.compile(ref))
+        end
+      end
+    end
+
+    if self._ensure
+      rs.push('} finally {')
+      rs.push(self._ensure.compile())
+    end
+
+    rs.push('}')
+    return rs.join('')
+  end
+
+  def findReference
+    for _rescue, i of self.rescues
+      return unless _rescue.identifier
+      if !ref
+        ref = _rescue.identifier.value
+      elsif ref != _rescue.identifier.value
+        return
+      end
+    end
+    return ref
+  end
+end
+
+module.exports = BeginStatement

@@ -1,0 +1,17 @@
+object ElseStatement
+  def init(body)
+    self.body = body
+    return self
+  end
+
+  def compile(options = {})
+    if options['case']
+      return 'default:' + self.body.compile() + '\n';
+    else
+      return '} else {' + self.body.compile() + '\n';
+    end
+  end
+end
+
+module.exports = ElseStatement
+

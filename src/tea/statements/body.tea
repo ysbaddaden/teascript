@@ -1,0 +1,31 @@
+scopes = require('scopes')
+
+object TBody
+  def init(statement)
+    self.statements = []
+    self.push(statement) if statement != undefined
+  end
+
+  def push(statement)
+    self.statements.push(statement)
+  end
+
+  def parseStatements
+    self.body = self.statements.reduce(->(body, statement) {
+      return body.concat(statement.compile())
+    }, [])
+  end
+
+  def compile(options = {})
+    if options.scope
+      identifiers = scopes.withScope(-> { self.parseStatements() })
+      self.body.unshift('var ' + identifiers.sort().join(', ') + ';') if identifiers.length > 0
+    else
+      self.parseStatements()
+    end
+    return self.body.join('')
+  end
+end
+
+module.exports = TBody
+

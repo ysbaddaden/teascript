@@ -1,0 +1,27 @@
+object TProgram
+  def init(body)
+    self.body = body
+    return self
+  end
+
+  def compile(options = {})
+    body = scopes.run(-> {
+      return self.body.compile(scope: true)
+    })
+    if options.scoped
+      program = '(function () {' + body + '}());'
+    elsif options.amd
+      program = 'function (require, module, exports) {' + body + '});'
+    else
+      body
+    end
+
+    if typeof Beautify != 'undefined'
+      return Beautify.js_beautify(program, jslint_happy: true)
+    else
+      return program
+    end
+  end
+end
+
+module.exports = TProgram

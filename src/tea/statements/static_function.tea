@@ -1,0 +1,13 @@
+TFunction = require('statements/function')
+
+object TStaticFunction
+  def init(name, args, body)
+    self.fn = new TFunction(name, args, body)
+  end
+
+  def compile(options)
+    return self.fn.compile(prefix: options.objectName)
+  end
+end
+
+module.exports = TStaticFunction

@@ -1,0 +1,48 @@
+TSplat = require('splat')
+
+# The solution for splat arguments when newing an object, comes
+# from CoffeeScript:
+splatConstructorTemplate =
+  "(function (fn, args, ctor) {
+      ctor.constructor = fn.constructor;
+      var child = new ctor(), result = fn.apply(child, args), t = typeof result;
+      return (t == 'object' || t == 'function') result || child : child;
+  }(%{FUNCTION}, %{ARGS}, function () {}))"
+
+object NewExpression
+  def init (expression, args)
+    self.expression = expression
+    self.args = args || []
+    return self
+  end
+
+  def compile
+    args = []
+    splat = []
+
+    for decl of self.args
+      if decl.constructor == TSplat
+        splat.push('[' + args.join(', ') + ']') if args.length > 0
+        splat.push(decl.compile())
+        args = [];
+      else
+        args.push(decl.compile())
+      end
+    end
+
+    if splat.length > 0
+      splat.push('[' + args.join(', ') + ']') if args.length > 0
+      return splatConstructorTemplate.replace(new RegExp('(%\{(.+?)\})', 'g'), ->(x) {
+        case x
+        when '%{FUNCTION}' then return self.expression.compile()
+        when '%{ARGS}'     then return '[].concat(' + splat.join(',')  + ')'
+        end
+      })
+    end
+
+    return 'new ' + self.expression.compile() + '(' + args.join(', ') + ')';
+  end
+end
+
+module.exports = NewExpression
+

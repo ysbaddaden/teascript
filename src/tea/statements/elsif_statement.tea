@@ -1,0 +1,14 @@
+object ElsifStatement
+  def init(test, body)
+    self.test = test
+    self.body = body
+    return self
+  end
+
+  def compile
+    return '} else if (' + self.test.compile() + ') {' + self.body.compile();
+  end
+end
+
+module.exports = ElsifStatement
+
