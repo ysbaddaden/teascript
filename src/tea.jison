@@ -237,6 +237,7 @@ EXPR
     | EXPR '!='  EXPR                       { $$ = new T.Operation("!==", $1, $3); }
     | EXPR 'and' EXPR                       { $$ = new T.Operation("&&", $1, $3); }
     | EXPR 'or'  EXPR                       { $$ = new T.Operation("||", $1, $3); }
+    | EXPR 'instanceof' EXPR                { $$ = new T.Operation("instanceof", $1, $3); }
     | EXPR '?' EXPR ':' EXPR                { $$ = new T.Condition($1, $3, $5); }
     | UNARY                                 -> $1
     | PRIMARY                               -> $1
@@ -287,7 +288,6 @@ UNARY
     | '+' EXPR                              { $$ = new T.UnaryExpression("+", $2); }
     | '~' EXPR                              { $$ = new T.UnaryExpression("~", $2); }
     | typeof EXPR                           { $$ = new T.UnaryExpression("typeof", $2); }
-    | instanceof EXPR                       { $$ = new T.UnaryExpression("instanceof", $2); }
     ;
 
 ARGDECL
