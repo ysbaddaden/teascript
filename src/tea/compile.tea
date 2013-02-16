@@ -1,0 +1,9 @@
+return {
+  parse: ->(source) {
+    return parser.parse(source + '\n\n')
+  },
+
+  compile: ->(source, options) {
+    return exports.parse(source).compile(options)
+  }
+}

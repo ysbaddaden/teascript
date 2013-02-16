@@ -1,6 +1,3 @@
-scopes      = require('scopes')
-TIdentifier = require('identifier')
-
 object TOperation
   def init(operator, left, right)
     self.operator = operator
@@ -19,6 +16,3 @@ object TOperation
     return self.left.compile() + ' ' + self.operator + ' ' + self.right.compile()
   end
 end
-
-module.exports = TOperation
-

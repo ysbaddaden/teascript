@@ -1,5 +1,3 @@
-#TRange = require('types/range')
-
 object TIndex
   def init(left, index)
     self.left  = left
@@ -17,6 +15,3 @@ object TIndex
     return self.left.compile() + '[' + self.index.compile() + ']'
   end
 end
-
-module.exports = TIndex
-

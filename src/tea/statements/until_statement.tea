@@ -9,6 +9,3 @@ object UntilStatement
     return 'while (!(' + self.test.compile() + ')) {' + self.body.compile() + '}';
   end
 end
-
-module.exports = UntilStatement
-

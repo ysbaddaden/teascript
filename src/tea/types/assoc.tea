@@ -1,5 +1,3 @@
-TIdentifier = require('identifier')
-
 object TAssoc
   def init(left, right)
     self.left  = left
@@ -12,6 +10,3 @@ object TAssoc
     return left + ": " + self.right.compile()
   end
 end
-
-module.exports = TAssoc
-

@@ -1,5 +1,3 @@
-TSplat = require('splat')
-
 object TCall
   def init(expression, args)
     self.expression = expression
@@ -41,6 +39,3 @@ object TCall
     return self.callerName() + '(' + args.join(', ') + ')'
   end
 end
-
-module.exports = TCall
-

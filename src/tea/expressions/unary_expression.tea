@@ -6,13 +6,10 @@ object UnaryExpression
   end
 
   def compile
-    if ['typeof', 'instanceof'].indexOf(self.operator) == -1
+    if self.operator == 'typeof'
       return self.operator + self.right.compile()
     else
       return self.operator + ' ' + self.right.compile()
     end
   end
 end
-
-module.exports = UnaryExpression
-

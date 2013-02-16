@@ -1,5 +1,3 @@
-scopes = require('scopes')
-
 object RescueStatement
   def init(names, identifier, body)
     self.names = names || []
@@ -28,6 +26,3 @@ object RescueStatement
     return rs.join('\n')
   end
 end
-
-module.exports = RescueStatement
-

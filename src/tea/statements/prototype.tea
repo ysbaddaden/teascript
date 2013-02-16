@@ -1,6 +1,3 @@
-scopes      = require('scopes');
-TIdentifier = require('identifier')
-
 object TPrototype
   def init(name, parent, methods)
     self.objectName = name
@@ -28,10 +25,7 @@ object TPrototype
       for fn of self.methods
         rs.push(fn.compile(objectName: name) + ';')
       end
-    });
+    })
     return rs.join('')
   end
 end
-
-module.exports = TPrototype
-

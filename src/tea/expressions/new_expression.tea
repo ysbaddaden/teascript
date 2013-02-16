@@ -1,5 +1,3 @@
-TSplat = require('splat')
-
 # The solution for splat arguments when newing an object, comes
 # from CoffeeScript:
 splatConstructorTemplate =
@@ -43,6 +41,3 @@ object NewExpression
     return 'new ' + self.expression.compile() + '(' + args.join(', ') + ')';
   end
 end
-
-module.exports = NewExpression
-

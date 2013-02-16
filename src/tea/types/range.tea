@@ -1,5 +1,3 @@
-TNumber = require('types/number');
-
 object TRange
   def init(type, left, right)
     self.exclusive = !(self.inclusive = type == 'inclusive')
@@ -25,6 +23,3 @@ object TRange
     return (parseInt(self.right.value, 10) + 1).toString()
   end
 end
-
-module.exports = TRange
-
