@@ -1,4 +1,4 @@
-object TCall
+object Tea.Call
   def init(expression, args)
     self.expression = expression
     self.args = args || []
@@ -18,7 +18,7 @@ object TCall
     splat = [];
 
     for decl of self.args
-      if decl.constructor == TSplat
+      if decl.constructor == Tea.Splat
         splat.push('[' + args.join(', ') + ']') if args.length > 0
         splat.push(decl.compile())
         args = []
@@ -27,7 +27,7 @@ object TCall
       end
     end
 
-    if splat.length == 1 && args.length == 0
+    if splat.length == 1 and args.length == 0
       return self.callerName() + '.apply(null, ' + splat[0] + ')'
     end
 

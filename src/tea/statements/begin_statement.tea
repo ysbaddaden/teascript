@@ -1,4 +1,4 @@
-object BeginStatement
+object Tea.BeginStatement
   def init(body, rescues, _ensure)
     self.body = body
     self.rescues = rescues || []
@@ -30,7 +30,7 @@ object BeginStatement
     end
 
     rs.push('}')
-    return rs.join('')
+    return rs.join('\n')
   end
 
   def findReference

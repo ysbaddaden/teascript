@@ -1,4 +1,4 @@
-object TIndex
+object Tea.Index
   def init(left, index)
     self.left  = left
     self.index = index
@@ -6,12 +6,12 @@ object TIndex
   end
 
   def compile
-    #if self.index.constructor === TRange
-    #  return 'Array.prototype.slice.call(' +
-    #    self.left.compile() + ', ' +
-    #    self.index.from() + ', ' +
-    #    self.index.to() + ')'
-    #end
+    if self.index.constructor == Tea.Range
+      return 'Array.prototype.slice.call(' +
+        self.left.compile() + ', ' +
+        self.index.from() + ', ' +
+        self.index.to() + ')'
+    end
     return self.left.compile() + '[' + self.index.compile() + ']'
   end
 end

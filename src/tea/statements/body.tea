@@ -1,7 +1,8 @@
-object TBody
+object Tea.Body
   def init(statement)
     self.statements = []
     self.push(statement) if statement != undefined
+    return self
   end
 
   def push(statement)

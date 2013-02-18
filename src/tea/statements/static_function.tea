@@ -1,6 +1,7 @@
-object TStaticFunction
+object Tea.StaticFunction
   def init(name, args, body)
-    self.fn = new TFunction(name, args, body)
+    self.fn = (new Tea.Function).init(name, args, body)
+    return self
   end
 
   def compile(options)

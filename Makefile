@@ -1,8 +1,9 @@
 .PHONY: test
 .IGNORE: test
 
-SOURCES=$(filter-out %compile.tea, $(wildcard src/tea/*.tea)) $(wildcard src/tea/**/*.tea)
-OBJECTS=$(patsubst src/tea/%.tea,build/%.js,$(SOURCES))
+SOURCES = $(filter-out %compile.tea, $(wildcard src/tea/*.tea)) $(wildcard src/tea/**/*.tea)
+OBJECTS = $(patsubst src/tea/%.tea, build/%.js, $(SOURCES))
+MODULES = $(filter-out %commands/tea.js, $(OBJECTS))
 
 parser: src/tea.jison src/tea.jisonlex
 	jison src/tea.jison src/tea.jisonlex -o lib/parser.js
@@ -16,12 +17,12 @@ build/parser.js: src/tea.jison src/tea.jisonlex
 	jison -m js src/tea.jison src/tea.jisonlex -o build/parser.js
 
 build/tea.js: $(OBJECTS) build/compile.js build/parser.js
-	echo "(function () {" > $@
-	cat $(OBJECTS) build/parser.js build/compile.js >> $@
+	echo "var Tea = {}; (function () {" > $@
+	cat $(MODULES) build/parser.js build/compile.js >> $@
 	echo "}());" >> $@
 
 folders:
-	mkdir -p build/types build/expressions build/statements
+	mkdir -p build/types build/expressions build/statements build/commands
 
 tea: folders build/tea.js
 

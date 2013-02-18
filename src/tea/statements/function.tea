@@ -1,4 +1,4 @@
-object TFunction
+object Tea.Function
   def init(name, args, body)
     self.name = name
     self.args = args || []
@@ -7,10 +7,12 @@ object TFunction
   end
 
   def compile(options = {})
-    return scopes.withScope(-> { return self.compileFunction() })
+    rs = null
+    scopes.withScope(-> { rs = self.compileFunction(options) })
+    return rs
   end
 
-  def compileFunction
+  def compileFunction(options)
     rs   = []
     a    = []
     b    = []
@@ -19,11 +21,11 @@ object TFunction
     # arguments
     for arg of self.args
       case arg.constructor
-      when TOperation
+      when Tea.Operation
         ident = arg.left.compile()
         a.push(ident)
         b.push('if (' + ident + ' === undefined) ' + arg.compile() + ';')
-      when TSplat
+      when Tea.Splat
         scopes.pushIdentifier(ident = arg.compile())
         v = 'Array.prototype.slice.call(arguments, ' + a.length + ') || []'
         b.push('var ' + ident + ' = ' + v + ';')
@@ -36,7 +38,7 @@ object TFunction
     if options.objectName
       name = self.name.compile()
       rs.push(options.objectName + '.prototype.' + name + ' = function (' + a.join(', ') + ') {')
-      rs.push('var self = self;')
+      rs.push('var self = this;')
     elsif options.prefix
       name = self.name.compile()
       rs.push(options.prefix + '.' + name + ' = function (' + a.join(', ') + ') {')

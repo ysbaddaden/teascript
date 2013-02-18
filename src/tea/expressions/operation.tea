@@ -1,8 +1,9 @@
-object TOperation
+object Tea.Operation
   def init(operator, left, right)
     self.operator = operator
     self.left     = left
     self.right    = right
+    return self
   end
 
   def compile
@@ -11,7 +12,7 @@ object TOperation
       left = self.left.compile()
       return 'if (!' + left + ') ' + left + ' = ' + self.right.compile()
     when '='
-      scopes.pushIdentifier(self.left.value) if self.left instanceof TIdentifier
+      scopes.pushIdentifier(self.left.value) if self.left instanceof Tea.Identifier
     end
     return self.left.compile() + ' ' + self.operator + ' ' + self.right.compile()
   end

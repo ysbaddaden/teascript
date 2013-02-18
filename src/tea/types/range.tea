@@ -1,12 +1,13 @@
-object TRange
+object Tea.Range
   def init(type, left, right)
     self.exclusive = !(self.inclusive = type == 'inclusive')
     self.left  = left
     self.right = right
+    return self
   end
 
   def numbers
-    return (self.left.constructor == TNumber and self.right.constructor == TNumber)
+    return (self.left.constructor == Tea.Number and self.right.constructor == Tea.Number)
   end
 
   def up
@@ -19,7 +20,7 @@ object TRange
 
   def to
     return self.right.compile() unless self.inclusive
-    return self.right.compile() + " + 1" unless self.right.constructor == TNumber
+    return self.right.compile() + " + 1" unless self.right.constructor == Tea.Number
     return (parseInt(self.right.value, 10) + 1).toString()
   end
 end

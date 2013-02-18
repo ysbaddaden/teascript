@@ -1,10 +1,10 @@
 var assert = require("assert");
-var T = require("../../lib/tea");
+var T = require("../../build/tea");
 
 exports.testEmptyForInStatement = function () {
-  assert.equal("var key;\nfor (key in hash) {}", T.toJavaScript("for key in hash\nend"));
-  assert.equal("var key;\nfor (key in {}) {}", T.toJavaScript("for key in {}\nend"));
-  assert.equal("var key;\nfor (key in {\n    a: 1,\n    b: 2\n}) {}", T.toJavaScript("for key in { a: 1, b: 2 }\nend"));
+  assert.equal("var key;\nfor (key in hash) {}", T.compile("for key in hash\nend"));
+  assert.equal("var key;\nfor (key in {}) {}", T.compile("for key in {}\nend"));
+  assert.equal("var key;\nfor (key in {\n    a: 1,\n    b: 2\n}) {}", T.compile("for key in { a: 1, b: 2 }\nend"));
 };
 
 exports.testForInStatement = function () {
@@ -12,7 +12,7 @@ exports.testForInStatement = function () {
                "for (name in attributes) {\n" +
                "    copy[name] = attributes[name];\n" +
                "}",
-               T.toJavaScript("for name in attributes\n" +
+               T.compile("for name in attributes\n" +
                               "  copy[name] = attributes[name]\n" +
                               "end"));
 
@@ -21,7 +21,7 @@ exports.testForInStatement = function () {
                "    value = attributes[name];\n" +
                "    copy[name] = value;\n" +
                "}",
-               T.toJavaScript("for name, value in attributes\n" +
+               T.compile("for name, value in attributes\n" +
                               "  copy[name] = value\n" +
                               "end"));
 };
@@ -33,7 +33,7 @@ exports.testForInStatementWithOwn = function () {
                "        copy[name] = attributes[name];\n" +
                "    }\n" +
                "}",
-               T.toJavaScript("for own name in attributes\n" +
+               T.compile("for own name in attributes\n" +
                               "  copy[name] = attributes[name]\n" +
                               "end"));
 
@@ -44,7 +44,7 @@ exports.testForInStatementWithOwn = function () {
                "        copy[name] = value;\n" +
                "    }\n" +
                "}",
-               T.toJavaScript("for own name, value in attributes\n" +
+               T.compile("for own name, value in attributes\n" +
                               "  copy[name] = value\n" +
                               "end"));
 };
@@ -54,7 +54,7 @@ exports.testOneLineForInStatement = function () {
                "for (name in obj) {\n" +
                "    copy[name] = obj[name];\n" +
                "}",
-              T.toJavaScript("copy[name] = obj[name] for name in obj")
+              T.compile("copy[name] = obj[name] for name in obj")
   );
 };
 

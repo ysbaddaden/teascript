@@ -1,9 +1,9 @@
 var assert = require("assert");
-var T = require("../../lib/tea");
+var T = require("../../build/tea");
 
 exports.testIdentifier = function () {
-  assert.equal("azerty;", T.toJavaScript("azerty"));
-  assert.equal("var left;\nleft = right;", T.toJavaScript("left = right"));
+  assert.equal("azerty;", T.compile("azerty"));
+  assert.equal("var left;\nleft = right;", T.compile("left = right"));
 };
 
 if (module === require.main) {

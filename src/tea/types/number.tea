@@ -1,4 +1,4 @@
-object TNumber
+object Tea.Number
   def init(value)
     self.value = value
     return self
@@ -6,7 +6,7 @@ object TNumber
 
   def compile
     # disambiguates float numbers like .125
-    return '0' + self.value if self.value.charAt(0) == '.'
-    return self.value
+    return '0' + self.value.trim() if self.value.charAt(0) == '.'
+    return self.value.trim()
   end
 end

@@ -1,4 +1,4 @@
-object UnaryExpression
+object Tea.UnaryExpression
   def init(operator, right)
     self.operator = operator
     self.right = right
@@ -6,7 +6,7 @@ object UnaryExpression
   end
 
   def compile
-    if self.operator == 'typeof'
+    if self.operator != 'typeof'
       return self.operator + self.right.compile()
     else
       return self.operator + ' ' + self.right.compile()

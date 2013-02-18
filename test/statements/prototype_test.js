@@ -1,19 +1,19 @@
 var assert = require("assert");
-var T = require("../../lib/tea");
+var T = require("../../build/tea");
 
 exports.testEmptyObject = function () {
-  assert.equal("var A = function () {};", T.toJavaScript("object A\nend"));
-  assert.equal("var Model = function () {};", T.toJavaScript("object Model\nend"));
+  assert.equal("var A = function () {};", T.compile("object A\nend"));
+  assert.equal("var Model = function () {};", T.compile("object Model\nend"));
 };
 
 exports.testWithLHS = function () {
-  assert.equal("Backbone.Model = function () {};", T.toJavaScript("object Backbone.Model\nend"));
-  assert.equal("Coll[name] = function () {};", T.toJavaScript("object Coll[name]\nend"));
+  assert.equal("Backbone.Model = function () {};", T.compile("object Backbone.Model\nend"));
+  assert.equal("Coll[name] = function () {};", T.compile("object Coll[name]\nend"));
 };
 
 exports.testInheritance = function () {
-  assert.equal("var Post = function () {};\nPost.prototype = new Model();", T.toJavaScript("object Post < Model\nend"));
-  assert.equal("App.Post = function () {};\nApp.Post.prototype = new BB.Model();", T.toJavaScript("object App.Post < BB.Model\nend"));
+  assert.equal("var Post = function () {};\nPost.prototype = new Model();", T.compile("object Post < Model\nend"));
+  assert.equal("App.Post = function () {};\nApp.Post.prototype = new BB.Model();", T.compile("object App.Post < BB.Model\nend"));
 };
 
 exports.testMethods = function () {
@@ -25,7 +25,7 @@ exports.testMethods = function () {
                "Post.create = function (attributes) {\n" +
                "    return new Post().init(attributes);\n" +
                "};",
-          T.toJavaScript("object Post\n" +
+          T.compile("object Post\n" +
             "  def init(attributes)\n"  +
             "    return self\n" +
             "  end\n"  +

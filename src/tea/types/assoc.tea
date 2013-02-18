@@ -1,4 +1,4 @@
-object TAssoc
+object Tea.Assoc
   def init(left, right)
     self.left  = left
     self.right = right
@@ -6,7 +6,7 @@ object TAssoc
   end
 
   def compile
-    left = self.left instanceof TIdentifier ? self.left.value : self.left.compile()
+    left = self.left instanceof Tea.Identifier ? self.left.value : self.left.compile()
     return left + ": " + self.right.compile()
   end
 end

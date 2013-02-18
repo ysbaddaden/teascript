@@ -7,7 +7,7 @@ splatConstructorTemplate =
       return (t == 'object' || t == 'function') result || child : child;
   }(%{FUNCTION}, %{ARGS}, function () {}))"
 
-object NewExpression
+object Tea.NewExpression
   def init (expression, args)
     self.expression = expression
     self.args = args || []
@@ -19,7 +19,7 @@ object NewExpression
     splat = []
 
     for decl of self.args
-      if decl.constructor == TSplat
+      if decl.constructor == Tea.Splat
         splat.push('[' + args.join(', ') + ']') if args.length > 0
         splat.push(decl.compile())
         args = [];
@@ -30,7 +30,7 @@ object NewExpression
 
     if splat.length > 0
       splat.push('[' + args.join(', ') + ']') if args.length > 0
-      return splatConstructorTemplate.replace(new RegExp('(%\{(.+?)\})', 'g'), ->(x) {
+      return splatConstructorTemplate.replace(new RegExp('(%\\{(.+?)\\})', 'g'), ->(x) {
         case x
         when '%{FUNCTION}' then return self.expression.compile()
         when '%{ARGS}'     then return '[].concat(' + splat.join(',')  + ')'

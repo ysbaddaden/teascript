@@ -1,22 +1,22 @@
 var assert = require("assert");
-var T = require("../../lib/tea");
+var T = require("../../build/tea");
 
 exports.testEmptyArrayDeclaration = function () {
-  assert.equal("[];", T.toJavaScript("[]"));
-  assert.equal("[];", T.toJavaScript(" [ \n ] "));
+  assert.equal("[];", T.compile("[]"));
+  assert.equal("[];", T.compile(" [ \n ] "));
 };
 
 exports.testArrayDeclaration = function () {
-  assert.equal("[1, 2, 3];", T.toJavaScript("[1,2,   3]"));
+  assert.equal("[1, 2, 3];", T.compile("[1,2,   3]"));
   
   assert.equal("[1 + 4.51, 2 - 45 / 2, 3];",
-    T.toJavaScript("[1 + 4.51,2 - 45 / 2,   3]"));
+    T.compile("[1 + 4.51,2 - 45 / 2,   3]"));
   
   assert.equal("[coords.x(), coords.y()];",
-    T.toJavaScript("[coords.x(), coords.y()]"));
+    T.compile("[coords.x(), coords.y()]"));
   
   assert.equal("var matrix;\nmatrix = [\n    [1, 2, 3],\n    [4, 5, 6],\n    [7, 8, 9]\n];",
-    T.toJavaScript(
+    T.compile(
       "matrix = [" +
       "  [ 1, 2, 3 ]," +
       "  [ 4, 5, 6 ]," +
@@ -27,10 +27,10 @@ exports.testArrayDeclaration = function () {
 
 exports.testOptionalLinefeedsAndLeadingComma = function () {
   assert.equal("[0, a, 2];",
-    T.toJavaScript(" [ 0 \n, a\n,\n    2\n ] "));
+    T.compile(" [ 0 \n, a\n,\n    2\n ] "));
   
   assert.equal("[a, b, azeazuey];",
-    T.toJavaScript(" [ a, b, azeazuey, \n ] "));
+    T.compile(" [ a, b, azeazuey, \n ] "));
 };
 
 if (module === require.main) {

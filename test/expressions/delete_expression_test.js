@@ -1,9 +1,9 @@
 var assert = require("assert");
-var T = require("../../lib/tea");
+var T = require("../../build/tea");
 
 exports.testDelete = function () {
-  assert.equal("delete a;", T.toJavaScript("delete a"));
-  assert.equal("delete window.someVariable;", T.toJavaScript("delete window.someVariable"));
+  assert.equal("delete a;", T.compile("delete a"));
+  assert.equal("delete window.someVariable;", T.compile("delete window.someVariable"));
 };
 
 if (module === require.main) {

@@ -36,15 +36,14 @@ scopes = (-> {
   end
 
   def isDefined(ident)
-    i = _scopes.length
-    while i -= 1
-      return true if _scopes[i].indexOf(ident) != -1
+    for scope of _scopes
+      return true if scope.indexOf(ident) != -1
     end
     return false
   end
 
   def isGlobal(ident)
-    return globals.indexOf(ident);
+    return globals.indexOf(ident) != -1;
   end
 
   def pushIdentifier(ident)

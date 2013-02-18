@@ -1,4 +1,4 @@
-object TPrototype
+object Tea.Prototype
   def init(name, parent, methods)
     self.objectName = name
     self.parentName = parent
@@ -11,7 +11,7 @@ object TPrototype
     scopes.withScope(-> () {
       name = self.objectName.compile()
 
-      if self.objectName instanceof TIdentifier
+      if self.objectName instanceof Tea.Identifier
         scopes.pushIdentifier(self.objectName.value)
         rs.push('var ' + name + ' = function () {};')
       else

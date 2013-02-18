@@ -1,4 +1,4 @@
-object UntilStatement
+object Tea.UntilStatement
   def init(test, body)
     self.test = test
     self.body = body
@@ -6,6 +6,6 @@ object UntilStatement
   end
 
   def compile
-    return 'while (!(' + self.test.compile() + ')) {' + self.body.compile() + '}';
+    return 'while (!(' + self.test.compile() + ')) {' + self.body.compile() + '}'
   end
 end

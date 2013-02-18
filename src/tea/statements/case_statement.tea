@@ -1,12 +1,13 @@
-object CaseStatement
+object Tea.CaseStatement
   def init(test, whenStatements)
     self.test = test
     self.whenStatements = whenStatements || []
+    return self
   end
 
   def compile
     rs = self.whenStatements.reduce(->(rs, stmt) {
-      return rs.concat(statement.compile('case': true))
+      return rs.concat(stmt.compile('case': true))
     }, [])
     return 'switch (' + self.test.compile() + ') {' + rs.join('') + '}';
   end

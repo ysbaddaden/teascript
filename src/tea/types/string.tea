@@ -1,10 +1,10 @@
-object TString
+object Tea.String
   def init(value)
     self.value = value
     return self
   end
 
   def compile
-    return this.value.replace(new RegExp('\n', 'g'), '\\n')
+    return self.value.replace(new RegExp('\n', 'g'), '\\n')
   end
 end

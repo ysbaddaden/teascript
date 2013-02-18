@@ -1,9 +1,30 @@
-return {
-  parse: ->(source) {
-    return parser.parse(source + '\n\n')
-  },
+beautify = require('js-beautify').js_beautify
 
-  compile: ->(source, options) {
-    return exports.parse(source).compile(options)
-  }
-}
+def lex(source)
+  parser.lexer.setInput(source)
+  tokens = []
+  while (token = lexer.lex()) != lexer.EOF
+    #tokens.push([ parser.terminals_[token], lexer.yytext ])
+    if typeof token == number
+      tokens.push(lexer.yytext)
+    else
+      tokens.push(token)
+    end
+  end
+  return tokens
+end
+
+def ast(source)
+  return parser.parse(source + '\n\n')
+end
+
+def compile(source, options)
+  raw = ast(source).compile(options)
+  return beautify(raw, jslint_happy: true)
+end
+
+exports = Tea if typeof exports == 'undefined'
+exports.lex = lex
+exports.ast = ast
+exports.compile = compile
+

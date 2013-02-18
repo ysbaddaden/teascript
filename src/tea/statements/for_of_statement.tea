@@ -1,4 +1,4 @@
-object ForOfStatement
+object Tea.ForOfStatement
   def init(identifier, index, expression, body)
     self.identifier = identifier
     self.index = index
@@ -8,7 +8,7 @@ object ForOfStatement
   end
 
   def compile
-    #if self.expression instanceof TRange
+    #if self.expression instanceof Tea.Range
     #  return self.compileRange()
     #else
       return self.compileExpression()
@@ -18,7 +18,7 @@ object ForOfStatement
   def compileExpression
     rs = []
 
-    if self.expression instanceof TIdentifier
+    if self.expression instanceof Tea.Identifier
       r1 = self.expression.compile()
     else
       r1 = scopes.reference()
@@ -57,10 +57,10 @@ object ForOfStatement
 #  else
 #    init = []
 #
-#    if range.left instanceof TNumber
+#    if range.left instanceof Tea.Number
 #      l = range.left.value
 #      init.push(i + ' = ' + l)
-#    elsif range.left instanceof TIdentifier
+#    elsif range.left instanceof Tea.Identifier
 #      l = range.left.value
 #      init.push(i + ' = ' + l)
 #    else
@@ -68,9 +68,9 @@ object ForOfStatement
 #      init.push(i + ' = ' + l + ' = ' + range.left.compile())
 #    end
 #
-#    if range.right instanceof TNumber
+#    if range.right instanceof Tea.Number
 #      r = range.right.value
-#    elsif range.right instanceof TIdentifier
+#    elsif range.right instanceof Tea.Identifier
 #      r = range.right.value
 #    } else {
 #      r = scopes.reference()

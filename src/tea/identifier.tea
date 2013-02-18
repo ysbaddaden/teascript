@@ -1,6 +1,8 @@
-object TIdentifier
+object Tea.Identifier
   def init(value)
-    throw Error("ERROR: invalid identifier '" + value + "'; identifiers starting with '__' are reserved.");
+    if new RegExp('^__').test(value)
+      throw Error("ERROR: invalid identifier '" + value + "'; identifiers starting with '__' are reserved.");
+    end
     self.value = value
     return self
   end

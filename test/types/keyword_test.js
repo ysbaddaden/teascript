@@ -1,19 +1,19 @@
 var assert = require("assert");
-var T = require("../../lib/tea");
+var T = require("../../build/tea");
 
 exports.testNull = function () {
-  assert.equal("null;", T.toJavaScript("null"));
+  assert.equal("null;", T.compile("null"));
 };
 
 exports.testBoolean = function () {
-  assert.equal("true;",  T.toJavaScript("true"));
-  assert.equal("false;", T.toJavaScript("false"));
+  assert.equal("true;",  T.compile("true"));
+  assert.equal("false;", T.compile("false"));
 };
 
 exports.testKeyword = function () {
-  assert.equal("continue;", T.toJavaScript("next"));
-  assert.equal("continue;", T.toJavaScript("continue"));
-  assert.equal("break;",    T.toJavaScript("break"));
+  assert.equal("continue;", T.compile("next"));
+  assert.equal("continue;", T.compile("continue"));
+  assert.equal("break;",    T.compile("break"));
 };
 
 if (module === require.main) {

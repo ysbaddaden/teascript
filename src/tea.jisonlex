@@ -3,9 +3,9 @@ D  [0-9]
 E  [eE][-+]?{D}+
 
 %{
-    if (typeof global.T === "undefined") {
-        global.T = require("../lib/tea");
-    }
+    //if (typeof global.T === "undefined") {
+    //    global.T = require("../lib/tea");
+    //}
 %}
 
 %%
