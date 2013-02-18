@@ -1,4 +1,6 @@
-object Tea.Assoc
+Identifier = require('../identifier')
+
+object TAssoc
   def init(left, right)
     self.left  = left
     self.right = right
@@ -6,7 +8,9 @@ object Tea.Assoc
   end
 
   def compile
-    left = self.left instanceof Tea.Identifier ? self.left.value : self.left.compile()
+    left = self.left instanceof Identifier ? self.left.value : self.left.compile()
     return left + ": " + self.right.compile()
   end
 end
+
+module.exports = TAssoc

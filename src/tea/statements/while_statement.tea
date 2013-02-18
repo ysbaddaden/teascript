@@ -1,4 +1,4 @@
-object Tea.WhileStatement
+object WhileStatement
   def init(test, body)
     self.test = test
     self.body = body
@@ -9,3 +9,5 @@ object Tea.WhileStatement
     return 'while (' + self.test.compile() + ') {' + self.body.compile() + '}';
   end
 end
+
+module.exports = WhileStatement

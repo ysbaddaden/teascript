@@ -1,4 +1,4 @@
-object Tea.IfStatement
+object IfStatement
   def init(test, body, alternatives)
     self.test = test
     self.body = body
@@ -22,3 +22,5 @@ object Tea.IfStatement
     return rs.join('')
   end
 end
+
+module.exports = IfStatement

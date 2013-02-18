@@ -1,4 +1,4 @@
-object Tea.ReturnStatement
+object ReturnStatement
   def init(expression)
     self.expression = expression
     return self
@@ -9,3 +9,5 @@ object Tea.ReturnStatement
     return 'return ' + self.expression.compile() + ';'
   end
 end
+
+module.exports = ReturnStatement

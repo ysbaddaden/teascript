@@ -1,4 +1,4 @@
-object Tea.Dot
+object Dot
   def init(left, right)
     self.left  = left
     self.right = right
@@ -9,3 +9,5 @@ object Tea.Dot
     return self.left.compile() + '.' + self.right.compile()
   end
 end
+
+module.exports = Dot

@@ -1,4 +1,6 @@
-object Tea.BeginStatement
+scopes = require('../scopes')
+
+object BeginStatement
   def init(body, rescues, _ensure)
     self.body = body
     self.rescues = rescues || []
@@ -45,3 +47,5 @@ object Tea.BeginStatement
     return ref
   end
 end
+
+module.exports = BeginStatement

@@ -1,4 +1,4 @@
-object Tea.DeleteStatement
+object DeleteStatement
   def init(primary)
     self.primary = primary
     return self
@@ -8,3 +8,5 @@ object Tea.DeleteStatement
     return 'delete ' + self.primary.compile() + ';'
   end
 end
+
+module.exports = DeleteStatement

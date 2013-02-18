@@ -1,3 +1,5 @@
+Splat = require('./splat')
+
 # The solution for splat arguments when newing an object, comes
 # from CoffeeScript:
 splatConstructorTemplate =
@@ -7,7 +9,7 @@ splatConstructorTemplate =
       return (t == 'object' || t == 'function') result || child : child;
   }(%{FUNCTION}, %{ARGS}, function () {}))"
 
-object Tea.NewExpression
+object NewExpression
   def init (expression, args)
     self.expression = expression
     self.args = args || []
@@ -19,7 +21,7 @@ object Tea.NewExpression
     splat = []
 
     for decl of self.args
-      if decl.constructor == Tea.Splat
+      if decl.constructor == Splat
         splat.push('[' + args.join(', ') + ']') if args.length > 0
         splat.push(decl.compile())
         args = [];
@@ -41,3 +43,5 @@ object Tea.NewExpression
     return 'new ' + self.expression.compile() + '(' + args.join(', ') + ')';
   end
 end
+
+module.exports = NewExpression

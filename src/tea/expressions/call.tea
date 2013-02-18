@@ -1,4 +1,6 @@
-object Tea.Call
+Splat = require('./splat')
+
+object Call
   def init(expression, args)
     self.expression = expression
     self.args = args || []
@@ -18,7 +20,7 @@ object Tea.Call
     splat = [];
 
     for decl of self.args
-      if decl.constructor == Tea.Splat
+      if decl.constructor == Splat
         splat.push('[' + args.join(', ') + ']') if args.length > 0
         splat.push(decl.compile())
         args = []
@@ -39,3 +41,5 @@ object Tea.Call
     return self.callerName() + '(' + args.join(', ') + ')'
   end
 end
+
+module.exports = Call

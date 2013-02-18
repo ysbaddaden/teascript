@@ -1,4 +1,4 @@
-object Tea.RequireStatement
+object RequireStatement
   def init(expression)
     self.expression = expression
     return self
@@ -8,3 +8,5 @@ object Tea.RequireStatement
     return 'require(' + self.expression.compile() + ')';
   end
 end
+
+module.exports = RequireStatement

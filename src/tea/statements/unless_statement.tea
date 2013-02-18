@@ -1,4 +1,4 @@
-object Tea.UnlessStatement
+object UnlessStatement
   def init(test, body, alternative)
     self.test = test
     self.body = body || new T.Body()
@@ -19,3 +19,5 @@ object Tea.UnlessStatement
     return rs.join('')
   end
 end
+
+module.exports = UnlessStatement

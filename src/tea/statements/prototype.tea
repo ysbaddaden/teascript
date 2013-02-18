@@ -1,4 +1,7 @@
-object Tea.Prototype
+scopes     = require('../scopes')
+Identifier = require('../identifier')
+
+object TPrototype
   def init(name, parent, methods)
     self.objectName = name
     self.parentName = parent
@@ -11,7 +14,7 @@ object Tea.Prototype
     scopes.withScope(-> () {
       name = self.objectName.compile()
 
-      if self.objectName instanceof Tea.Identifier
+      if self.objectName instanceof Identifier
         scopes.pushIdentifier(self.objectName.value)
         rs.push('var ' + name + ' = function () {};')
       else
@@ -29,3 +32,5 @@ object Tea.Prototype
     return rs.join('')
   end
 end
+
+module.exports = TPrototype

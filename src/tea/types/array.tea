@@ -1,4 +1,4 @@
-object Tea.Array
+object TArray
   def init(declaration)
     self.declaration = declaration || []
     return self
@@ -9,3 +9,5 @@ object Tea.Array
     return "[" + declaration.join(", ") + "]"
   end
 end
+
+module.exports = TArray

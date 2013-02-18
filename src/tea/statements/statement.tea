@@ -1,4 +1,4 @@
-object Tea.Statement
+object Statement
   def init(value)
     self.value = value
     return self
@@ -8,3 +8,5 @@ object Tea.Statement
     return self.value.compile() + ';'
   end
 end
+
+module.exports = Statement

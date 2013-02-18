@@ -1,4 +1,6 @@
-object Tea.Index
+TRange = require('../types/range')
+
+object Index
   def init(left, index)
     self.left  = left
     self.index = index
@@ -6,7 +8,7 @@ object Tea.Index
   end
 
   def compile
-    if self.index.constructor == Tea.Range
+    if self.index.constructor == TRange
       return 'Array.prototype.slice.call(' +
         self.left.compile() + ', ' +
         self.index.from() + ', ' +
@@ -15,3 +17,5 @@ object Tea.Index
     return self.left.compile() + '[' + self.index.compile() + ']'
   end
 end
+
+module.exports = Index

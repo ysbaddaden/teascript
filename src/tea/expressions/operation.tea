@@ -1,4 +1,7 @@
-object Tea.Operation
+scopes     = require('../scopes')
+Identifier = require('../identifier')
+
+object Operation
   def init(operator, left, right)
     self.operator = operator
     self.left     = left
@@ -12,8 +15,10 @@ object Tea.Operation
       left = self.left.compile()
       return 'if (!' + left + ') ' + left + ' = ' + self.right.compile()
     when '='
-      scopes.pushIdentifier(self.left.value) if self.left instanceof Tea.Identifier
+      scopes.pushIdentifier(self.left.value) if self.left instanceof Identifier
     end
     return self.left.compile() + ' ' + self.operator + ' ' + self.right.compile()
   end
 end
+
+module.exports = Operation

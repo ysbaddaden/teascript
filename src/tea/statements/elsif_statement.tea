@@ -1,4 +1,4 @@
-object Tea.ElsifStatement
+object ElsifStatement
   def init(test, body)
     self.test = test
     self.body = body
@@ -9,3 +9,5 @@ object Tea.ElsifStatement
     return '} else if (' + self.test.compile() + ') {' + self.body.compile();
   end
 end
+
+module.exports = ElsifStatement

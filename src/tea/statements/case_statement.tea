@@ -1,4 +1,4 @@
-object Tea.CaseStatement
+object CaseStatement
   def init(test, whenStatements)
     self.test = test
     self.whenStatements = whenStatements || []
@@ -12,3 +12,5 @@ object Tea.CaseStatement
     return 'switch (' + self.test.compile() + ') {' + rs.join('') + '}';
   end
 end
+
+module.exports = CaseStatement

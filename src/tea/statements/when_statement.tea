@@ -1,4 +1,4 @@
-object Tea.WhenStatement
+object WhenStatement
   def init(tests, body)
     self.tests = tests
     self.body = body
@@ -14,3 +14,5 @@ object Tea.WhenStatement
     return rs.join('') + body
   end
 end
+
+module.exports = WhenStatement

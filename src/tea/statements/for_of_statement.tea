@@ -1,4 +1,9 @@
-object Tea.ForOfStatement
+scopes     = require('../scopes')
+Identifier = require('../identifier')
+TNumber    = require('../types/number')
+TRange     = require('../types/range')
+
+object ForOfStatement
   def init(identifier, index, expression, body)
     self.identifier = identifier
     self.index = index
@@ -8,7 +13,7 @@ object Tea.ForOfStatement
   end
 
   def compile
-    #if self.expression instanceof Tea.Range
+    #if self.expression instanceof TRange
     #  return self.compileRange()
     #else
       return self.compileExpression()
@@ -18,7 +23,7 @@ object Tea.ForOfStatement
   def compileExpression
     rs = []
 
-    if self.expression instanceof Tea.Identifier
+    if self.expression instanceof Identifier
       r1 = self.expression.compile()
     else
       r1 = scopes.reference()
@@ -57,10 +62,10 @@ object Tea.ForOfStatement
 #  else
 #    init = []
 #
-#    if range.left instanceof Tea.Number
+#    if range.left instanceof TNumber
 #      l = range.left.value
 #      init.push(i + ' = ' + l)
-#    elsif range.left instanceof Tea.Identifier
+#    elsif range.left instanceof Identifier
 #      l = range.left.value
 #      init.push(i + ' = ' + l)
 #    else
@@ -68,9 +73,9 @@ object Tea.ForOfStatement
 #      init.push(i + ' = ' + l + ' = ' + range.left.compile())
 #    end
 #
-#    if range.right instanceof Tea.Number
+#    if range.right instanceof TNumber
 #      r = range.right.value
-#    elsif range.right instanceof Tea.Identifier
+#    elsif range.right instanceof Identifier
 #      r = range.right.value
 #    } else {
 #      r = scopes.reference()
@@ -91,3 +96,5 @@ object Tea.ForOfStatement
 #  return rs.join('')
 #};
 end
+
+module.exports = ForOfStatement

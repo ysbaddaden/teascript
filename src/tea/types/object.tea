@@ -1,4 +1,4 @@
-object Tea.Object
+object TObject
   def init(declarations)
     self.declarations = declarations || [];
     return self
@@ -9,3 +9,5 @@ object Tea.Object
     return "{" + declarations.join(", ") + "}";
   end
 end
+
+module.exports = TObject

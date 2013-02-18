@@ -1,4 +1,6 @@
-object Tea.ForInStatement
+scopes = require('../scopes')
+
+object ForInStatement
   def init(_own, key, value, expression, body)
     self._own = _own
     self.key = key
@@ -36,3 +38,5 @@ object Tea.ForInStatement
     end
   end
 end
+
+module.exports = ForInStatement

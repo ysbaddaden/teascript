@@ -1,4 +1,6 @@
-object Tea.RescueStatement
+scopes = require('../scopes')
+
+object RescueStatement
   def init(names, identifier, body)
     self.names = names || []
     self.identifier = identifier
@@ -26,3 +28,5 @@ object Tea.RescueStatement
     return rs.join('\n')
   end
 end
+
+module.exports = RescueStatement

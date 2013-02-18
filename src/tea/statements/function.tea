@@ -1,4 +1,8 @@
-object Tea.Function
+scopes    = require('../scopes')
+Splat     = require('../expressions/splat')
+Operation = require('../expressions/operation')
+
+object TFunction
   def init(name, args, body)
     self.name = name
     self.args = args || []
@@ -21,11 +25,11 @@ object Tea.Function
     # arguments
     for arg of self.args
       case arg.constructor
-      when Tea.Operation
+      when Operation
         ident = arg.left.compile()
         a.push(ident)
         b.push('if (' + ident + ' === undefined) ' + arg.compile() + ';')
-      when Tea.Splat
+      when Splat
         scopes.pushIdentifier(ident = arg.compile())
         v = 'Array.prototype.slice.call(arguments, ' + a.length + ') || []'
         b.push('var ' + ident + ' = ' + v + ';')
@@ -58,3 +62,5 @@ object Tea.Function
     return rs.join('')
   end
 end
+
+module.exports = TFunction

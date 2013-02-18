@@ -1,6 +1,8 @@
-object Tea.StaticFunction
+TFunction = require('./function')
+
+object StaticFunction
   def init(name, args, body)
-    self.fn = (new Tea.Function).init(name, args, body)
+    self.fn = (new TFunction).init(name, args, body)
     return self
   end
 
@@ -8,3 +10,5 @@ object Tea.StaticFunction
     return self.fn.compile(prefix: options.objectName)
   end
 end
+
+module.exports = StaticFunction

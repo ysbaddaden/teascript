@@ -1,4 +1,4 @@
-object Tea.Identifier
+object Identifier
   def init(value)
     if new RegExp('^__').test(value)
       throw Error("ERROR: invalid identifier '" + value + "'; identifiers starting with '__' are reserved.");
@@ -12,3 +12,4 @@ object Tea.Identifier
   end
 end
 
+module.exports = Identifier

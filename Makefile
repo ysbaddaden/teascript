@@ -14,17 +14,21 @@ build/%.js: src/tea/%.tea
 	bin/tea $< > $@
 
 build/parser.js: src/tea.jison src/tea.jisonlex
-	jison -m js src/tea.jison src/tea.jisonlex -o build/parser.js
+	jison -m js src/tea.jison src/tea.jisonlex -o build/_parser.js
+	echo "var Tea = require('./tea');" > $@
+	cat build/_parser.js >> $@
+	echo "module.exports = _parser;" >> $@
+	rm build/_parser.js
 
-build/tea.js: $(OBJECTS) build/compile.js build/parser.js
-	echo "var Tea = {}; (function () {" > $@
-	cat $(MODULES) build/parser.js build/compile.js >> $@
-	echo "}());" >> $@
+#build/tea.js: $(OBJECTS) build/compile.js build/parser.js
+#	echo "var Tea = {}; (function () {" > $@
+#	cat $(MODULES) build/parser.js build/compile.js >> $@
+#	echo "}());" >> $@
 
 folders:
 	mkdir -p build/types build/expressions build/statements build/commands
 
-tea: folders build/tea.js
+tea: folders build/parser.js $(OBJECTS)
 
 test:
 	cd test && node all.js `find * -iname "*_test.js"`

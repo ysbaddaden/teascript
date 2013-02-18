@@ -1,4 +1,6 @@
-object Tea.Body
+scopes = require('../scopes')
+
+object Body
   def init(statement)
     self.statements = []
     self.push(statement) if statement != undefined
@@ -25,3 +27,5 @@ object Tea.Body
     return self.body.join('')
   end
 end
+
+module.exports = Body
