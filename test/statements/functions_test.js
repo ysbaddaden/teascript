@@ -1,20 +1,24 @@
 var assert = require("assert");
 var T = require("../../build/tea");
 
-exports.testEmptyFunctionStatement = function () {
+exports["test empty function statements"] = function () {
   assert.equal("function fn() {}", T.compile("def fn\nend"));
   assert.equal("function fn() {}", T.compile("def fn()\nend"));
-  assert.equal("function test(a) {}", T.compile("def test(a);end"));
 };
 
-exports.testArguments = function () {
+exports["test function names as dot expressions"] = function () {
+  assert.equal('exports.compile = function () {};', T.compile('def exports.compile;end'));
+  assert.equal('a.b.c.d = function () {};', T.compile('def a.b.c.d;end'));
+};
+
+exports["test arguments"] = function () {
   assert.equal("function test(a) {}", T.compile("def test(a);end"));
   assert.equal("function test(b) {}", T.compile("def test b;end"));
   assert.equal("function test(a, b, c, d) {}", T.compile("def test a, b, c, d;end"));
   assert.equal("function test(key) {\n    key = 'val';\n}", T.compile("def test(key);key = 'val';end"));
 };
 
-exports.testDefaultArguments = function () {
+exports['test default arguments'] = function () {
   assert.equal('function test(a) {\n' +
                '    if (a === undefined) a = "str";\n' +
                '}',
@@ -37,7 +41,7 @@ exports.testDefaultArguments = function () {
                T.compile('def render(error, status = error);end'));
 };
 
-exports.testSplatArguments = function () {
+exports["test splat arguments"] = function () {
   assert.equal('function sendTo() {\n' +
                '    var emails = Array.prototype.slice.call(arguments, 0) || [];\n' +
                '}',
@@ -55,14 +59,14 @@ exports.testSplatArguments = function () {
                T.compile('def send(from = Config.default_from, *to)\nend'));
 };
 
-exports.testEmptyLambda = function () {
+exports["test empty lambdas"] = function () {
   assert.equal("var l;\nl = function () {};", T.compile("l = ->() {}"));
   assert.equal("var l;\nl = function () {};", T.compile("l = ->() {\n}"));
   assert.equal("var l;\nl = function () {};", T.compile("l = -> (\n) {}"));
   assert.equal("var l;\nl = function () {};", T.compile("l = -> {}"));
 };
 
-exports.testEmptyLambdaWithArguments = function () {
+exports["test empty lambdas with arguments"] = function () {
   assert.equal('var l;\nl = function (a, b, c, d) {};',
                T.compile('l = ->(a, b, c, d) {\n}'));
 
@@ -72,7 +76,7 @@ exports.testEmptyLambdaWithArguments = function () {
                T.compile('caller = ->(*emails) {\n}'));
 };
 
-exports.testLambdaWithStatement = function () {
+exports["test lambda assignment"] = function () {
   assert.equal('var x;\nx = function () {\n' +
                '    return "something";\n' +
                '};',
@@ -90,7 +94,7 @@ exports.testLambdaWithStatement = function () {
   );
 };
 
-exports.testLambdaWithBody = function () {
+exports["test lambda assignment with body"] = function () {
   assert.equal('var obj, resize;\n' +
                'obj = require("graphics");\n' +
                'resize = function () {\n' +
@@ -100,13 +104,12 @@ exports.testLambdaWithBody = function () {
                '    return x + y;\n' +
                '};',
                T.compile('obj = require("graphics")\n' +
-                              'resize = -> {\n' +
-                              '  x = obj.getX()\n' +
-                              '  y = obj.getY()\n' +
-                              '  return x + y\n' +
-                              '}'
-                             )
-  );
+                         'resize = -> {\n' +
+                         '  x = obj.getX()\n' +
+                         '  y = obj.getY()\n' +
+                         '  return x + y\n' +
+                         '}'));
+
   assert.equal('var obj, resize;\n' +
                'obj = require("graphics");\n' +
                'resize = function () {\n' +
@@ -116,7 +119,7 @@ exports.testLambdaWithBody = function () {
                '    return x + y;\n' +
                '};',
                T.compile('obj = require("graphics")\n' +
-                              'resize = ->() {\n  x = obj.getX()\n  y = obj.getY()\n  return x + y\n}')
+                         'resize = ->() {x = obj.getX(); y = obj.getY(); return x + y}')
   );
   assert.equal('var obj, resize;\n' +
                'obj = require("graphics");\n' +
@@ -126,7 +129,7 @@ exports.testLambdaWithBody = function () {
                '    return x + y;\n' +
                '};',
                T.compile('obj = require("graphics")\n' +
-                              'resize = ->(x) {\n  y = obj.getY()\n  return x + y\n}')
+                         'resize = ->(x) {\n  y = obj.getY()\n  return x + y\n}')
   );
 };
 

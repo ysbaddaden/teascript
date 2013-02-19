@@ -49,7 +49,7 @@ exports.parser = parser
 
 beautify = require('js-beautify').js_beautify
 
-def lex(source)
+def exports.lex(source)
   parser.lexer.setInput(source)
   tokens = []
   while (token = lexer.lex()) != lexer.EOF
@@ -63,15 +63,11 @@ def lex(source)
   return tokens
 end
 
-def ast(source)
+def exports.ast(source)
   return parser.parse(source + '\n\n')
 end
 
-def compile(source, options)
-  return beautify(ast(source).compile(options), jslint_happy: true)
+def exports.compile(source, options)
+  return beautify(exports.ast(source).compile(options), jslint_happy: true)
 end
-
-exports.lex = lex
-exports.ast = ast
-exports.compile = compile
 

@@ -1,7 +1,5 @@
 Tea = require('../tea')
-optimist = require('optimist').argv
-
-isNodeJS = (typeof process != 'undefined')
+#optimist = require('optimist').argv
 
 def main(args)
   unless args[1]
@@ -9,21 +7,13 @@ def main(args)
     return
   end
 
-  if isNodeJS
-    fs   = require('fs')
-    path = require('path')
-    src  = fs.readFileSync(path.join(process.cwd(), args[1]), 'utf8')
-  else
-    file = require('file')
-    src  = file.path(file.cwd()).join(args[1].read(charset: 'utf-8'))
-  end
+  fs   = require('fs')
+  path = require('path')
+  src  = fs.readFileSync(path.join(process.cwd(), args[1]), 'utf8')
 
   dest = Tea.compile(src, amd: args[2] == '--amd', scoped: args[2] == '--scope')
   console.log(dest)
 end
 
-if isNodeJS
-  main(process.argv.slice(1))
-else
-  main(require('system').args)
-end
+main(process.argv.slice(1))
+

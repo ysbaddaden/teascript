@@ -1,5 +1,6 @@
 scopes    = require('../scopes')
 Splat     = require('../expressions/splat')
+Dot       = require('../expressions/dot')
 Operation = require('../expressions/operation')
 
 object TFunction
@@ -39,6 +40,7 @@ object TFunction
       end
     end
 
+    # function name
     if options.objectName
       name = self.name.compile()
       rs.push(options.objectName + '.prototype.' + name + ' = function (' + a.join(', ') + ') {')
@@ -46,11 +48,15 @@ object TFunction
     elsif options.prefix
       name = self.name.compile()
       rs.push(options.prefix + '.' + name + ' = function (' + a.join(', ') + ') {')
+    elsif self.name and self.name instanceof Dot
+      name = self.name.compile()
+      rs.push(name + ' = function (' + a.join(', ') + ') {')
     else
       name = self.name ? self.name.compile() : ''
       rs.push('function ' + name + '(' + a.join(', ') + ') {')
     end
 
+    # body
     body = self.body.compile(scope: true) if self.body != undefined
 
     if body.length > 0 || b.length > 0
@@ -58,7 +64,11 @@ object TFunction
       rs.push(body)
     end
 
-    rs.push('}')
+    if self.name and self.name instanceof Dot
+      rs.push('};')
+    else
+      rs.push('}')
+    end
     return rs.join('')
   end
 end

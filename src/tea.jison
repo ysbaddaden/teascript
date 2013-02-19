@@ -193,11 +193,16 @@ OFUNC
     ;
 
 FUNCTION
-    : def IDENTIFIER ARGDECL ASTMT end      { $$ = (new Tea.Function).init($2, $3, $4); }
+    : def FUNCNAME ARGDECL ASTMT end        { $$ = (new Tea.Function).init($2, $3, $4); }
     ;
 
 STATIC
-    : def '+' IDENTIFIER ARGDECL ASTMT end  { $$ = (new Tea.StaticFunction).init($3, $4, $5); }
+    : def '+' FUNCNAME ARGDECL ASTMT end    { $$ = (new Tea.StaticFunction).init($3, $4, $5); }
+    ;
+
+FUNCNAME
+    : IDENTIFIER                            { $$ = $1; }
+    | FUNCNAME '.' IDENTIFIER               { $$ = (new Tea.Dot).init($1, $3); }
     ;
 
 ELSIF
