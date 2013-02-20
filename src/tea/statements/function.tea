@@ -29,7 +29,7 @@ object TFunction
       when Operation
         ident = arg.left.compile()
         a.push(ident)
-        b.push('if (' + ident + ' === undefined) ' + arg.compile() + ';')
+        b.push('if (' + ident + ' == null) ' + arg.compile() + ';')
       when Splat
         scopes.pushIdentifier(ident = arg.compile())
         v = 'Array.prototype.slice.call(arguments, ' + a.length + ') || []'

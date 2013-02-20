@@ -20,23 +20,23 @@ exports["test arguments"] = function () {
 
 exports['test default arguments'] = function () {
   assert.equal('function test(a) {\n' +
-               '    if (a === undefined) a = "str";\n' +
+               '    if (a == null) a = "str";\n' +
                '}',
                T.compile('def test(a = "str");end'));
 
   assert.equal('function test(a, b) {\n' +
-               '    if (b === undefined) b = "str";\n' +
+               '    if (b == null) b = "str";\n' +
                '}',
                T.compile('def test(a, b = "str");end'));
 
   assert.equal('function test(a, b) {\n' +
-               '    if (a === undefined) a = "test";\n' +
-               '    if (b === undefined) b = "suite";\n' +
+               '    if (a == null) a = "test";\n' +
+               '    if (b == null) b = "suite";\n' +
                '}',
                T.compile('def test(a = "test", b = "suite");end'));
 
   assert.equal('function render(error, status) {\n' +
-               '    if (status === undefined) status = error;\n' +
+               '    if (status == null) status = error;\n' +
                '}',
                T.compile('def render(error, status = error);end'));
 };
@@ -53,7 +53,7 @@ exports["test splat arguments"] = function () {
                T.compile('def send(from, *to)\nend'));
 
   assert.equal('function send(from) {\n' +
-               '    if (from === undefined) from = Config.default_from;\n' +
+               '    if (from == null) from = Config.default_from;\n' +
                '    var to = Array.prototype.slice.call(arguments, 1) || [];\n' +
                '}',
                T.compile('def send(from = Config.default_from, *to)\nend'));

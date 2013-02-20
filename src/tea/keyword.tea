@@ -5,7 +5,7 @@ object Keyword
   end
 
   def compile
-    return self.value
+    return self.value == 'nil' ? 'null' : self.value
   end
 end
 

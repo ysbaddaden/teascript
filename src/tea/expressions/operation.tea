@@ -1,5 +1,7 @@
 scopes     = require('../scopes')
 Identifier = require('../identifier')
+Keyword    = require('../keyword')
+Condition  = require('./condition')
 
 object Operation
   def init(operator, left, right)
@@ -11,6 +13,12 @@ object Operation
 
   def compile
     case self.operator.trim()
+    when '===', '!=='
+      if self.isNil(self.left) or self.isNil(self.right) or
+          (self.left  instanceof Condition and self.isNil(self.left.condition)) or
+          (self.right instanceof Condition and self.isNil(self.right.condition))
+        self.operator = self.operator.substr(0, 2)
+      end
     when '||='
       left = self.left.compile()
       return 'if (!' + left + ') ' + left + ' = ' + self.right.compile()
@@ -18,6 +26,10 @@ object Operation
       scopes.pushIdentifier(self.left.value) if self.left instanceof Identifier
     end
     return self.left.compile() + ' ' + self.operator + ' ' + self.right.compile()
+  end
+
+  def isNil(arg)
+    return arg instanceof Keyword and arg.value == 'nil'
   end
 end
 

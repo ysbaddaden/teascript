@@ -352,6 +352,7 @@ IDENTIFIER
 LITERAL
     : true              { $$ = (new Tea.Keyword).init($1); }
     | false             { $$ = (new Tea.Keyword).init($1); }
+    | nil               { $$ = (new Tea.Keyword).init($1); }
     | null              { $$ = (new Tea.Keyword).init($1); }
     | undefined         { $$ = (new Tea.Keyword).init($1); }
     | NUMBER            { $$ = (new Tea.Number).init($1); }

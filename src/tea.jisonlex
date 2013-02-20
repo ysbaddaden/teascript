@@ -15,6 +15,7 @@ E  [eE][-+]?{D}+
 "true"                      return 'true';
 "false"                     return 'false';
 "null"                      return 'null';
+"nil"                       return 'nil';
 {D}+(\.{D}+)?({E})?         return 'NUMBER';
 \.{D}+({E})?                return 'NUMBER';
 \"(\\.|[^\\"])*\"           return 'STRING';
