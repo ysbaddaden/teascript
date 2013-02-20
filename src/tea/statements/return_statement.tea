@@ -5,7 +5,7 @@ object ReturnStatement
   end
 
   def compile
-    return 'return;' if self.expression == 'undefined'
+    return 'return;' if self.expression == undefined
     return 'return ' + self.expression.compile() + ';'
   end
 end
