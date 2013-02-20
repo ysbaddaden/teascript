@@ -17,6 +17,10 @@ object Body
     }, [])
   end
 
+  def lastStatement
+    return self.statements[self.statements.length - 1]
+  end
+
   def compile(options = {})
     if options.scope
       identifiers = scopes.withScope(-> { self.parseStatements() })

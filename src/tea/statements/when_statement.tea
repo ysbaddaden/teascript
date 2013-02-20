@@ -1,3 +1,5 @@
+ReturnStatement = require('./return_statement')
+
 object WhenStatement
   def init(tests, body)
     self.tests = tests
@@ -7,11 +9,12 @@ object WhenStatement
 
   # NOTE: check wether there is a good reason to generate the body before the tests
   def compile
-    body = self.body.compile() + 'break;'
+    body = self.body.compile();
+    _break = self.body.lastStatement() instanceof ReturnStatement ? '' : 'break;'
     rs = self.tests.map(->(expr) {
       return 'case ' + expr.compile() + ':'
     })
-    return rs.join('') + body
+    return rs.join('') + body + _break
   end
 end
 

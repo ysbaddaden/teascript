@@ -14,7 +14,7 @@ exports.testCaseStatement = function () {
     "    break;\n" +
     "}",
     T.compile("case true\nwhen 1 then x = false\nend"));
-  
+
   assert.equal("var x;\n" +
     "switch (true) {\n" +
     "case 1:\n" +
@@ -22,7 +22,7 @@ exports.testCaseStatement = function () {
     "    break;\n" +
     "}",
     T.compile("case true\nwhen 1\nx = false\nend"));
-  
+
   assert.equal("var x;\n" +
     "switch (true) {\n" +
     "case 1:\n" +
@@ -31,7 +31,7 @@ exports.testCaseStatement = function () {
     "    x = false;\n" +
     "}",
     T.compile("case true\nwhen 1\nelse x = false\nend"));
-  
+
   assert.equal("var x;\n" +
     "switch (true) {\n" +
     "case 1:\n" +
@@ -41,7 +41,7 @@ exports.testCaseStatement = function () {
     "    x = false;\n" +
     "}",
     T.compile("case true\nwhen 1 then x = true\nelse x = false\nend"));
-  
+
   assert.equal("var x;\n" +
     "switch (true) {\n" +
     "case 1:\n" +
@@ -56,6 +56,19 @@ exports.testCaseStatement = function () {
     "    x = false;\n" +
     "}",
     T.compile("case true\nwhen 1 then x = true\nwhen 2, 3, 4 + y\nx = null\nelse x = false\nend"));
+};
+
+exports["test case statements with returns shouldn't break"] = function () {
+  assert.equal(
+    "switch (true) {\n" +
+    "case 1:\n" +
+    "    return 'one';\n" +
+    "case 2:\n" +
+    "    return 'two';\n" +
+    "default:\n" +
+    "    return null;\n" +
+    "}",
+    T.compile("case true\nwhen 1\n  return 'one'\nwhen 2\n  return 'two'\nelse\n  return null\nend"));
 };
 
 if (module === require.main) {
