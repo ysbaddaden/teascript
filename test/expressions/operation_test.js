@@ -1,5 +1,5 @@
 var assert = require("assert");
-var T = require("../../build/tea");
+var T = require("../../lib/tea");
 
 exports.testAdditive = function () {
   assert.equal("a + 1;", T.compile("a + 1"));

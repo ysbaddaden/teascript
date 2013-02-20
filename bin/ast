@@ -1,7 +1,22 @@
-#! /usr/bin/env bash
+#! /usr/bin/env node
+var fs = require('fs');
+var path = require('path');
+var util = require('util');
+var CHARSET = 'utf8';
 
-cd `dirname $0`
-ROOT=`dirname $(pwd -P)`
+function main(argv) {
+    var input  = path.join(process.cwd(), argv._[0]);
+    var result = parse(input);
+    process.stdout.write(util.inspect(result, false, null));
+}
 
-node $ROOT/lib/commands/ast ../$1 $2
+function parse(input) {
+    var Tea = require('../lib/tea');
+    return Tea.ast(fs.readFileSync(input, CHARSET));
+}
+
+main(require('optimist').
+    usage('Usage: $0 <fname>').
+    demand(1).
+    argv);
 

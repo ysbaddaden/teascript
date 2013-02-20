@@ -1,5 +1,5 @@
 var assert = require("assert");
-var T = require("../../build/tea");
+var T = require("../../lib/tea");
 
 exports.testIndex = function () {
   assert.equal("ary[1];", T.compile("ary[1]"));

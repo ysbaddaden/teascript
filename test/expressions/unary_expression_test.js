@@ -1,5 +1,5 @@
 var assert = require("assert");
-var T = require("../../build/tea");
+var T = require("../../lib/tea");
 
 exports.testMinus = function () {
   assert.equal("-1;", T.compile("-1"));

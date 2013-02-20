@@ -1,5 +1,5 @@
 var assert = require('assert');
-var T = require("../../build/tea");
+var T = require("../../lib/tea");
 
 exports['test throw'] = function () {
     assert.equal("throw Error('message');", T.compile("throw Error('message')"));

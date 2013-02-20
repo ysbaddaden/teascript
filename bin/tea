@@ -1,7 +1,44 @@
-#! /usr/bin/env bash
+#! /usr/bin/env node
+var fs = require('fs');
+var path = require('path');
+var CHARSET = 'utf8';
 
-cd `dirname $0`
-ROOT=`dirname $(pwd -P)`
+function main(argv) {
+    var input  = path.join(process.cwd(), argv._[0]);
+    var result = compile(input, argv);
+    if (argv.output) {
+        write(argv.output, result);
+    } else {
+        process.stdout.setEncoding(CHARSET);
+        process.stdout.write(result);
+    }
+}
 
-node $ROOT/build/commands/tea.js ../$1 $2
+function compile(input, options) {
+    var Tea = require('../lib/tea');
+    return Tea.compile(fs.readFileSync(input, CHARSET), options);
+}
+
+function write(output, result) {
+    if (isDirectory(output)) {
+        output = path.join(output, path.basename(input, '.tea') + '.js');
+    }
+    fs.writeFileSync(path.join(process.cwd(), output), result, CHARSET);
+}
+
+function isDirectory(file) {
+    try {
+        return fs.statSync(file).isDirectory();
+    } catch (ex) {
+        return false;
+    }
+}
+
+main(require('optimist').
+    usage('Usage: $0 <fname> [-o <fname>]').
+    alias('o', 'output').
+    describe('output', "Write result to file (defaults to STDOUT)").
+    describe('scope',  "Scope result in an IIFE").
+    describe('amd',    "Scope result in an AMD definition").
+    demand(1).argv);
 

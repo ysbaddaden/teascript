@@ -1,5 +1,5 @@
 var assert = require("assert");
-var T = require("../../build/tea");
+var T = require("../../lib/tea");
 
 exports.testEmptyObject = function () {
   assert.equal("var A = function () {};", T.compile("object A\nend"));

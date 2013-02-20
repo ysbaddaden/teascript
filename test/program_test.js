@@ -1,5 +1,5 @@
 var assert = require("assert");
-var T = require("../build/tea");
+var T = require("../lib/tea");
 
 exports.testProgram = function () {
   assert.equal("var T;\nT = require('./tea');",

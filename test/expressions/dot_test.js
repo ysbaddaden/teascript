@@ -1,5 +1,5 @@
 var assert = require("assert");
-var T = require("../../build/tea");
+var T = require("../../lib/tea");
 
 exports.testDot = function () {
   assert.equal("hsh.value;", T.compile("hsh.value"));

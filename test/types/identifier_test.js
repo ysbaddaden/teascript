@@ -1,5 +1,5 @@
 var assert = require("assert");
-var T = require("../../build/tea");
+var T = require("../../lib/tea");
 
 exports.testIdentifier = function () {
   assert.equal("azerty;", T.compile("azerty"));

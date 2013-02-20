@@ -1,5 +1,5 @@
 var assert = require("assert");
-var T = require("../../build/tea");
+var T = require("../../lib/tea");
 
 exports.testSingleQuotedString = function () {
   assert.equal("'this is a string';", T.compile("'this is a string'"));

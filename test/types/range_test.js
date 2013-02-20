@@ -1,5 +1,5 @@
 var assert = require("assert");
-var T = require("../../build/tea");
+var T = require("../../lib/tea");
 
 exports.testExclusiveSlice = function () {
   assert.equal("Array.prototype.slice.call(ary, 0, 4);",

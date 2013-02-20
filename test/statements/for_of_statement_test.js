@@ -1,5 +1,5 @@
 var assert = require("assert");
-var T = require("../../build/tea");
+var T = require("../../lib/tea");
 
 exports['test empty for of statement'] = function () {
   assert.equal("var __ref1, __ref2, i;\nfor (__ref1 = 0, __ref2 = ary.length; __ref1 < __ref2; __ref1++) {\n    i = ary[__ref1];\n}", T.compile("for i of ary\nend"));

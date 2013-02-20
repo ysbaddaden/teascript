@@ -1,5 +1,5 @@
 var assert = require("assert");
-var T = require("../../build/tea");
+var T = require("../../lib/tea");
 
 exports["test ="] = function () {
   assert.equal("var a;\na = 1;", T.compile("a = 1"));

@@ -1,5 +1,5 @@
 var assert = require("assert");
-var T = require("../../build/tea");
+var T = require("../../lib/tea");
 
 exports.testEmptyCaseStatement = function () {
   assert.equal("switch (true) {\ncase 1:\n    break;\n}", T.compile("case true\nwhen 1\nend"));

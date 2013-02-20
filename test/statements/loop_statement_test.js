@@ -1,5 +1,5 @@
 var assert = require("assert");
-var T = require("../../build/tea");
+var T = require("../../lib/tea");
 
 exports.testEmptyLoopStatement = function () {
   assert.equal("while (true) {}", T.compile("loop do\nend"));

@@ -1,5 +1,5 @@
 var assert = require("assert");
-var T = require("../../build/tea");
+var T = require("../../lib/tea");
 
 exports.testEmptyUnlessStatement = function () {
   assert.equal("if (!(true)) {}", T.compile("unless true then end"));

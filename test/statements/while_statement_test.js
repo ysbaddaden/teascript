@@ -1,5 +1,5 @@
 var assert = require("assert");
-var T = require("../../build/tea");
+var T = require("../../lib/tea");
 
 exports.testEmptyWhileStatement = function () {
   assert.equal("while (x < 10) {}", T.compile("while x < 10\nend"));

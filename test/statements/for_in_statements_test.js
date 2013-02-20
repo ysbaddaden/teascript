@@ -1,5 +1,5 @@
 var assert = require("assert");
-var T = require("../../build/tea");
+var T = require("../../lib/tea");
 
 exports.testEmptyForInStatement = function () {
   assert.equal("var key;\nfor (key in hash) {}", T.compile("for key in hash\nend"));

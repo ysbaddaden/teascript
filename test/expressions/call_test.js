@@ -1,5 +1,5 @@
 var assert = require("assert");
-var T = require("../../build/tea");
+var T = require("../../lib/tea");
 
 exports['test empty calls'] = function () {
   assert.equal("doSomething();",            T.compile("doSomething()"));

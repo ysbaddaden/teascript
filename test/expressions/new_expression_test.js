@@ -1,5 +1,5 @@
 var assert = require("assert");
-var T = require("../../build/tea");
+var T = require("../../lib/tea");
 
 exports.testNewExpression = function () {
   assert.equal("new Object();", T.compile("new Object()"));
