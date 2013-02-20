@@ -2,7 +2,6 @@ object UnlessStatement
   def init(test, body, alternative)
     self.test = test
     self.body = body || new T.Body()
-    self.alternative = alternative
     return self
   end
 
@@ -10,11 +9,6 @@ object UnlessStatement
     rs = []
     rs.push('if (!(' + self.test.compile() + ')) {')
     rs.push(self.body.compile())
-
-    if typeof self.alternative != 'undefined'
-      rs = rs.concat(self.alternative.compile())
-    end
-
     rs.push('}')
     return rs.join('')
   end

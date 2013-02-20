@@ -3,7 +3,7 @@ scopes = require('../scopes')
 object Body
   def init(statement)
     self.statements = []
-    self.push(statement) if statement != undefined
+    self.push(statement) if statement
     return self
   end
 
