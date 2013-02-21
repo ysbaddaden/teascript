@@ -7,7 +7,7 @@ var CHARSET = 'utf8';
 function main(argv) {
     var input  = path.join(process.cwd(), argv._[0]);
     var result = lex(input);
-    process.stdout.write(util.inspect(result, false, null));
+    process.stdout.write(util.inspect(result, false, null) + '\n');
 }
 
 function lex(input) {

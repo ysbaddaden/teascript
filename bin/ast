@@ -7,7 +7,7 @@ var CHARSET = 'utf8';
 function main(argv) {
     var input  = path.join(process.cwd(), argv._[0]);
     var result = parse(input);
-    process.stdout.write(util.inspect(result, false, null));
+    process.stdout.write(util.inspect(result, false, null) + '\n');
 }
 
 function parse(input) {
