@@ -919,10 +919,12 @@ end
     with something it would actually check against both null and undefined,
     allowing to make no difference between those two values.
 
+    [DONE]
+
   * **String interpolations**: tea code should be embedable in double quoted
     strings, using the `#{<code>}` syntax.
 
-  * **Bind operator**: automatically binds self for event listeners in
+  * **Bind operator**: automatically bind self for event listeners in
     prototypes. Something like:
 
     ```
@@ -943,8 +945,8 @@ end
     end
     ```
 
-    `name` should return `"something"` if `arg` is falsy, and `"something else"`
-    is `arg` is truthy.
+    `name` should return `"something"` if `arg` is truthy, and `"something else"`
+    is `arg` is falsy.
 
   * **SourceMaps**: generated JavaScript code should come with a source map, so
     that errors and debug can be done from the Tea code, not the generated

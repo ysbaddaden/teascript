@@ -6,11 +6,8 @@ object Unary
   end
 
   def compile
-    if self.operator != 'typeof'
-      return self.operator + self.right.compile()
-    else
-      return self.operator + ' ' + self.right.compile()
-    end
+    rs = [ self.operator, self.right.compile() ]
+    return self.operator == 'typeof' ? rs.join(' ') : rs.join('')
   end
 end
 

@@ -1,12 +1,14 @@
-%right and or not typeof instanceof
-%right '=' OP_ASGN
-%right '..' '...'
-%left  '+' '-' '|' '^' '&' '~'
-%right '*' '/' '%'
-%left  '>' '>=' '<' '<=' '==' '!='
-%right '<<' '>>'
-%left  '&&' '||'
-%left  '?' ':'
+%left     '.'
+%right    '!' '~' new not typeof delete
+%left     '*' '/' '%'
+%left     '+' '-'
+%left     '<<' '>>' '>>>'
+%left     in of instanceof
+%left     '==' '!=' '<' '>' '<=' '>='
+%left     '&&' '||' '&' '|' '^' and or
+%right    '=' OP_ASGN return throw
+%right    '..' '...'
+%nonassoc '?' ':'
 
 %start PROGRAM
 
@@ -220,33 +222,58 @@ DO   : do   | LF do   | LF ;
 THEN : then | LF then | LF ;
 
 EXPR
-    : LHS '=' EXPR                          { $$ = (new Tea.Operation).init("=", $1, $3); }
-    | LHS OP_ASGN EXPR                      { $$ = (new Tea.Operation).init($2, $1, $3); }
-    | EXPR '..' EXPR                        { $$ = (new Tea.Range).init("inclusive", $1, $3); }
-    | EXPR '...' EXPR                       { $$ = (new Tea.Range).init("exclusive", $1, $3); }
-    | EXPR '+'   EXPR                       { $$ = (new Tea.Operation).init("+", $1, $3); }
-    | EXPR '-'   EXPR                       { $$ = (new Tea.Operation).init("-", $1, $3); }
-    | EXPR '*'   EXPR                       { $$ = (new Tea.Operation).init("*", $1, $3); }
-    | EXPR '/'   EXPR                       { $$ = (new Tea.Operation).init("/", $1, $3); }
-    | EXPR '%'   EXPR                       { $$ = (new Tea.Operation).init("%", $1, $3); }
-    | EXPR '|'   EXPR                       { $$ = (new Tea.Operation).init("|", $1, $3); }
-    | EXPR '&'   EXPR                       { $$ = (new Tea.Operation).init("&", $1, $3); }
-    | EXPR '^'   EXPR                       { $$ = (new Tea.Operation).init("^", $1, $3); }
-    | EXPR '>>'  EXPR                       { $$ = (new Tea.Operation).init(">>", $1, $3); }
-    | EXPR '<<'  EXPR                       { $$ = (new Tea.Operation).init("<<", $1, $3); }
-    | EXPR '<'   EXPR                       { $$ = (new Tea.Operation).init("<", $1, $3); }
-    | EXPR '<='  EXPR                       { $$ = (new Tea.Operation).init("<=", $1, $3); }
-    | EXPR '>'   EXPR                       { $$ = (new Tea.Operation).init(">", $1, $3); }
-    | EXPR '>='  EXPR                       { $$ = (new Tea.Operation).init(">=", $1, $3); }
-    | EXPR '=='  EXPR                       { $$ = (new Tea.Operation).init("===", $1, $3); }
-    | EXPR '!='  EXPR                       { $$ = (new Tea.Operation).init("!==", $1, $3); }
-    | EXPR 'and' EXPR                       { $$ = (new Tea.Operation).init("&&", $1, $3); }
-    | EXPR 'or'  EXPR                       { $$ = (new Tea.Operation).init("||", $1, $3); }
+    : CONDITIONAL                           -> $1
+    | LHS '=' EXPR                          { $$ = (new Tea.Operation).init("=", $1, $3); }
+    | LHS OP_ASGN EXPR                      { $$ = (new Tea.Operation).init($2,  $1, $3); }
     | EXPR 'instanceof' EXPR                { $$ = (new Tea.Operation).init("instanceof", $1, $3); }
-    | EXPR '?' EXPR ':' EXPR                { $$ = (new Tea.Condition).init($1, $3, $5); }
-    | UNARY                                 -> $1
-    | PRIMARY                               -> $1
-    | new PRIMARY                           {
+    ;
+
+CONDITIONAL
+    : LOGICAL                               -> $1
+    | LOGICAL '?' EXPR ':' CONDITIONAL      { $$ = (new Tea.Condition).init($1, $3, $5); }
+    ;
+
+LOGICAL
+    : RELATIONAL                            -> $1
+    | LOGICAL '||' LOGICAL                  { $$ = (new Tea.Operation).init("||", $1, $3); }
+    | LOGICAL or   LOGICAL                  { $$ = (new Tea.Operation).init("||", $1, $3); }
+    | LOGICAL '&&' LOGICAL                  { $$ = (new Tea.Operation).init("&&", $1, $3); }
+    | LOGICAL and  LOGICAL                  { $$ = (new Tea.Operation).init("&&", $1, $3); }
+    | LOGICAL '|'  LOGICAL                  { $$ = (new Tea.Operation).init("|",  $1, $3); }
+    | LOGICAL '^'  LOGICAL                  { $$ = (new Tea.Operation).init("^",  $1, $3); }
+    | LOGICAL '&'  LOGICAL                  { $$ = (new Tea.Operation).init("&",  $1, $3); }
+    ;
+
+RELATIONAL
+    : OPERATION                             -> $1
+    | RELATIONAL '==' RELATIONAL            { $$ = (new Tea.Operation).init("===", $1, $3); }
+    | RELATIONAL '!=' RELATIONAL            { $$ = (new Tea.Operation).init("!==", $1, $3); }
+    | RELATIONAL '<'  RELATIONAL            { $$ = (new Tea.Operation).init("<",   $1, $3); }
+    | RELATIONAL '>'  RELATIONAL            { $$ = (new Tea.Operation).init(">",   $1, $3); }
+    | RELATIONAL '<=' RELATIONAL            { $$ = (new Tea.Operation).init("<=",  $1, $3); }
+    | RELATIONAL '>=' RELATIONAL            { $$ = (new Tea.Operation).init(">=",  $1, $3); }
+    ;
+
+OPERATION
+    : UNARY                                 -> $1
+    | OPERATION '<<'  OPERATION             { $$ = (new Tea.Operation).init("<<",  $1, $3); }
+    | OPERATION '>>'  OPERATION             { $$ = (new Tea.Operation).init(">>",  $1, $3); }
+    | OPERATION '>>>' OPERATION             { $$ = (new Tea.Operation).init(">>>", $1, $3); }
+    | OPERATION '+'   OPERATION             { $$ = (new Tea.Operation).init("+",   $1, $3); }
+    | OPERATION '-'   OPERATION             { $$ = (new Tea.Operation).init("-",   $1, $3); }
+    | OPERATION '*'   OPERATION             { $$ = (new Tea.Operation).init("*",   $1, $3); }
+    | OPERATION '/'   OPERATION             { $$ = (new Tea.Operation).init("/",   $1, $3); }
+    | OPERATION '%'   OPERATION             { $$ = (new Tea.Operation).init("%",   $1, $3); }
+    ;
+
+UNARY
+    : PRIMARY                               -> $1
+    | '+'    PRIMARY                        { $$ = (new Tea.Unary).init("+",      $2); }
+    | '-'    PRIMARY                        { $$ = (new Tea.Unary).init("-",      $2); }
+    | '~'    PRIMARY                        { $$ = (new Tea.Unary).init("~",      $2); }
+    | not    PRIMARY                        { $$ = (new Tea.Unary).init("!",      $2); }
+    | typeof PRIMARY                        { $$ = (new Tea.Unary).init("typeof", $2); }
+    | new    PRIMARY                        {
         if ($2 instanceof Tea.Call) {
             $$ = (new Tea.NewExpression).init($2.expression, $2.args);
         } else {
@@ -256,24 +283,42 @@ EXPR
     ;
 
 PRIMARY
-    : '(' EXPR ')'                          { $$ = (new Tea.Paren).init($2); }
-    | '[' ']'                               { $$ = (new Tea.Array).init(); }
-    | '[' ARGS ']'                          { $$ = ($2[0] instanceof Tea.Range) ? $2[0] : (new Tea.Array).init($2) ; }
-    | '[' ARGS ',' ']'                      { $$ = ($2[0] instanceof Tea.Range) ? $2[0] : (new Tea.Array).init($2) ; }
-    | '{' '}'                               { $$ = (new Tea.Object).init(); }
+    : LHS                                   -> $1
+    | LITERAL                               -> $1
+    | ARRAY                                 -> $1
+    | OBJECT                                -> $1
+    | LAMBDA                                -> $1
+    | '(' EXPR ')'                          { $$ = (new Tea.Paren).init($2); }
+    | PRIMARY '(' CALL_ARGS ')'             { $$ = (new Tea.Call).init($1, $3); }
+    ;
+
+ARRAY
+    : '[' ']'                               { $$ = (new Tea.Array).init(); }
+    | '[' ARGS ']'                          { $$ = (new Tea.Array).init($2); }
+    | '[' ARGS ',' ']'                      { $$ = (new Tea.Array).init($2); }
+    ;
+
+OBJECT
+    : '{' '}'                               { $$ = (new Tea.Object).init(); }
     | '{' ASSOCS '}'                        { $$ = (new Tea.Object).init($2); }
     | '{' ASSOCS ',' '}'                    { $$ = (new Tea.Object).init($2); }
-    | '->' '{' ASTMT '}'                    { $$ = (new Tea.Function).init(null, [], $3); }
+    ;
+
+LAMBDA
+    : '->' '{' ASTMT '}'                    { $$ = (new Tea.Function).init(null, [], $3); }
     | '->' '(' CALL_ARGS ')' '{' ASTMT '}'  { $$ = (new Tea.Function).init(null, $3, $6); }
-    | PRIMARY '(' CALL_ARGS ')'             { $$ = (new Tea.Call).init($1, $3); }
-    | LITERAL                               -> $1
-    | LHS                                   -> $1
+    ;
+
+RANGE
+    : EXPR '..'  EXPR                       { $$ = (new Tea.Range).init("inclusive", $1, $3); }
+    | EXPR '...' EXPR                       { $$ = (new Tea.Range).init("exclusive", $1, $3); }
     ;
 
 LHS
     : IDENTIFIER                            -> $1
     | PRIMARY '.' DOTABLE                   { $$ = (new Tea.Dot).init($1, $3); }
     | PRIMARY '[' EXPR ']'                  { $$ = (new Tea.Index).init($1, $3); }
+    | PRIMARY '[' RANGE ']'                 { $$ = (new Tea.Index).init($1, $3); }
     ;
 
 DOTABLE
@@ -285,14 +330,6 @@ DOTABLE
     | own                                   { $$ = (new Tea.Identifier).init('own'); }
     | then                                  { $$ = (new Tea.Identifier).init('then'); }
     | when                                  { $$ = (new Tea.Identifier).init('when'); }
-    ;
-
-UNARY
-    : not EXPR                              { $$ = (new Tea.UnaryExpression).init("!", $2); }
-    | '-' EXPR                              { $$ = (new Tea.UnaryExpression).init("-", $2); }
-    | '+' EXPR                              { $$ = (new Tea.UnaryExpression).init("+", $2); }
-    | '~' EXPR                              { $$ = (new Tea.UnaryExpression).init("~", $2); }
-    | typeof EXPR                           { $$ = (new Tea.UnaryExpression).init("typeof", $2); }
     ;
 
 ARGDECL
