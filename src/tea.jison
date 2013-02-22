@@ -191,7 +191,6 @@ TFUNC
 
 OFUNC
     : FUNCTION                              -> $1
-    | STATIC                                -> $1
     ;
 
 FUNCTION
@@ -199,15 +198,14 @@ FUNCTION
     | def FUNCNAME INHERIT LF ASTMT end                  { $$ = (new Tea.Function).init($2, null, $5, $3); }
     | def FUNCNAME '(' ARGLIST ')' ASTMT end             { $$ = (new Tea.Function).init($2, $4,   $6); }
     | def FUNCNAME '(' ARGLIST ')' INHERIT LF ASTMT end  { $$ = (new Tea.Function).init($2, $4,   $8, $6); }
+    | def '-' FUNCNAME LF ASTMT end                      { $$ = (new Tea.Function).init($3, null, $5, null, "-"); }
+    | def '-' FUNCNAME '(' ARGLIST ')' ASTMT end         { $$ = (new Tea.Function).init($3, $5,   $7, null, "-"); }
+    | def '+' FUNCNAME LF ASTMT end                      { $$ = (new Tea.Function).init($3, null, $5, null, "+"); }
+    | def '+' FUNCNAME '(' ARGLIST ')' ASTMT end         { $$ = (new Tea.Function).init($3, $5,   $7, null, "+"); }
     ;
 
 INHERIT
     : '<' FUNCNAME  -> $2
-    ;
-
-STATIC
-    : def '+' FUNCNAME ARGLIST LF ASTMT end              { $$ = (new Tea.StaticFunction).init($3, $4, $6); }
-    | def '+' FUNCNAME '(' ARGLIST ')' ASTMT end         { $$ = (new Tea.StaticFunction).init($3, $5, $7); }
     ;
 
 FUNCNAME

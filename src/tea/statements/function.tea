@@ -4,17 +4,34 @@ Dot       = require('../expressions/dot')
 Operation = require('../expressions/operation')
 
 object TFunction
-  def init(name, args, body, parent)
-    self.name = name
-    self.args = args || []
-    self.body = body
-    self.parent = parent
+  def init(name, args, body, parent, type)
+    self.name    = name
+    self.args    = args || []
+    self.body    = body
+    self.parent  = parent
+    self.type    = type
+    self.methods = self.extract('-')
+    self.statics = self.extract('+')
     return self
   end
 
   def compile(options = {})
     rs = null
     scopes.withScope(-> { rs = self.compileFunction(options) })
+    return rs
+  end
+
+  def extract(type)
+    rs = []
+    i  = self.body.statements.length
+    until i < 0
+      i -= 1
+      stmt = self.body.statements[i]
+      if stmt and stmt.type == type
+        rs.unshift(stmt)
+        self.body.statements.splice(i, 1)
+      end
+    end
     return rs
   end
 
@@ -45,7 +62,6 @@ object TFunction
     if options.objectName
       name = self.name.compile()
       rs.push(options.objectName + '.prototype.' + name + ' = function (' + a.join(', ') + ') {')
-      rs.push('var self = this;')
     elsif options.prefix
       name = self.name.compile()
       rs.push(options.prefix + '.' + name + ' = function (' + a.join(', ') + ') {')
@@ -57,19 +73,37 @@ object TFunction
       rs.push('function ' + name + '(' + a.join(', ') + ') {')
     end
 
+    if options.objectName or ((self.parent or self.methods.length > 0) and self.body.statements.length > 0)
+      rs.push('var self = this;')
+    end
+
     # body
     body = self.body.compile(scope: true) if self.body
-
     if body.length > 0 || b.length > 0
       rs.push(b.join(''))
       rs.push(body)
     end
 
-    if self.name and self.name instanceof Dot
+    if options.objectName or options.prefix or (self.name and self.name instanceof Dot)
       rs.push('};')
     else
       rs.push('}')
     end
+
+    # inheritance
+    if self.parent
+      rs.push(name + '.prototype = new ' + self.parent.compile() + '();');
+    end
+
+    # prototype methods
+    for fn of self.methods
+      rs.push(fn.compile(objectName: name))
+    end
+
+    for fn of self.statics
+      rs.push(fn.compile(prefix: name))
+    end
+
     return rs.join('')
   end
 end

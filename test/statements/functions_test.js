@@ -132,6 +132,21 @@ exports["test lambda assignment with body"] = function () {
   );
 };
 
+exports["test inheritance"] = function () {
+  assert.equal('function A() {}\nA.prototype = new B();',     T.compile("def A < B;end"));
+  assert.equal('function A() {}\nA.prototype = new B.C.D();', T.compile("def A < B.C.D;end"));
+};
+
+exports["test prototype methods"] = function () {
+  assert.equal('function A() {}\nA.prototype.init = function () {\n    var self = this;\n};',
+    T.compile('def A;def -init;end;end'));
+};
+
+exports["test prototype methods"] = function () {
+  assert.equal('function A() {}\nA.create = function () {};',
+    T.compile('def A;def +create;end;end'));
+};
+
 if (module === require.main) {
   require("../test").run(exports);
 }
