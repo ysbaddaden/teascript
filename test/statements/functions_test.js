@@ -13,8 +13,7 @@ exports["test function names as dot expressions"] = function () {
 
 exports["test arguments"] = function () {
   assert.equal("function test(a) {}", T.compile("def test(a);end"));
-  assert.equal("function test(b) {}", T.compile("def test b;end"));
-  assert.equal("function test(a, b, c, d) {}", T.compile("def test a, b, c, d;end"));
+  assert.equal("function test(a, b, c, d) {}", T.compile("def test(a, b, c, d);end"));
   assert.equal("function test(key) {\n    key = 'val';\n}", T.compile("def test(key);key = 'val';end"));
 };
 

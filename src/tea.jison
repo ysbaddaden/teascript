@@ -195,11 +195,19 @@ OFUNC
     ;
 
 FUNCTION
-    : def FUNCNAME ARGDECL ASTMT end        { $$ = (new Tea.Function).init($2, $3, $4); }
+    : def FUNCNAME LF ASTMT end                          { $$ = (new Tea.Function).init($2, null, $4); }
+    | def FUNCNAME INHERIT LF ASTMT end                  { $$ = (new Tea.Function).init($2, null, $5, $3); }
+    | def FUNCNAME '(' ARGLIST ')' ASTMT end             { $$ = (new Tea.Function).init($2, $4,   $6); }
+    | def FUNCNAME '(' ARGLIST ')' INHERIT LF ASTMT end  { $$ = (new Tea.Function).init($2, $4,   $8, $6); }
+    ;
+
+INHERIT
+    : '<' FUNCNAME  -> $2
     ;
 
 STATIC
-    : def '+' FUNCNAME ARGDECL ASTMT end    { $$ = (new Tea.StaticFunction).init($3, $4, $5); }
+    : def '+' FUNCNAME ARGLIST LF ASTMT end              { $$ = (new Tea.StaticFunction).init($3, $4, $6); }
+    | def '+' FUNCNAME '(' ARGLIST ')' ASTMT end         { $$ = (new Tea.StaticFunction).init($3, $5, $7); }
     ;
 
 FUNCNAME
@@ -330,11 +338,6 @@ DOTABLE
     | own                                   { $$ = (new Tea.Identifier).init('own'); }
     | then                                  { $$ = (new Tea.Identifier).init('then'); }
     | when                                  { $$ = (new Tea.Identifier).init('when'); }
-    ;
-
-ARGDECL
-    : '(' ARGLIST ')'                       -> $2
-    | ARGLIST LF                            -> $1
     ;
 
 ARGLIST

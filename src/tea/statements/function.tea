@@ -4,10 +4,11 @@ Dot       = require('../expressions/dot')
 Operation = require('../expressions/operation')
 
 object TFunction
-  def init(name, args, body)
+  def init(name, args, body, parent)
     self.name = name
     self.args = args || []
     self.body = body
+    self.parent = parent
     return self
   end
 

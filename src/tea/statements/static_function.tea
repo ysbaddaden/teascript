@@ -2,7 +2,7 @@ TFunction = require('./function')
 
 object StaticFunction
   def init(name, args, body)
-    self.fn = (new TFunction).init(name, args, body)
+    self.fn = (new TFunction).init(name, args, body, nil)
     return self
   end
 
