@@ -3,8 +3,16 @@ var fs = require('fs');
 var path = require('path');
 var CHARSET = 'utf8';
 
+function realpath(arg) {
+    if (/^\//.test(arg)) {
+        return arg;
+    } else {
+        return path.join(process.cwd(), arg);
+    }
+}
+
 function main(argv) {
-    var input  = path.join(process.cwd(), argv._[0]);
+    var input  = realpath(argv._[0]);
     var result = compile(input, argv);
     if (argv.output) {
         write(argv.output, result);
