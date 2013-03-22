@@ -10,7 +10,8 @@ E  [eE][-+]?{D}+
 
 %%
 
-"#".*\n?                    ; // skip comments
+("#".*\n\s*)*"#".*          ; // skip comments on multiple lines
+"#".*                       ; // skip comments
 
 "true"                      return 'true';
 "false"                     return 'false';
