@@ -27,9 +27,12 @@ object TFunction
     until i < 0
       i -= 1
       stmt = self.body.statements[i]
-      if stmt and stmt.type == type
-        rs.unshift(stmt)
-        self.body.statements.splice(i, 1)
+      if stmt and stmt instanceof TFunction
+        stmt.type = '-' unless stmt.type
+        if stmt.type == type
+          rs.unshift(stmt)
+          self.body.statements.splice(i, 1)
+        end
       end
     end
     return rs

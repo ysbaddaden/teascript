@@ -140,9 +140,12 @@ exports["test inheritance"] = function () {
 exports["test prototype methods"] = function () {
   assert.equal('function A() {}\nA.prototype.init = function () {\n    var self = this;\n};',
     T.compile('def A;def -init;end;end'));
+
+  assert.equal('function B() {}\nB.prototype.init = function () {\n    var self = this;\n};',
+    T.compile('def B;def init;end;end'));
 };
 
-exports["test prototype methods"] = function () {
+exports["test object methods"] = function () {
   assert.equal('function A() {}\nA.create = function () {};',
     T.compile('def A;def +create;end;end'));
 };
