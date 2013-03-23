@@ -162,6 +162,12 @@ floats from Number) or should come in an library (like Object.extend).
 This is also true for `true`, `false`, `null` and `undefined`, which are all
 supported in Tea.
 
+#### Nil
+
+Tea introduces one singleton: `nil`. It transcompiles to `null` but evaluates to
+either `null` or `undefined`. The sole purpose of `nil` is to leverage the
+difference between `null` and `undefined`, by considering them to be the same thing.
+
 #### Strings
 
 A string starts with a single or double quote and ends with the same single
@@ -752,14 +758,16 @@ That means they may have default arguments, splats, etc:
 
 ### Prototypes
 
-WARNING: CURRENTLY BEING REDEFINED FOR INNER FUNCTION DECLARATIONS INSTEAD.
+Declaring prototypes in JavaScript leads to a lot of visual noise in the code.
+Tea tries to simplify this by considering any nested function definition as a
+prototype method, and any method preceded by a `+` as an object method.
 
-That will look like:
+For example:
 
     def MyObject(arg) < Resource
       self.arg = arg
 
-      def -doSomething
+      def doSomething
         console.log(self.inspect())
         return self
       end
@@ -795,90 +803,28 @@ Which would transcompile to:
         });
     };
 
-EBNF:
-
-    def <fname> [< <fname>]
-      [<statements>]
-
-      (def -<fname>[(][<arguments>][)]
-        <statements>
-      end])*
-
-      (def +<fname>[(][<arguments>][)]
-        <statements>
-      end])*
-    end
-
-#### Current Prototype Definition
-
-Tea proposes a readable syntax for Javacript prototypes. You create an object
-definition using `object` and add method to its prototype by declaring functions
-into its body. You may also declare 'static' methods which will be added to the
-object itself, using a `+` before the method name. For instance:
-
-```tea
-object Post
-  def +create(attributes)
-    (record = new Post).init(attributes)
-    return record
-  end
-
-  def init(attributes)
-    for own name, value in attributes
-      self[name] = value
-    end
-  end
-end
-
-Post.create(name: "Jean Dupont")
-```
-
 #### Constructor
 
-An instance of an object is built using `new`, but there aren't any constructor
-methods that would initialize the object. We could have some initialization code
-by having the code inside the function block in JavaScript:
-
-```javascript
-var Post = function (attributes) {
-  // initialization code goes here
-};
-```
-
-But that would prevent inherited prototypes to work correctly, because
-inheritance in JavaScript is achieved by constructing the parent prototype. For
-example:
-
-```javascript
-var Model = function () {};
-var Post  = function () {};
-Post.prototype = new Model();
-```
-
-Tea could generate some JavaScript to new an Object then call an init method,
-but that could clash with other JavaScript libraries that do not follow this
-pattern.
-
-Tea thus doesn't provide any construct + initialization sugar. A proposed way
-to handle this, is to have an `init` method and to manually call it:
-
-```tea
-(post = new Post).init(attributes)
-```
+An instance of an object is built using the `new` keyword. The constructor
+method is simply the top function definition, in our previous example, the
+MyObject.
 
 #### Self
 
-You may have noticed that tea suse `self` instead of `this`. Tea automatically
+You may notice that tea suse `self` instead of `this`. Tea automatically
 declares `var self = this;` at the beginning of every method so that even within
 a lambda `self` always refers to the current object. No need to manually bind
 lambdas anymore!
 
-You still need to bind methods used as callbacks, thought. For instance:
+Thought you can still use `this` just like you would normally do in JavaScript.
+
+But, you still need to bind methods used as callbacks, because Tea will stupidly
+continue to declare self as this, which won't be what we want. For instance:
 
 ```tea
-object Widget
+def Widget
   def init(elm)
-    elm.addEventListener('click', self.onClick.bind(self))
+    elm.addEventListener('click', -> { self.onclick() })
   end
 
   def onclick(e)
@@ -886,40 +832,62 @@ object Widget
 end
 ```
 
-NOTE: Tea may provide some sugar for binding methods to self in the future.
-      Something like `&onClick` or `^onClick` for instance.
-
 #### Inheritance
 
+This is how you inherit:
+
 ```tea
-object Dialog < Widget
-  def init
-    Widget::init(className: 'ui-dialog')
+def Widget
+  def initWidget(options)
+    # ...
+  end
+end
+
+def Dialog < Widget
+  def initDialog
+    self.initWidget(className: 'ui-dialog')
   end
 end
 ```
 
+This is what it will transcompile to:
+
+```javascript
+function Widget() {}
+
+Widget.prototype.initWidget = function (options) {
+    // ...
+};
+
+function Dialog() {}
+Dialog.prototype = new Widget();
+Dialog.prototype.initDialog = function () {
+    var self = this;
+    self.initWidget({
+        className: 'ui-dialog'
+    })
+};
+```
+
+And that's it.
+
 #### Pseudo BNF
 
 ```ebnf
-object <identifier> [< <identifier>]
-  (def <identifier>[(][<arguments>][)]
-    <statements>
-  end)*
+def <fname> [< <fname>]
+  [<statements>]
 
-  (def +<identifier>[(][<arguments>][)]
+  (def [-]<fname>[(][<arguments>][)]
     <statements>
-  end)*
+  end])*
+
+  (def +<fname>[(][<arguments>][)]
+    <statements>
+  end])*
 end
 ```
 
 ## Future
-
-  * **nil keyword**: the nil keyword would translate to null, but when compared
-    with something it would actually check against both null and undefined,
-    allowing to make no difference between those two values.
-
-    [DONE]
 
   * **String interpolations**: tea code should be embedable in double quoted
     strings, using the `#{<code>}` syntax.
