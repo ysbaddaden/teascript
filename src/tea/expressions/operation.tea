@@ -14,6 +14,19 @@ object Operation
   def compile
     case self.operator.trim()
     when '===', '!=='
+      # comparing var OP nil?
+      if self.isNil(self.left) and self.right instanceof Identifier and !scopes.isDefined(self.right.value)
+        va = self.right.compile()
+        return 'typeof ' + va + ' ' + self.operator + " 'undefined' || " + va + ' ' + self.operator + ' null'
+      end
+
+      # comparing nil OP var?
+      if self.isNil(self.right) and self.left instanceof Identifier and !scopes.isDefined(self.left.value)
+        va = self.left.compile()
+        return 'typeof ' + va + ' ' + self.operator + " 'undefined' || " + va + ' ' + self.operator + ' null'
+      end
+
+      # comparing nil in conditional expression?
       if self.isNil(self.left) or self.isNil(self.right) or
           (self.left  instanceof Condition and self.isNil(self.left.condition)) or
           (self.right instanceof Condition and self.isNil(self.right.condition))
