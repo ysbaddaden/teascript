@@ -1,0 +1,1 @@
+require 'tea_script'
