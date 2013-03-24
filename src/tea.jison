@@ -312,7 +312,7 @@ OBJECT
 
 LAMBDA
     : '->' '{' ASTMT '}'                    { $$ = (new Tea.Function).init(null, [], $3); }
-    | '->' '(' CALL_ARGS ')' '{' ASTMT '}'  { $$ = (new Tea.Function).init(null, $3, $6); }
+    | '->' '(' ARGLIST ')' '{' ASTMT '}'    { $$ = (new Tea.Function).init(null, $3, $6); }
     ;
 
 RANGE
