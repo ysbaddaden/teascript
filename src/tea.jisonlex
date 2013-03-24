@@ -21,6 +21,7 @@ E  [eE][-+]?{D}+
 \.{D}+({E})?                return 'NUMBER';
 \"(\\.|[^\\"])*\"           return 'STRING';
 \'(\\.|[^\\'])*\'           return 'STRING';
+\/(\\.|[^\\/])*\/[gimy]*    return 'REGEXP';
 
 "def"                       return 'def';
 "delete"                    return 'delete';

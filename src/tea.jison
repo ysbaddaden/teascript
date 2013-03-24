@@ -395,6 +395,7 @@ LITERAL
     | undefined         { $$ = (new Tea.Keyword).init($1); }
     | NUMBER            { $$ = (new Tea.Number).init($1); }
     | STRING            { $$ = (new Tea.String).init($1); }
+    | REGEXP            { $$ = (new Tea.RegExp).init($1); }
     ;
 
 OP_ASGN
