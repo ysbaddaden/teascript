@@ -32,7 +32,7 @@ object NewExpression
 
     if splat.length > 0
       splat.push('[' + args.join(', ') + ']') if args.length > 0
-      return splatConstructorTemplate.replace(new RegExp('(%\\{(.+?)\\})', 'g'), ->(x) {
+      return splatConstructorTemplate.replace(/(%\{(.+?)\})/g, ->(x) {
         case x
         when '%{FUNCTION}' then return self.expression.compile()
         when '%{ARGS}'     then return '[].concat(' + splat.join(',')  + ')'

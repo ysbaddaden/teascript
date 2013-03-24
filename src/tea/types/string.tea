@@ -5,7 +5,7 @@ object TString
   end
 
   def compile
-    return self.value.replace(new RegExp('\n', 'g'), '\\n')
+    return self.value.replace(/\n/g, '\\n')
   end
 end
 

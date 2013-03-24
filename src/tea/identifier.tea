@@ -1,6 +1,6 @@
 object Identifier
   def init(value)
-    if new RegExp('^__').test(value)
+    if /^__/.test(value)
       throw Error("ERROR: invalid identifier '" + value + "'; identifiers starting with '__' are reserved.");
     end
     self.value = value
