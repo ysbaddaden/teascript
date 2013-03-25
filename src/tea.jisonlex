@@ -8,6 +8,8 @@ E  [eE][-+]?{D}+
     //}
 %}
 
+%s interpolation
+
 %%
 
 ("#".*\n\s*)*"#".*          ; // skip comments on multiple lines
@@ -19,7 +21,23 @@ E  [eE][-+]?{D}+
 "nil"                       return 'nil';
 {D}+(\.{D}+)?({E})?         return 'NUMBER';
 \.{D}+({E})?                return 'NUMBER';
-\"(\\.|[^\\"])*\"           return 'STRING';
+
+\"[^"]*                     %{
+                                if (yytext.charAt(yyleng - 1) === '\\') {
+                                    this.more();
+                                } else if (m = yytext.match(new RegExp("#\{"))) {
+                                    this.less(m.index + 1);
+                                    yytext += '"';
+                                    this.begin('interpolation');
+                                    return 'STRING';
+                                } else {
+                                    yytext += this.input();
+                                    return 'STRING';
+                                }
+                            %}
+<interpolation>#\{          this.unput("+ (");
+<interpolation>\}           this.unput(") + \"");
+
 \'(\\.|[^\\'])*\'           return 'STRING';
 \/(\\.|[^\\/])*\/[gimy]*    return 'REGEXP';
 
