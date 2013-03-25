@@ -6,7 +6,7 @@ E  [eE][-+]?{D}+
     //if (!global.Tea) {
     //    global.Tea = require('./tea');
     //}
-%}
+    %}
 
 %s interpolation
 
@@ -22,11 +22,12 @@ E  [eE][-+]?{D}+
 {D}+(\.{D}+)?({E})?         return 'NUMBER';
 \.{D}+({E})?                return 'NUMBER';
 
+\'(\\.|[^\\'])*\'           return 'STRING';
 \"[^"]*                     %{
                                 if (yytext.charAt(yyleng - 1) === '\\') {
                                     this.more();
                                 } else if (m = yytext.match(new RegExp("#\{"))) {
-                                    this.less(m.index + 1);
+                                    this.less(m.index+1);
                                     yytext += '"';
                                     this.begin('interpolation');
                                     return 'STRING';
@@ -37,9 +38,6 @@ E  [eE][-+]?{D}+
                             %}
 <interpolation>#\{          this.unput("+ (");
 <interpolation>\}           this.unput(") + \"");
-
-\'(\\.|[^\\'])*\'           return 'STRING';
-\/(\\.|[^\\/])*\/[gimy]*    return 'REGEXP';
 
 "def"                       return 'def';
 "delete"                    return 'delete';
@@ -88,7 +86,7 @@ E  [eE][-+]?{D}+
 "&&"\s*                     return 'and';
 "or"\s+                     return 'or';
 "||"\s*                     return 'or';
-[-+~*%/&|^\?]\s*            return yytext.replace(/\s+$/, "");
+[-+~*%&|^\?]\s*             return yytext.replace(/\s+$/, "");
 ">>"\s*                     return '>>';
 "<<"\s*                     return '<<';
 "!="\s*                     return '!=';
@@ -104,6 +102,26 @@ E  [eE][-+]?{D}+
 "instanceof"\s+             return 'instanceof';
 "not"\s*                    return 'not';
 "!"\s*                      return 'not';
+
+\/[^/]*                     %{
+                                var past = this.pastInput().replace(/\s+$/, '');
+                                if ("(,=:[!&|?{};~+-*%^<>".indexOf(past.charAt(past.length - 1)) !== -1 || /(return|when|if|else|elsif|unless)$/.test(past)) {
+                                    // regexp literal
+                                    if (yytext.charAt(yyleng - 1) === '\\') {
+                                        this.more();
+                                    } else {
+                                        yytext += this.input();
+                                        while ("gimy".indexOf(this._input[0]) !== -1) {
+                                            yytext += this.input();
+                                        }
+                                        return 'REGEXP';
+                                    }
+                                } else {
+                                    // divisor
+                                    this.less(yytext.length - yytext.slice(1).replace(/^\s+/, '').length); // skips / + LF
+                                    return '/';
+                                }
+                            %}
 
 [(=,\.:\[\{]\s*             return yytext.replace(/\s+$/, "");
 [)\]\}]                     return yytext;
