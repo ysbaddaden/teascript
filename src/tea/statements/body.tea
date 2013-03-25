@@ -24,7 +24,7 @@ object Body
   def compile(options = {})
     if options.scope
       identifiers = scopes.withScope(-> { self.parseStatements() })
-      self.body.unshift('var ' + identifiers.sort().join(', ') + ';') if identifiers.length > 0
+      self.body.unshift('var ' + identifiers.sort().join(', ') + ';') if identifiers and identifiers.length > 0
     else
       self.parseStatements()
     end

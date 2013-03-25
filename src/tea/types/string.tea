@@ -1,10 +1,24 @@
+Tea = require('../tea')
+
 object TString
   def init(value)
+    self.type  = value.charAt(0)
     self.value = value
     return self
   end
 
   def compile
+    return self.type == '"' ? self.interpolate() : self.escape()
+  end
+
+  def interpolate
+    return self.escape().replace(/#\{(.+?)\}/g, ->(_, code) {
+      stmt = Tea.compile(code).replace(/;$/, '')
+      return self.type + ' + (' + stmt + ') + ' + self.type
+    })
+  end
+
+  def escape
     return self.value.replace(/\n/g, '\\n')
   end
 end
