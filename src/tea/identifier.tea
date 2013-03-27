@@ -1,4 +1,4 @@
-object Identifier
+def Identifier
   def init(value)
     if /^__/.test(value)
       throw Error("ERROR: invalid identifier '" + value + "'; identifiers starting with '__' are reserved.");

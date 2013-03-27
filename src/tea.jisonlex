@@ -61,7 +61,6 @@ E  [eE][-+]?{D}+
 "break"                     return 'break';
 "next"                      return 'next';
 "continue"                  return 'continue';
-"object"                    return 'object';
 "new"                       return 'new';
 "throw"                     return 'throw';
 "begin"                     return 'begin';

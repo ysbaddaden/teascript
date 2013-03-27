@@ -9,7 +9,7 @@ splatConstructorTemplate =
       return (t == 'object' || t == 'function') result || child : child;
   }(%{FUNCTION}, %{ARGS}, function () {}))"
 
-object NewExpression
+def NewExpression
   def init (expression, args)
     self.expression = expression
     self.args = args || []

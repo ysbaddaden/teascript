@@ -131,8 +131,6 @@ STMT
     | for own IDENTIFIER ',' IDENTIFIER in EXPR DO ASTMT end {
         $$ = (new Tea.ForInStatement).init(true, $3, $5, $7, $9);
     }
-    | object LHS OSTMT end                       { $$ = (new Tea.Prototype).init($2, null, $3); }
-    | object LHS '<' LHS OSTMT end               { $$ = (new Tea.Prototype).init($2, $4, $5); }
     | FUNCTION                                   -> $1
     | return                                     { $$ = (new Tea.ReturnStatement).init(); }
     | return EXPR                                { $$ = (new Tea.ReturnStatement).init($2); }
