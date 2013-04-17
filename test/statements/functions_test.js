@@ -81,11 +81,13 @@ exports["test lambda assignment"] = function () {
                '};',
                T.compile('x = -> { return "something"; }')
   );
+
   assert.equal('var x;\nx = function () {\n' +
                '    return "something";\n' +
                '};',
                T.compile('x = ->(\n) { return "something"; }')
   );
+
   assert.equal('var x;\nx = function (x, y) {\n' +
                '    return x + y;\n' +
                '};',
@@ -120,6 +122,7 @@ exports["test lambda assignment with body"] = function () {
                T.compile('obj = require("graphics")\n' +
                          'resize = ->() {x = obj.getX(); y = obj.getY(); return x + y}')
   );
+
   assert.equal('var obj, resize;\n' +
                'obj = require("graphics");\n' +
                'resize = function (x) {\n' +
@@ -148,6 +151,21 @@ exports["test prototype methods"] = function () {
 exports["test object methods"] = function () {
   assert.equal('function A() {}\nA.create = function () {};',
     T.compile('def A;def +create;end;end'));
+};
+
+exports["test prototype definition inside lambda"] = function () {
+  assert.equal('define(function (require) {\n' +
+      '    function MyObject() {}\n' +
+      '    MyObject.prototype.init = function () {\n' +
+      '        var self = this;\n' +
+      '    };\n' +
+      '});',
+    T.compile('define(->(require) {\n' +
+      '  def MyObject\n' +
+      '    def init\n' +
+      '    end\n' +
+      '  end\n' +
+      '\n})'));
 };
 
 if (module === require.main) {

@@ -219,6 +219,13 @@ ary = [ 0, 1, 2 ]
 NOTE: maybe we should just drop ranges altogether?
 -->
 
+#### RegExp Literals
+
+Tea supports RegExp literals, using the the slash separated notation of
+javascript regexp literals. Tea actually guesses when to differenciate
+between a regexp literal and a math division, and uses the same trick that
+JSLint.
+
 ### Identifiers
 
 All valid identifiers in JavaScript should be valid in Tea. Which means that

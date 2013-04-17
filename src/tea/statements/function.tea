@@ -10,8 +10,8 @@ def TFunction
     self.body    = body
     self.parent  = parent
     self.type    = type
-    self.methods = self.extract('-')
-    self.statics = self.extract('+')
+    self.methods = name ? self.extract('-') : []
+    self.statics = name ? self.extract('+') : []
     return self
   end
 
