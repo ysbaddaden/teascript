@@ -37,7 +37,10 @@ E  [eE][-+]?{D}+
                                 }
                             %}
 <interpolation>#\{          this.unput("+ (");
-<interpolation>\}           this.unput(") + \"");
+<interpolation>\}           %{
+                                this.unput(") + \"");
+                                this.popState();
+                            %}
 
 "def"                       return 'def';
 "delete"                    return 'delete';
