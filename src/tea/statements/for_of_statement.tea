@@ -1,7 +1,5 @@
 scopes     = require('../scopes')
 Identifier = require('../identifier')
-#TNumber    = require('../types/number')
-#TRange     = require('../types/range')
 
 def ForOfStatement
   def init(identifier, index, expression, body)
@@ -13,14 +11,6 @@ def ForOfStatement
   end
 
   def compile
-    #if self.expression instanceof TRange
-    #  return self.compileRange()
-    #else
-      return self.compileExpression()
-    #end
-  end
-
-  def compileExpression
     rs = []
 
     if self.expression instanceof Identifier
@@ -31,7 +21,9 @@ def ForOfStatement
     end
     r2 = self.index ? self.index.compile() : scopes.reference()
     r3 = scopes.reference()
+
     scopes.pushIdentifier(self.identifier.value)
+    scopes.pushIdentifier(self.index.value) if self.index
 
     rs.push('for (' + r2 + ' = 0, ' + r3 + ' = ' + r1 + '.length; ' + r2 + ' < ' + r3 + '; ' + r2 + '++) {')
     rs.push(self.identifier.compile() + ' = ' + r1 + '[' + r2 + '];')
@@ -39,62 +31,6 @@ def ForOfStatement
     rs.push('}')
     return rs.join('')
   end
-
-#ForOfStatement.prototype.compileRange = function () {
-#  rs = [];
-#  i = self.identifier.compile();
-#  init, cond, update;
-#  left, right, rl, rr;
-#  range = self.expression;
-#
-#  scopes.pushIdentifier(self.identifier.value);
-#
-#  if range.numbers()
-#    init = [ i + ' = ' + range.left.compile() ]
-#
-#    if range.up()
-#      cond   = i + (range.exclusive ? ' < ' : ' <= ') + range.right.compile()
-#      update = i + '++'
-#    else
-#      cond   = i + (range.exclusive ? ' > ' : ' >= ') + range.right.compile()
-#      update = i + '--'
-#    end
-#  else
-#    init = []
-#
-#    if range.left instanceof TNumber
-#      l = range.left.value
-#      init.push(i + ' = ' + l)
-#    elsif range.left instanceof Identifier
-#      l = range.left.value
-#      init.push(i + ' = ' + l)
-#    else
-#      l = scopes.reference()
-#      init.push(i + ' = ' + l + ' = ' + range.left.compile())
-#    end
-#
-#    if range.right instanceof TNumber
-#      r = range.right.value
-#    elsif range.right instanceof Identifier
-#      r = range.right.value
-#    } else {
-#      r = scopes.reference()
-#      init.push(r + ' = ' + range.right.compile())
-#    }
-#
-#    if range.exclusive
-#      cond = l + ' > ' + r + ' ? ' + i + ' > '  + r + ' : ' + i + ' < '  + r
-#    else
-#      cond = l + ' > ' + r + ' ? ' + i + ' >= ' + r + ' : ' + i + ' <= ' + r
-#    end
-#    update = l + ' > ' + r + ' ? ' + i + '-- : ' + i + '++'
-#  end
-#
-#  rs.push('for (' + [ init.join(', '), cond, update ].join('; ') + ') {')
-#  rs.push(self.body.compile())
-#  rs.push('}')
-#  return rs.join('')
-#};
 end
 
 module.exports = ForOfStatement

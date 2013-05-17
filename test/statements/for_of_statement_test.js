@@ -26,7 +26,7 @@ exports['test for of statement with array like objects'] = function () {
 };
 
 exports['test for of statement with index'] = function () {
-  assert.equal("var __ref1, item;\n" +
+  assert.equal("var __ref1, index, item;\n" +
                "for (index = 0, __ref1 = ary.length; index < __ref1; index++) {\n" +
                "    item = ary[index];\n" +
                "}",

@@ -1,10 +1,13 @@
 def UnlessStatement
-  def init(test, body, alternative)
+  def init(test, body)
     self.test = test
-    self.body = body || new T.Body()
+    self.body = body
     return self
   end
 
+  # IMPROVE: check if test is an operation and negatize it:
+  # "doSomething() unless x === y" => "if (x !== y) { doSomething(); }"
+  #
   def compile
     rs = []
     rs.push('if (!(' + self.test.compile() + ')) {')

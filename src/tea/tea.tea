@@ -50,11 +50,12 @@ exports.parser = parser
 beautify = require('js-beautify').js_beautify
 
 def exports.lex(source)
-  parser.lexer.setInput(source)
+  lexer = parser.lexer
+  lexer.setInput(source)
   tokens = []
   while (token = lexer.lex()) != lexer.EOF
     #tokens.push([ parser.terminals_[token], lexer.yytext ])
-    if typeof token == number
+    if typeof token == exports.Number
       tokens.push(lexer.yytext)
     else
       tokens.push(token)
