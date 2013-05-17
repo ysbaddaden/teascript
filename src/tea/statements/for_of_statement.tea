@@ -12,13 +12,7 @@ def ForOfStatement
 
   def compile
     rs = []
-
-    if self.expression instanceof Identifier
-      r1 = self.expression.compile()
-    else
-      r1 = scopes.reference()
-      rs.push(r1 + '=' + self.expression.compile() + ';')
-    end
+    r1 = self.reference(rs)
     r2 = self.index ? self.index.compile() : scopes.reference()
     r3 = scopes.reference()
 
@@ -30,6 +24,16 @@ def ForOfStatement
     rs.push(self.body.compile())
     rs.push('}')
     return rs.join('')
+  end
+
+  def reference(rs)
+    if self.expression instanceof Identifier
+      r1 = self.expression.compile()
+    else
+      r1 = scopes.reference()
+      rs.push(r1 + '=' + self.expression.compile() + ';')
+    end
+    return r1
   end
 end
 

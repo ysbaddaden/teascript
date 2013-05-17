@@ -13,6 +13,17 @@ def BeginStatement
     rs.push('try {')
     rs.push(self.body.compile())
 
+    self.compileRescues(rs)
+    if self._ensure
+      rs.push('} finally {')
+      rs.push(self._ensure.compile())
+    end
+
+    rs.push('}')
+    return rs.join('\n')
+  end
+
+  def compileRescues(rs)
     if self.rescues.length > 0
       ref = self.findReference() || scopes.reference(push: false)
       rs.push('} catch (' + ref + ') {')
@@ -26,13 +37,6 @@ def BeginStatement
       end
     end
 
-    if self._ensure
-      rs.push('} finally {')
-      rs.push(self._ensure.compile())
-    end
-
-    rs.push('}')
-    return rs.join('\n')
   end
 
   def findReference

@@ -39,12 +39,26 @@ def TFunction
   end
 
   def compileFunction(options)
-    rs   = []
-    a    = []
-    b    = []
-    body = []
+    rs = []
+    a  = []
+    b  = []
 
-    # arguments
+    self.compileArguments(a, b)
+    name = self.compileDefinition(rs, a, options)
+    rs.push('var self = this;') if self.isPrototype(options)
+    self.compileBody(rs, b, options)
+
+    # inheritance
+    if self.parent
+      rs.push(name + '.prototype = new ' + self.parent.compile() + '();');
+    end
+
+    self.compileMethods(rs, name)
+
+    return rs.join('')
+  end
+
+  def compileArguments(a, b)
     for arg of self.args
       case arg.constructor
       when Operation
@@ -60,8 +74,9 @@ def TFunction
         a.push(arg.compile())
       end
     end
+  end
 
-    # function name
+  def compileDefinition(rs, a, options)
     if options.objectName
       name = self.name.compile()
       rs.push(options.objectName + '.prototype.' + name + ' = function (' + a.join(', ') + ') {')
@@ -75,13 +90,12 @@ def TFunction
       name = self.name ? self.name.compile() : ''
       rs.push('function ' + name + '(' + a.join(', ') + ') {')
     end
+    return name
+  end
 
-    if options.objectName or ((self.parent or self.methods.length > 0) and self.body.statements.length > 0)
-      rs.push('var self = this;')
-    end
-
-    # body
+  def compileBody(rs, b, options)
     body = self.body.compile(scope: true) if self.body
+
     if body.length > 0 || b.length > 0
       rs.push(b.join(''))
       rs.push(body)
@@ -92,22 +106,15 @@ def TFunction
     else
       rs.push('}')
     end
+  end
 
-    # inheritance
-    if self.parent
-      rs.push(name + '.prototype = new ' + self.parent.compile() + '();');
-    end
+  def compileMethods(rs, name)
+    rs.push(fn.compile(objectName: name)) for fn of self.methods
+    rs.push(fn.compile(prefix: name))     for fn of self.statics
+  end
 
-    # prototype methods
-    for fn of self.methods
-      rs.push(fn.compile(objectName: name))
-    end
-
-    for fn of self.statics
-      rs.push(fn.compile(prefix: name))
-    end
-
-    return rs.join('')
+  def isPrototype(options)
+    return options.objectName or ((self.parent or self.methods.length > 0) and self.body.statements.length > 0)
   end
 end
 

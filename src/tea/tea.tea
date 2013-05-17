@@ -55,7 +55,7 @@ def exports.lex(source)
   tokens = []
   while (token = lexer.lex()) != lexer.EOF
     #tokens.push([ parser.terminals_[token], lexer.yytext ])
-    if typeof token == exports.Number
+    if typeof token == 'number'
       tokens.push(lexer.yytext)
     else
       tokens.push(token)

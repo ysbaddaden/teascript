@@ -3,7 +3,7 @@ Splat = require('./splat')
 def Call
   def init(expression, args)
     self.expression = expression
-    self.args = args || []
+    self.arguments  = args || []
     return self
   end
 
@@ -11,34 +11,34 @@ def Call
     return self.expression.compile()
   end
 
-  def pushArg(arg)
-    self.args.push(arg)
+  def compile
+    self.parseArguments()
+
+    if self.splat.length == 1 and self.args.length == 0
+      return self.callerName() + '.apply(null, ' + self.splat[0] + ')'
+    end
+
+    if self.splat.length > 0
+      self.splat.push('[' + self.args.join(', ') + ']') if self.args.length > 0
+      return self.callerName() + '.apply(null, Array.prototype.concat.call(' + self.splat.join(', ') + '))'
+    end
+
+    return self.callerName() + '(' + self.args.join(', ') + ')'
   end
 
-  def compile
-    args  = [];
-    splat = [];
+  def parseArguments
+    self.args  = [];
+    self.splat = [];
 
-    for decl of self.args
+    for decl of self.arguments
       if decl.constructor == Splat
-        splat.push('[' + args.join(', ') + ']') if args.length > 0
-        splat.push(decl.compile())
-        args = []
+        self.splat.push('[' + self.args.join(', ') + ']') if self.args.length > 0
+        self.splat.push(decl.compile())
+        self.args = []
       else
-        args.push(decl.compile())
+        self.args.push(decl.compile())
       end
     end
-
-    if splat.length == 1 and args.length == 0
-      return self.callerName() + '.apply(null, ' + splat[0] + ')'
-    end
-
-    if splat.length > 0
-      splat.push('[' + args.join(', ') + ']') if args.length > 0
-      return self.callerName() + '.apply(null, Array.prototype.concat.call(' + splat.join(', ') + '))'
-    end
-
-    return self.callerName() + '(' + args.join(', ') + ')'
   end
 end
 

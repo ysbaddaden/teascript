@@ -1,4 +1,5 @@
 Splat = require('./splat')
+Call  = require('./call')
 
 # The solution for splat arguments when newing an object, comes
 # from CoffeeScript:
@@ -9,38 +10,21 @@ splatConstructorTemplate =
       return (t == 'object' || t == 'function') result || child : child;
   }(%{FUNCTION}, %{ARGS}, function () {}))"
 
-def NewExpression
-  def init (expression, args)
-    self.expression = expression
-    self.args = args || []
-    return self
-  end
-
+def NewExpression < Call
   def compile
-    args = []
-    splat = []
+    self.parseArguments()
 
-    for decl of self.args
-      if decl.constructor == Splat
-        splat.push('[' + args.join(', ') + ']') if args.length > 0
-        splat.push(decl.compile())
-        args = [];
-      else
-        args.push(decl.compile())
-      end
-    end
-
-    if splat.length > 0
-      splat.push('[' + args.join(', ') + ']') if args.length > 0
+    if self.splat.length > 0
+      self.splat.push('[' + self.args.join(', ') + ']') if self.args.length > 0
       return splatConstructorTemplate.replace(/(%\{(.+?)\})/g, ->(x) {
         case x
         when '%{FUNCTION}' then return self.expression.compile()
-        when '%{ARGS}'     then return '[].concat(' + splat.join(',')  + ')'
+        when '%{ARGS}'     then return '[].concat(' + self.splat.join(',')  + ')'
         end
       })
     end
 
-    return 'new ' + self.expression.compile() + '(' + args.join(', ') + ')';
+    return 'new ' + self.expression.compile() + '(' + self.args.join(', ') + ')';
   end
 end
 

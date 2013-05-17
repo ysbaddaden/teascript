@@ -279,7 +279,7 @@ UNARY
     | typeof PRIMARY                        { $$ = (new Tea.Unary).init("typeof", $2); }
     | new    PRIMARY                        {
         if ($2 instanceof Tea.Call) {
-            $$ = (new Tea.NewExpression).init($2.expression, $2.args);
+            $$ = (new Tea.NewExpression).init($2.expression, $2.arguments);
         } else {
             $$ = (new Tea.NewExpression).init($2);
         }

@@ -23,9 +23,10 @@
   "unused": true,
   //"strict": true,
   "trailing": true,
-  "maxstatements": 10,
-  "maxcomplexity": 4,
+  "maxstatements": 15,
+  "maxcomplexity": 5,
   //"maxlen": 80,
+
   "asi": false,
   "eqnull": true
 }
