@@ -14,8 +14,8 @@ all: lib/parser.js $(OBJECTS)
 lib/%.js: src/tea/%.tea
 	bin/tea $< -o $@
 
-lib/parser.js: src/tea.jison src/tea.jisonlex
-	$(JISON) -m js src/tea.jison src/tea.jisonlex -o lib/_parser.js
+lib/parser.js: src/tea.y src/tea.l
+	$(JISON) -m js src/tea.y src/tea.l -o lib/_parser.js
 	echo "var Tea = require('./tea');" > $@
 	cat lib/_parser.js >> $@
 	echo "module.exports = _parser;" >> $@
