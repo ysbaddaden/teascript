@@ -368,13 +368,17 @@ SUB_CALL_ARGS
     ;
 
 ARGS
-    : EXPR              { $$ = [ $1 ]; }
-    | ARGS ',' EXPR     { $1.push($3); $$ = $1; }
+    : EXPR                  { $$ = [ $1 ]; }
+    | ARGS ',' EXPR         { $1.push($3); $$ = $1; }
+    | ARGS LF* ',' EXPR     { $1.push($4); $$ = $1; }
+    | ARGS ',' LF* EXPR     { $1.push($4); $$ = $1; }
     ;
 
 ASSOCS
-    : ASSOC             { $$ = [ $1 ]; }
-    | ASSOCS ',' ASSOC  { $1.push($3); $$ = $1; }
+    : ASSOC                 { $$ = [ $1 ]; }
+    | ASSOCS ',' ASSOC      { $1.push($3); $$ = $1; }
+    | ASSOCS LF* ',' ASSOC  { $1.push($4); $$ = $1; }
+    | ASSOCS ',' LF* ASSOC  { $1.push($4); $$ = $1; }
     ;
 
 ASSOC
