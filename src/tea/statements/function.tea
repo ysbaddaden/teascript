@@ -51,6 +51,7 @@ def TFunction
     # inheritance
     if self.parent
       rs.push(name + '.prototype = new ' + self.parent.compile() + '();');
+      rs.push(name + '.prototype.constructor = ' + name + ';')
     end
 
     self.compileMethods(rs, name)

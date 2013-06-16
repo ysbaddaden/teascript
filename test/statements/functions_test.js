@@ -136,8 +136,8 @@ exports["test lambda assignment with body"] = function () {
 };
 
 exports["test inheritance"] = function () {
-  assert.equal('function A() {}\nA.prototype = new B();',     T.compile("def A < B;end"));
-  assert.equal('function A() {}\nA.prototype = new B.C.D();', T.compile("def A < B.C.D;end"));
+  assert.equal('function A() {}\nA.prototype = new B();\nA.prototype.constructor = A;', T.compile("def A < B;end"));
+  assert.equal('function A() {}\nA.prototype = new B.C.D();\nA.prototype.constructor = A;', T.compile("def A < B.C.D;end"));
 };
 
 exports["test prototype methods"] = function () {
