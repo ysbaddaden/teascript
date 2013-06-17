@@ -1,0 +1,367 @@
+def escape(str)
+  return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
+end
+
+def re(ary, bound)
+  map = ary.map(->(t) { return escape(t) }).join('|')
+  return new RegExp('^(' + map + ')' + (bound ? '\\b' : ''))
+end
+
+def words(str)
+  ary = str.trim().split(/\s+/)
+  ary.contains = ->(value) { return this.indexOf(value) != -1 }
+  return ary
+end
+
+def enhanced_array
+  ary = []
+  ary.last  = -> { return this[this.length - 1] }
+  return ary
+end
+
+KEYWORDS = words("
+  def delete return then do end
+  if unless else elsif case when while until loop for in own of
+  break next new throw begin rescue ensure
+  and or not typeof instanceof
+")
+
+OPERATORS = words("
+  -> += -= *= /= %= &= |= ^= ||= >>= <<=
+  + - ~ * / % & | ^ << >> == != <= < => >
+  ... .. . , = : ?
+")
+
+PARENS = words("( ) { } [ ] }")
+
+REGEXP = words("
+  ( , = : [ ! & | ? { } ; ~ + - * % ^ < >
+  return when if else elsif unless
+")
+
+ARGUMENT = words("
+  BOOL NIL NUMBER STRING REGEXP identifier
+  ( [ \{ * -> ~ not typeof new
+")
+
+SKIP_LINEFEED = OPERATORS.concat(PARENS).concat(['LF', 'COMMENT'])
+SKIP_LINEFEED.contains = ->(value) { return this.indexOf(value) != -1 }
+
+COMMENT_RE    = /^((?:#.*\n\s*)*#[^\n]*)/
+LINEFEED_RE   = /^\n/
+SEMICOLON_RE  = /^(;)/
+BOOL_RE       = /^(true|false)\b/
+NIL_RE        = /^(null|nil|undefined)\b/
+INTEGER_RE    = /^(\d+)\b/
+FLOAT_RE      = /^((\d+)?\.\d+)\b/
+REGEXP_RE     = /^\//
+KEYWORDS_RE   = re(KEYWORDS, true)
+OPERATORS_RE  = re(OPERATORS)
+PARENS_RE     = re(PARENS)
+IDENTIFIER_RE = /^([a-zA-Z][a-zA-Z0-9]*)\b/
+WHITESPACE_RE = /^([ \t\r]+)/
+#STRING_RE     =  /^('(\.|[^\'])*')/
+STRING_RE     = /^(')/
+STRING2_RE    = /^(")/
+
+def Token(name, value, line = nil, column = nil)
+  self.name   = name
+  self.value  = value
+  self.line   = line
+  self.column = column
+
+  def inspect
+    return self.value || self.name
+  end
+
+  def yylloc
+    lloc = {
+      first_line:   self.line,
+      last_line:    self.line,
+      first_column: self.column,
+      last_column:  self.column,
+    }
+
+    if self.value
+      if m = self.value.match(/(\n)/g)
+        lloc.last_line += m.length
+
+        idx = self.value.lastIndexOf('\n')
+        if idx == -1
+          lloc.last_column += self.value.length
+        else
+          lloc.last_column = self.value.slice(idx).length
+        end
+      else
+        lloc.last_column += self.value.length
+      end
+    end
+
+    return lloc
+  end
+
+  def is(name)
+    case name
+    when 'keyword'
+      return KEYWORDS.contains(self.name)
+    when 'operator'
+      return OPERATORS.contains(self.name)
+    when 'argument'
+      return ARGUMENT.contains(self.name)
+    else
+      return self.name == name
+    end
+  end
+end
+
+def Lexer(input)
+  self.input  = input
+  self.index  = 0
+  self.line   = 1
+  self.column = 1
+
+  self.tokens = enhanced_array()
+  self.state  = enhanced_array()
+
+  def tokenize
+    loop
+      str = self.input.slice(self.index)
+
+      unless str
+        self.tokens.push(self.token('EOF'))
+        break
+      end
+
+      next if self.state.last() == 'embed' and self.match_embed(str)
+      self.match(str)
+    end
+
+    return self.rewrite(self.tokens)
+  end
+
+  def rewrite(tokens)
+    i = 0
+    rs = enhanced_array()
+    state = enhanced_array()
+    state.is = ->(name) { return this.last() == name }
+
+    while token = tokens[i]
+      i += 1
+
+      case token.name
+      when 'whitespace'
+        if rs.last().is('identifier') and tokens[i].is('argument')
+          state.push('call')
+          rs.push(new Token('(', '(', token.line, token.column))
+        end
+        next
+
+      when 'LF'
+        if state.is('call')
+          state.pop()
+          rs.push(new Token(')', ')', token.line, token.column))
+        elsif SKIP_LINEFEED.contains(rs.last().name)
+          next
+        end
+
+      when '{'
+        if state.is('lambda_def')
+          state.pop()
+          state.push('lambda')
+        else
+          state.push('object')
+        end
+
+      when '}'       then state.pop() # either 'lambda' or 'object'
+      when '('       then state.push('paren')
+      when ')'       then state.pop() # either 'call' or 'paren'
+      when '->'      then state.push('lambda_def')
+      when 'COMMENT' then next
+      when 'EOF'
+        while s = state.pop()
+          rs.push(new Token(')', ')', token.line, token.column)) if s == 'call'
+        end
+        return rs
+      end
+
+      rs.push(token)
+    end
+
+    return rs
+  end
+
+  def match(str)
+    if    m = str.match(COMMENT_RE)         then name = 'COMMENT'
+    elsif m = str.match(LINEFEED_RE)        then self.linefeed(); return
+    elsif m = str.match(SEMICOLON_RE)       then name = m[0]
+    elsif m = str.match(BOOL_RE)            then name = 'BOOL'
+    elsif m = str.match(NIL_RE)             then name = 'NIL'
+    elsif m = str.match(INTEGER_RE)         then name = 'NUMBER'
+    elsif m = str.match(FLOAT_RE)           then name = 'NUMBER'
+    elsif     str.match(REGEXP_RE)          then self.regexp(str); return
+    elsif m = str.match(KEYWORDS_RE)        then name = m[0]
+    elsif m = str.match(OPERATORS_RE)       then name = m[0]
+    elsif m = str.match(PARENS_RE)          then name = m[0]
+    elsif m = str.match(IDENTIFIER_RE)      then name = 'identifier'
+    elsif m = str.match(WHITESPACE_RE)      then name = 'whitespace'
+    elsif     str.match(STRING_RE)          then self.string(str); return
+    elsif     str.match(STRING2_RE)         then self.embedable_string(str); return
+    else
+      m = str.match(/^(.+)\b/)
+      throw Error("unknown token #{m[0]} at #{self.line},#{self.column}")
+    end
+
+    self.tokens.push(self.token(name, m[0])) if name
+  end
+
+  def match_embed(str)
+    if str.match(/^#\{/)
+      self.tokens.push(self.token('+', '+'))
+      self.tokens.push(self.token('(', '('))
+    elsif str.match(/^\}/)
+      if str[1] == '"'
+        self.tokens.push(self.token(')', ')'))
+        self.tokens.push(self.token(')', ')'))
+        self.state.pop() # embed
+        self.state.pop() # string
+      else
+        self.tokens.push(self.token(')', ')'))
+        self.tokens.push(self.token('+', '+'))
+        self.consume(-1)
+        self.unput('"')
+        self.state.pop() # embed
+      end
+    else
+      return false
+    end
+    return true
+  end
+
+  def linefeed
+    self.line += 1
+    self.column += 0
+    self.consume(1)
+    self.tokens.push(self.token('LF'))
+  end
+
+  def embedable_string(str)
+    self.string(str)
+
+    if self.state.last() == 'string'
+      self.tokens.push(self.token(')', ')'))
+      self.state.pop()
+    end
+  end
+
+  def string(str)
+    quote = str[0]
+    idx   = 1
+    value = ''
+    re    = quote == '"' ? /^([^"]*")/ : /^([^']*')/
+
+    loop
+      if m = str.slice(idx).match(re)
+        text = m[0]
+
+        if quote == '"' and (j = text.match(/#\{/))
+          value += text.slice(0, j.index) + quote
+          self.embed()
+          break
+        else
+          value += text
+
+          if text.slice(-2) == "\\#{quote}"
+            idx += text.length
+          else
+            break
+          end
+        end
+      else
+        throw Error("unterminated string")
+      end
+    end
+
+    self.tokens.push(self.token('STRING', quote + value))
+  end
+
+  def embed
+    unless self.state.last() == 'string'
+      self.tokens.push(self.token('(', '('))
+      self.state.push('string')
+    end
+    self.state.push('embed')
+    self.consume(-2)
+  end
+
+  def regexp(str)
+    if !self.tokens.last() or REGEXP.contains(self.tokens.last().name)
+      if m = str.match(/^(\/(\.|[^\\\/])*\/[gimy]*)/)
+        self.tokens.push(self.token('REGEXP', m[0]))
+        return
+      end
+    end
+    self.tokens.push(self.token('/', '/'))
+  end
+
+  def token(name, value = nil)
+    #console.log("TOKEN: #{name}   #{value}")
+    self.consume(value.length) if value
+    return new Token(name, value, self.line, self.column)
+  end
+
+  def consume(size)
+    self.index  += size
+    self.column += size
+  end
+
+  def unput(str)
+    if self.index > 0
+      self.input = self.input.slice(0, self.index) + str + self.input.slice(self.index)
+    else
+      self.input = str + self.input.slice(self.index)
+    end
+  end
+end
+
+exports.lexer = lexer = {
+  setInput: ->(input) {
+    this.tokens = new Lexer(input).tokenize()
+  },
+
+  lex: -> {
+    token = this.tokens.shift()
+    if token
+      this.yytext   = token.value
+      this.yyleng   = token.value ? token.value.length : 0
+      this.yyline   = token.line
+      this.yycolumn = token.column
+      return token.name
+    end
+  }
+}
+
+def debug(code)
+  lexer.setInput(code)
+
+  #while name = lexer.lex()
+  #  console.log("#{name} '#{lexer.yytext}' #{lexer.yyleng} #{lexer.yyline},#{lexer.yycolumn}")
+  #end
+
+  console.log(lexer.tokens.map(->(t) { return t.inspect() }).join(' '))
+  console.log("")
+end
+
+debug("def A(a)\nreturn a + 1\n\n\n end")
+debug("def A default = nil\nreturn a + 1\n end")
+debug("describe 'DSL', -> {\n  it 'must be ok', -> {\n    assert.ok true\n }\n}")
+debug("lmbd = ->(rs) { doSomething() }")
+debug("'I can\\'t be damned.'")
+debug("'This is a string\nspanning on\nmultiple lines'")
+debug('"total: #{amount} €"')
+debug('"debug: #{hello} #{world}".test(something)')
+debug('/azerty/i')
+debug('# this is a comment')
+debug("# this is a comment\n# spanning on\n# multiple lines")
+debug("select = readkey() - 1 #comment")
+debug("{ a: -> {},\n #comment\nb: -> {} }")
+
