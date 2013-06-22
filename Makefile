@@ -2,20 +2,20 @@
 .IGNORE: test
 
 BIN = ./node_modules/.bin
-JISON        = $(BIN)/jison
+JISON = $(BIN)/jison
 BROWSERBUILD = $(BIN)/browserbuild
-UGLIFYJS     = $(BIN)/uglifyjs
+UGLIFYJS = $(BIN)/uglifyjs
 
-SOURCES = $(wildcard src/tea/*.tea) $(wildcard src/tea/**/*.tea)
-OBJECTS = $(patsubst src/tea/%.tea, lib/%.js, $(SOURCES))
+SOURCES = $(wildcard src/*.tea) $(wildcard src/**/*.tea)
+OBJECTS = $(patsubst src/%.tea, lib/%.js, $(SOURCES))
 
 all: lib/parser.js $(OBJECTS)
 
-lib/%.js: src/tea/%.tea
+lib/%.js: src/%.tea
 	bin/tea $< -o $@
 
-lib/parser.js: src/tea.y src/tea.l
-	$(JISON) -m js src/tea.y src/tea.l -o lib/_parser.js
+lib/parser.js: src/tea.y
+	$(JISON) -m js src/tea.y -o lib/_parser.js
 	echo "var Tea = require('./tea');" > $@
 	cat lib/_parser.js >> $@
 	echo "module.exports = _parser;" >> $@

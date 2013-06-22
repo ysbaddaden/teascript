@@ -13,7 +13,11 @@ def Body
 
   def parseStatements
     self.body = self.statements.reduce(->(body, statement) {
-      return body.concat(statement.compile())
+      if statement
+        return body.concat(statement.compile())
+      else
+        return body
+      end
     }, [])
   end
 

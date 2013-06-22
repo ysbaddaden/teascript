@@ -275,6 +275,7 @@ UNARY
     | '+'    PRIMARY                        { $$ = (new Tea.Unary).init("+",      $2); }
     | '-'    PRIMARY                        { $$ = (new Tea.Unary).init("-",      $2); }
     | '~'    PRIMARY                        { $$ = (new Tea.Unary).init("~",      $2); }
+    | '!'    PRIMARY                        { $$ = (new Tea.Unary).init("!",      $2); }
     | not    PRIMARY                        { $$ = (new Tea.Unary).init("!",      $2); }
     | typeof PRIMARY                        { $$ = (new Tea.Unary).init("typeof", $2); }
     | new    PRIMARY                        {
@@ -390,11 +391,8 @@ IDENTIFIER
     ;
 
 LITERAL
-    : true              { $$ = (new Tea.Keyword).init($1); }
-    | false             { $$ = (new Tea.Keyword).init($1); }
-    | nil               { $$ = (new Tea.Keyword).init($1); }
-    | null              { $$ = (new Tea.Keyword).init($1); }
-    | undefined         { $$ = (new Tea.Keyword).init($1); }
+    : BOOLEAN           { $$ = (new Tea.Keyword).init($1); }
+    | NIL               { $$ = (new Tea.Keyword).init($1); }
     | NUMBER            { $$ = (new Tea.Number).init($1); }
     | STRING            { $$ = (new Tea.String).init($1); }
     | REGEXP            { $$ = (new Tea.RegExp).init($1); }

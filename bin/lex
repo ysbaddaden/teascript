@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 var fs = require('fs');
 var path = require('path');
-var util = require('util');
+//var util = require('util');
 var CHARSET = 'utf8';
 
 function realpath(arg) {
@@ -12,26 +12,18 @@ function realpath(arg) {
     }
 }
 
+function lex(input) {
+    var lexer = require('../lib/lexer');
+    lexer.setInput(fs.readFileSync(input, CHARSET));
+    return lexer.tokens.map(function (token) {
+        return token.inspect();
+    }).join(" ");
+}
+
 function main(argv) {
     var input  = realpath(argv._[0]);
     var result = lex(input);
-    process.stdout.write(util.inspect(result, false, null) + '\n');
-}
-
-function lex(input) {
-    var lexer = require('../lib/parser').lexer;
-    lexer.setInput(fs.readFileSync(input, CHARSET));
-
-    var tokens = [], token;
-    while ((token = lexer.lex()) !== lexer.EOF) {
-        //tokens.push([ parser.terminals_[token], lexer.yytext ]);
-        if (typeof token === 'number') {
-            tokens.push(lexer.yytext);
-        } else {
-            tokens.push(token);
-        }
-    }
-    return tokens;
+    process.stdout.write(result + '\n');
 }
 
 main(require('optimist').

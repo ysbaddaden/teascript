@@ -44,24 +44,13 @@ exports.ThrowStatement = require('./statements/throw_statement.js')
 exports.BeginStatement = require('./statements/begin_statement.js')
 exports.RescueStatement = require('./statements/rescue_statement.js')
 
-parser = require('./parser')
-exports.parser = parser
-
+exports.parser = parser = require('./parser')
+exports.parser.lexer = lexer = require('./lexer')
 beautify = require('js-beautify').js_beautify
 
 def exports.lex(source)
-  lexer = parser.lexer
   lexer.setInput(source)
-  tokens = []
-  while (token = lexer.lex()) != lexer.EOF
-    #tokens.push([ parser.terminals_[token], lexer.yytext ])
-    if typeof token == 'number'
-      tokens.push(lexer.yytext)
-    else
-      tokens.push(token)
-    end
-  end
-  return tokens
+  return lexer.map(->(token) { return token.inspect() })
 end
 
 def exports.ast(source)

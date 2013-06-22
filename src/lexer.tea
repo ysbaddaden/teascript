@@ -28,11 +28,11 @@ KEYWORDS = words("
 
 OPERATORS = words("
   -> += -= *= /= %= &= |= ^= ||= >>= <<=
-  + - ~ * / % & | ^ << >> == != <= < => >
-  ... .. . , = : ?
+  + - ~ * / % && || & | ^ << >> == != <= >= => < >
+  ... .. . , = : ? !
 ")
 
-PARENS = words("( ) { } [ ] }")
+PARENS = words("( ) { } [ ]")
 
 REGEXP = words("
   ( , = : [ ! & | ? { } ; ~ + - * % ^ < >
@@ -40,25 +40,28 @@ REGEXP = words("
 ")
 
 ARGUMENT = words("
-  BOOL NIL NUMBER STRING REGEXP identifier
-  ( [ \{ * -> ~ not typeof new
-")
+  BOOLEAN NIL NUMBER STRING REGEXP identifier
+  ( [ \{ -> ~ not typeof new
+") # - + *
 
-SKIP_LINEFEED = OPERATORS.concat(PARENS).concat(['LF', 'COMMENT'])
-SKIP_LINEFEED.contains = ->(value) { return this.indexOf(value) != -1 }
+SKIP_LF_AFTER = OPERATORS.concat(words("and or not LF COMMENT ( { [ ,"))
+SKIP_LF_AFTER.contains = ->(value) { return this.indexOf(value) != -1 }
+
+SKIP_LF_BEFORE = words(", : ) } ]")
+SKIP_LF_BEFORE.contains = ->(value) { return this.indexOf(value) != -1 }
 
 COMMENT_RE    = /^((?:#.*\n\s*)*#[^\n]*)/
 LINEFEED_RE   = /^\n/
 SEMICOLON_RE  = /^(;)/
 BOOL_RE       = /^(true|false)\b/
 NIL_RE        = /^(null|nil|undefined)\b/
-INTEGER_RE    = /^(\d+)\b/
-FLOAT_RE      = /^((\d+)?\.\d+)\b/
-REGEXP_RE     = /^\//
+FLOAT_RE      = /^((\d+)?\.\d+)([eE][-+]?\d+)?\b/
+INTEGER_RE    = /^(\d+)([eE][-+]?\d+)?\b/
+REGEXP_RE     = /^\/[^=]/
 KEYWORDS_RE   = re(KEYWORDS, true)
 OPERATORS_RE  = re(OPERATORS)
 PARENS_RE     = re(PARENS)
-IDENTIFIER_RE = /^([a-zA-Z][a-zA-Z0-9]*)\b/
+IDENTIFIER_RE = /^([a-zA-Z_][a-zA-Z0-9_]*)\b/
 WHITESPACE_RE = /^([ \t\r]+)/
 #STRING_RE     =  /^('(\.|[^\'])*')/
 STRING_RE     = /^(')/
@@ -71,7 +74,8 @@ def Token(name, value, line = nil, column = nil)
   self.column = column
 
   def inspect
-    return self.value || self.name
+    value = self.value == null ? '' : (self.value == self.name ? '' : self.value)
+    return "[" + self.name + (value ? ' ' + value : '') + "]"
   end
 
   def yylloc
@@ -145,12 +149,25 @@ def Lexer(input)
     state = enhanced_array()
     state.is = ->(name) { return this.last() == name }
 
+    next_token = -> {
+      if tokens[i] and !tokens[i].is('whitespace')
+        return tokens[i]
+      else
+        return tokens[i + 1]
+      end
+    }
+
+    skip = -> {
+      return (rs.last() and SKIP_LF_AFTER.contains(rs.last().name)) or
+        (next_token() and SKIP_LF_BEFORE.contains(next_token().name))
+    }
+
     while token = tokens[i]
       i += 1
 
       case token.name
       when 'whitespace'
-        if rs.last().is('identifier') and tokens[i].is('argument')
+        if rs.last() and rs.last().is('identifier') and tokens[i] and tokens[i].is('argument')
           state.push('call')
           rs.push(new Token('(', '(', token.line, token.column))
         end
@@ -160,9 +177,13 @@ def Lexer(input)
         if state.is('call')
           state.pop()
           rs.push(new Token(')', ')', token.line, token.column))
-        elsif SKIP_LINEFEED.contains(rs.last().name)
-          next
         end
+        next if skip()
+        #elsif rs.last() and SKIP_LINEFEED.contains(rs.last().name)
+        #  next
+        #elsif (tokens[i] and tokens[i].is(',')) or (tokens[i + 1] and tokens[i + 1].is(','))
+        #  next
+        #end
 
       when '{'
         if state.is('lambda_def')
@@ -177,9 +198,14 @@ def Lexer(input)
       when ')'       then state.pop() # either 'call' or 'paren'
       when '->'      then state.push('lambda_def')
       when 'COMMENT' then next
+      when ';'
+        rs.push(new Token('LF', nil, token.line, token.column))
+        next
+
       when 'EOF'
         while s = state.pop()
           rs.push(new Token(')', ')', token.line, token.column)) if s == 'call'
+          rs.push(token)
         end
         return rs
       end
@@ -194,10 +220,10 @@ def Lexer(input)
     if    m = str.match(COMMENT_RE)         then name = 'COMMENT'
     elsif m = str.match(LINEFEED_RE)        then self.linefeed(); return
     elsif m = str.match(SEMICOLON_RE)       then name = m[0]
-    elsif m = str.match(BOOL_RE)            then name = 'BOOL'
+    elsif m = str.match(BOOL_RE)            then name = 'BOOLEAN'
     elsif m = str.match(NIL_RE)             then name = 'NIL'
-    elsif m = str.match(INTEGER_RE)         then name = 'NUMBER'
     elsif m = str.match(FLOAT_RE)           then name = 'NUMBER'
+    elsif m = str.match(INTEGER_RE)         then name = 'NUMBER'
     elsif     str.match(REGEXP_RE)          then self.regexp(str); return
     elsif m = str.match(KEYWORDS_RE)        then name = m[0]
     elsif m = str.match(OPERATORS_RE)       then name = m[0]
@@ -239,7 +265,7 @@ def Lexer(input)
 
   def linefeed
     self.line += 1
-    self.column += 0
+    self.column = 0
     self.consume(1)
     self.tokens.push(self.token('LF'))
   end
@@ -282,29 +308,56 @@ def Lexer(input)
     end
 
     self.tokens.push(self.token('STRING', quote + value))
+    self.line += (value.match(/\n/g) || '').length
+
+    #console.log('__STR:', str, quote + value, self.input.slice(self.index))
   end
 
   def embed
-    unless self.state.last() == 'string'
+    if self.state.last() == 'string'
+      self.consume(-1)
+    else
       self.tokens.push(self.token('(', '('))
       self.state.push('string')
+      self.consume(-2)
     end
     self.state.push('embed')
-    self.consume(-2)
   end
 
   def regexp(str)
-    if !self.tokens.last() or REGEXP.contains(self.tokens.last().name)
-      if m = str.match(/^(\/(\.|[^\\\/])*\/[gimy]*)/)
-        self.tokens.push(self.token('REGEXP', m[0]))
-        return
+    i = self.tokens.length - 1
+    idx = 1
+
+    while self.tokens[i] and self.tokens[i].name == 'whitespace' do
+      i -= 1
+    end
+
+    if !self.tokens[i] or REGEXP.contains(self.tokens[i].name)
+      loop
+        m = str.slice(idx).indexOf('/')
+
+        if m == -1
+          throw Error('unterminated regexp')
+        else
+          idx += m + 1;
+
+          if str.slice(idx - 2, idx) != '\\/'
+            if mm = str.slice(idx).match(/^[gimy]*/)
+              idx += mm[0].length;
+            end
+
+            self.tokens.push(self.token('REGEXP', str.slice(0, idx)))
+            return
+          end
+        end
       end
     end
+
     self.tokens.push(self.token('/', '/'))
   end
 
   def token(name, value = nil)
-    #console.log("TOKEN: #{name}   #{value}")
+    #console.log("TOKEN: " + name + " " + (value == null ? '' : (value == name ? '' : value)))
     self.consume(value.length) if value
     return new Token(name, value, self.line, self.column)
   end
@@ -323,7 +376,7 @@ def Lexer(input)
   end
 end
 
-exports.lexer = lexer = {
+module.exports = {
   setInput: ->(input) {
     this.tokens = new Lexer(input).tokenize()
   },
@@ -333,35 +386,39 @@ exports.lexer = lexer = {
     if token
       this.yytext   = token.value
       this.yyleng   = token.value ? token.value.length : 0
-      this.yyline   = token.line
+      this.yylineno = token.line - 1
       this.yycolumn = token.column
       return token.name
+    else
+      return 'EOF'
     end
   }
 }
 
-def debug(code)
-  lexer.setInput(code)
+#def debug(code)
+#  lexer = module.exports
+#  lexer.setInput(code)
+#
+#  #while name = lexer.lex()
+#  #  console.log("#{name} '#{lexer.yytext}' #{lexer.yyleng} #{lexer.yyline},#{lexer.yycolumn}")
+#  #end
+#
+#  console.log(lexer.tokens.map(->(t) { return t.inspect() }).join(' '))
+#  console.log("")
+#end
 
-  #while name = lexer.lex()
-  #  console.log("#{name} '#{lexer.yytext}' #{lexer.yyleng} #{lexer.yyline},#{lexer.yycolumn}")
-  #end
-
-  console.log(lexer.tokens.map(->(t) { return t.inspect() }).join(' '))
-  console.log("")
-end
-
-debug("def A(a)\nreturn a + 1\n\n\n end")
-debug("def A default = nil\nreturn a + 1\n end")
-debug("describe 'DSL', -> {\n  it 'must be ok', -> {\n    assert.ok true\n }\n}")
-debug("lmbd = ->(rs) { doSomething() }")
-debug("'I can\\'t be damned.'")
-debug("'This is a string\nspanning on\nmultiple lines'")
-debug('"total: #{amount} €"')
-debug('"debug: #{hello} #{world}".test(something)')
-debug('/azerty/i')
-debug('# this is a comment')
-debug("# this is a comment\n# spanning on\n# multiple lines")
-debug("select = readkey() - 1 #comment")
-debug("{ a: -> {},\n #comment\nb: -> {} }")
+#debug("def A(a)\nreturn a + 1\n\n\n end")
+#debug("def A default = nil\nreturn a + 1\n end")
+#debug("describe 'DSL', -> {\n  it 'must be ok', -> {\n    assert.ok true\n }\n}")
+#debug("lmbd = ->(rs) { doSomething() }")
+#debug("'I can\\'t be damned.'")
+#debug("'This is a string\nspanning on\nmultiple lines'")
+#debug('"total: #{amount} €"')
+#debug('"debug: #{hello} #{world}".test(something)')
+#debug('/azerty/i')
+#debug('# this is a comment')
+#debug("# this is a comment\n# spanning on\n# multiple lines")
+#debug("select = readkey() - 1 #comment")
+#debug("{ a: -> {},\n #comment\nb: -> {} }")
+#debug('"unknown token #{self.line},#{self.column}"')
 
