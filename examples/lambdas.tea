@@ -11,7 +11,9 @@ resize(-> (x, by = 2) {
 })
 
 resize -> {}
-resize(x) -> {}
+#resize(x) -> {}
+
+$.test();
 
 $("#layout").click ->(e) {
   e.preventDefault()
@@ -25,7 +27,7 @@ $("#layout").click ->(e) {
 #  return [ x * by, y * by ];
 #};
 #
-#[ 
+#[
 #  "var getRedizedSizes;",
 #  "getResizedSizes = function (x, y, by) {",
 #  [

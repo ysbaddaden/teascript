@@ -33,10 +33,10 @@ exports['test call with splats'] = function () {
 
 exports['test call with options hash'] = function () {
   assert.equal("model.set(attr, undefined, {\n    unset: true\n});",
-      T.compile("model.set(attr, undefined, unset: true)"));
+    T.compile("model.set(attr, undefined, unset: true)"));
 
   assert.equal("model.clear({\n    silent: true\n});",
-      T.compile("model.clear(silent: true)"));
+    T.compile("model.clear(silent: true)"));
 };
 
 exports['test call with reserved keywords'] = function () {
@@ -47,6 +47,29 @@ exports['test call with reserved keywords'] = function () {
   assert.equal("req.own;", T.compile("req.own"));
   assert.equal("req.then;", T.compile("req.then"));
   assert.equal("req.when;", T.compile("req.when"));
+};
+
+exports["test call without parens (DSL)"] = function () {
+  assert.equal("add(1);", T.compile("add 1"));
+  assert.equal("add(1 * 2);", T.compile("add 1 * 2"));
+  assert.equal(
+    "describe('something', function () {\n" +
+    "    it('must be ok', function () {\n" +
+    "        assert.ok(something());\n" +
+    "    });" +
+    "\n});",
+    T.compile("describe 'something', -> {\n" +
+              "  it 'must be ok', -> {\n" +
+              "     assert.ok something()\n" +
+              "  }\n" +
+              "}"));
+};
+
+exports["test special DSL cases"] = function () {
+  assert.equal("add(-1);", T.compile("add -1"));
+  assert.equal("add(+x);", T.compile("add +x"));
+  assert.equal("add(~doSomething());", T.compile("add ~doSomething()"));
+  assert.equal("add.apply(null, args);", T.compile("add *args"));
 };
 
 if (module === require.main) {
