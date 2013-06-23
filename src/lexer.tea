@@ -47,7 +47,7 @@ ARGUMENT = words("
 SKIP_LF_AFTER = OPERATORS.concat(words("and or not LF COMMENT ( { [ ,"))
 SKIP_LF_AFTER.contains = ->(value) { return this.indexOf(value) != -1 }
 
-SKIP_LF_BEFORE = words(", : ) } ]")
+SKIP_LF_BEFORE = words(", : ) } ]") # = .
 SKIP_LF_BEFORE.contains = ->(value) { return this.indexOf(value) != -1 }
 
 COMMENT_RE    = /^((?:#.*\n\s*)*#[^\n]*)/
