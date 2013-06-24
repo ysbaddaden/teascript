@@ -10,6 +10,7 @@ exports.testDot = function () {
 exports.testDotFromArray = function () {
   assert.equal("[].slice.call(list, 1, 3);", T.compile("[].slice.call(list, 1, 3)"));
 };
+
 exports.testDotFromObject = function () {
   assert.equal("{}.hasOwnProperty.call(obj, 'name');", T.compile("{}.hasOwnProperty.call(obj, 'name')"));
 };

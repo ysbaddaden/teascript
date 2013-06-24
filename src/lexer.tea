@@ -316,6 +316,12 @@ def Lexer(input)
     self.tokens.push(self.token('STRING', quote + value))
     self.line += (value.match(/\n/g) || '').length
 
+    if self.state.last() == 'string'
+      self.tokens.push(self.token(')', ')'))
+      self.consume(-1)
+      self.state.pop()
+    end
+
     #console.log('__STR:', str, quote + value, self.input.slice(self.index))
   end
 

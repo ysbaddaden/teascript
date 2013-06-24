@@ -58,9 +58,14 @@ exports["test no interpolation for single quoted string"] = function () {
 
 exports["test string interpolation state must be popped"] = function () {
   assert.equal('function () {\n' +
-    '    console.log(("download " + (code) + " into " + (directoryEntry)));\n' +
-    '};',
-    T.compile('-> { console.log("download #{code} into #{directoryEntry}") }'));
+      '    console.log(("download " + (code) + " into " + (directoryEntry)));\n' +
+      '};',
+      T.compile('-> { console.log("download #{code} into #{directoryEntry}") }'));
+};
+
+exports["test more string after interpolation"] = function () {
+  assert.equal("replace((\"hello \" + (world) + \"!\")).slice(0);",
+      T.compile("replace(\"hello #{world}!\").slice(0)\n"));
 };
 
 if (module === require.main) {
