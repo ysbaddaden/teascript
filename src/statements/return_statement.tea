@@ -1,8 +1,5 @@
-def ReturnStatement
-  def init(expression)
-    self.expression = expression
-    return self
-  end
+def ReturnStatement(expression)
+  self.expression = expression
 
   def compile
     return 'return;' if self.expression == nil

@@ -1,10 +1,11 @@
 Splat = require('./splat')
 
-def Call
+def Call(expression, args)
+  self.init(expression, args)
+
   def init(expression, args)
     self.expression = expression
     self.arguments  = args || []
-    return self
   end
 
   def callerName

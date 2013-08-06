@@ -1,10 +1,11 @@
-def Identifier
-  def init(value)
-    if /^__/.test(value)
-      throw new Error("ERROR: invalid identifier '" + value + "'; identifiers starting with '__' are reserved.");
+def Identifier(value)
+  self.value = value
+  self.refute_reserved()
+
+  def refute_reserved
+    if /^__/.test(self.value)
+      throw new Error("ERROR: invalid identifier '" + self.value + "'; identifiers starting with '__' are reserved.");
     end
-    self.value = value
-    return self
   end
 
   def compile

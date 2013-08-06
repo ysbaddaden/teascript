@@ -1,22 +1,10 @@
-def TArray
-  def -init(declaration)
-    self.declaration = declaration || []
-    return self
-  end
+def TArray(declaration)
+  self.declaration = declaration || []
 
   def -compile
     declaration = self.declaration.map(->(decl) { return decl.compile() })
     return "[" + declaration.join(", ") + "]"
   end
 end
-
-#def TArray2(declaration)
-#  self.declaration = declaration
-#
-#  def -compile
-#    declaration = self.declaration.map(->(decl) { return decl.compile() })
-#    return "[" + declaration.join(", ") + "]"
-#  end
-#end
 
 module.exports = TArray

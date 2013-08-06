@@ -1,8 +1,5 @@
-def TObject
-  def init(declarations)
-    self.declarations = declarations || [];
-    return self
-  end
+def TObject(declarations)
+  self.declarations = declarations || [];
 
   def compile
     declarations = self.declarations.map(->(decl) { return decl.compile() })

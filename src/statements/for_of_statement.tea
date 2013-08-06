@@ -1,14 +1,11 @@
 scopes     = require('../scopes')
 Identifier = require('../identifier')
 
-def ForOfStatement
-  def init(identifier, index, expression, body)
-    self.identifier = identifier
-    self.index = index
-    self.expression = expression
-    self.body = body
-    return self
-  end
+def ForOfStatement(identifier, index, expression, body)
+  self.identifier = identifier
+  self.index = index
+  self.expression = expression
+  self.body = body
 
   def compile
     rs = []

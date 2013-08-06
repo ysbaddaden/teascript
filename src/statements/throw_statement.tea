@@ -1,8 +1,5 @@
-def ThrowStatement
-  def init(expression)
-    self.expression = expression
-    return self
-  end
+def ThrowStatement(expression)
+  self.expression = expression
 
   def compile
     return 'throw ' + self.expression.compile() + ';'

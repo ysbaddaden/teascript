@@ -1,8 +1,5 @@
-def DeleteStatement
-  def init(primary)
-    self.primary = primary
-    return self
-  end
+def DeleteStatement(primary)
+  self.primary = primary
 
   def compile
     return 'delete ' + self.primary.compile() + ';'

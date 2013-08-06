@@ -1,8 +1,5 @@
-def RequireStatement
-  def init(expression)
-    self.expression = expression
-    return self
-  end
+def RequireStatement(expression)
+  self.expression = expression
 
   def compile
     return 'require(' + self.expression.compile() + ')';

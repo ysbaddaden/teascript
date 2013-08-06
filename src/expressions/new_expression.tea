@@ -10,7 +10,9 @@ splatConstructorTemplate =
       return (t == 'object' || t == 'function') result || child : child;
   }(%{FUNCTION}, %{ARGS}, function () {}))"
 
-def NewExpression < Call
+def NewExpression(expression, args) < Call
+  self.init(expression, args) # Call.prototype.init.call(self, expression, args);
+
   def compile
     self.parseArguments()
 

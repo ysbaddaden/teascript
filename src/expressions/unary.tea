@@ -1,9 +1,6 @@
-def Unary
-  def init(operator, right)
-    self.operator = operator
-    self.right = right
-    return self
-  end
+def Unary(operator, right)
+  self.operator = operator
+  self.right = right
 
   def compile
     rs = [ self.operator, self.right.compile() ]

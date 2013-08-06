@@ -1,10 +1,7 @@
 TFunction = require('./function')
 
-def StaticFunction
-  def init(name, args, body)
-    self.fn = (new TFunction).init(name, args, body)
-    return self
-  end
+def StaticFunction(name, args, body)
+  self.fn = new TFunction(name, args, body)
 
   def compile(options)
     return self.fn.compile(prefix: options.objectName)

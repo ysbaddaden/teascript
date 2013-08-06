@@ -1,8 +1,5 @@
-def LoopStatement
-  def init(body)
-    self.body = body
-    return self
-  end
+def LoopStatement(body)
+  self.body = body
 
   def compile
     return 'while (true) {' + self.body.compile() + '}'

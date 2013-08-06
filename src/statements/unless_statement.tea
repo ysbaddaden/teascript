@@ -1,9 +1,6 @@
-def UnlessStatement
-  def init(test, body)
-    self.test = test
-    self.body = body
-    return self
-  end
+def UnlessStatement(test, body)
+  self.test = test
+  self.body = body
 
   # IMPROVE: check if test is an operation and negatize it:
   # "doSomething() unless x === y" => "if (x !== y) { doSomething(); }"

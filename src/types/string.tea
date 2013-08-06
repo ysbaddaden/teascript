@@ -1,10 +1,7 @@
 Tea = require('../tea')
 
-def TString
-  def init(value)
-    self.value = value
-    return self
-  end
+def TString(value)
+  self.value = value
 
   def compile
     return self.value.replace(/\n/g, '\\n')

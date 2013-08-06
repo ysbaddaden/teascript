@@ -1,8 +1,5 @@
-def Statement
-  def init(value)
-    self.value = value
-    return self
-  end
+def Statement(value)
+  self.value = value
 
   def compile
     return self.value.compile() + ';'

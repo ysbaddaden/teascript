@@ -1,8 +1,5 @@
-def Keyword
-  def init(value)
-    self.value = value
-    return self
-  end
+def Keyword(value)
+  self.value = value
 
   def compile
     return self.value == 'nil' ? 'null' : self.value

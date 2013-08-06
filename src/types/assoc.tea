@@ -1,11 +1,8 @@
 Identifier = require('../identifier')
 
-def TAssoc
-  def init(left, right)
-    self.left  = left
-    self.right = right
-    return self
-  end
+def TAssoc(left, right)
+  self.left  = left
+  self.right = right
 
   def compile
     left = self.left instanceof Identifier ? self.left.value : self.left.compile()

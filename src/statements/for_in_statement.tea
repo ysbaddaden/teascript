@@ -1,14 +1,11 @@
 scopes = require('../scopes')
 
-def ForInStatement
-  def init(_own, key, value, expression, body)
-    self._own = _own
-    self.key = key
-    self.value = value
-    self.expression = expression
-    self.body = body
-    return self
-  end
+def ForInStatement(_own, key, value, expression, body)
+  self._own = _own
+  self.key = key
+  self.value = value
+  self.expression = expression
+  self.body = body
 
   def compile
     rs   = []

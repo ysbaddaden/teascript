@@ -1,10 +1,7 @@
-def IfStatement
-  def init(test, body, alternatives)
-    self.test = test
-    self.body = body
-    self.alternatives = alternatives || []
-    return self
-  end
+def IfStatement(test, body, alternatives)
+  self.test = test
+  self.body = body
+  self.alternatives = alternatives || []
 
   def compile
     rs = []

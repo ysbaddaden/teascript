@@ -1,12 +1,9 @@
 scopes = require('../scopes')
 
-def BeginStatement
-  def init(body, rescues, _ensure)
-    self.body = body
-    self.rescues = rescues || []
-    self._ensure = _ensure
-    return self
-  end
+def BeginStatement(body, rescues, _ensure)
+  self.body = body
+  self.rescues = rescues || []
+  self._ensure = _ensure
 
   def compile
     rs = []

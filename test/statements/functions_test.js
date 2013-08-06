@@ -155,17 +155,28 @@ exports["test object methods"] = function () {
 
 exports["test prototype definition inside lambda"] = function () {
   assert.equal('define(function (require) {\n' +
-      '    function MyObject() {}\n' +
-      '    MyObject.prototype.init = function () {\n' +
-      '        var self = this;\n' +
-      '    };\n' +
-      '});',
-    T.compile('define(->(require) {\n' +
-      '  def MyObject\n' +
-      '    def init\n' +
-      '    end\n' +
-      '  end\n' +
-      '\n})'));
+               '    function MyObject() {}\n' +
+               '    MyObject.prototype.init = function () {\n' +
+                   '        var self = this;\n' +
+               '    };\n' +
+               '});',
+          T.compile('define ->(require) {\n' +
+              '  def MyObject\n' +
+              '    def init\n' +
+              '    end\n' +
+              '  end\n' +
+              '\n}'));
+};
+
+exports["test self in prototype definition"] = function () {
+  assert.equal('function A(value) {\n' +
+      '    var self = this;\n' +
+      '    self.value = value;\n' +
+      '}\n' +
+      'A.prototype.compile = function () {\n' +
+      '    var self = this;\n' +
+      '};',
+      T.compile('def A(value)\n  self.value = value;\n  def compile\n  end\nend'));
 };
 
 if (module === require.main) {

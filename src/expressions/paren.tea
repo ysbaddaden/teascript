@@ -1,8 +1,5 @@
-def Paren
-  def init(expression)
-    self.expression = expression
-    return self
-  end
+def Paren(expression)
+  self.expression = expression
 
   def compile
     return '(' + self.expression.compile() + ')'

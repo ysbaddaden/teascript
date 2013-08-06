@@ -1,11 +1,8 @@
 scopes = require('../scopes')
 
-def Body
-  def init(statement)
-    self.statements = []
-    self.push(statement) if statement
-    return self
-  end
+def Body(statement)
+  self.statements = []
+  self.push(statement) if statement
 
   def push(statement)
     self.statements.push(statement)

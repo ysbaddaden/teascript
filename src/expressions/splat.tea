@@ -1,8 +1,5 @@
-def Splat
-  def init(expression)
-    self.expression = expression
-    return self
-  end
+def Splat(expression)
+  self.expression = expression
 
   def compile
     return self.expression.compile()
