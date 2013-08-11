@@ -299,8 +299,16 @@ PRIMARY
     | ARRAY                                 -> $1
     | OBJECT                                -> $1
     | LAMBDA                                -> $1
+    | super                                 { $$ = new Tea.Super(); }
     | '(' EXPR ')'                          { $$ = new Tea.Paren($2); }
-    | PRIMARY '(' CALL_ARGS ')'             { $$ = new Tea.Call($1, $3); }
+    | PRIMARY '(' CALL_ARGS ')'             {
+        if ($1 instanceof Tea.Super) {
+            $1.setArguments($3 || []);
+            $$ = $1;
+        } else {
+            $$ = new Tea.Call($1, $3);
+        }
+    }
     ;
 
 ARRAY
@@ -341,6 +349,7 @@ DOTABLE
     | own                                   { $$ = new Tea.Identifier('own'); }
     | then                                  { $$ = new Tea.Identifier('then'); }
     | when                                  { $$ = new Tea.Identifier('when'); }
+    | class                                 { $$ = new Tea.Identifier('class'); }
     ;
 
 ARGLIST

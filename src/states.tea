@@ -1,0 +1,34 @@
+states = []
+
+def current
+  return states[states.length - 1]
+end
+
+def dup(original)
+  state = {}
+  state[property] = original[property] for own property in original
+  return state
+end
+
+def push(options = {})
+  state = dup(current())
+  state[property] = options[property] for own property in options
+  states.push state
+end
+
+def pull
+  return states.pop()
+end
+
+def withState(options = {}, callback)
+  push(options)
+  callback()
+  return pull()
+end
+
+module.exports = {
+  push: push,
+  pull: pull,
+  current: current,
+  withState: withState
+}

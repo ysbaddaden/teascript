@@ -1,4 +1,5 @@
 scopes = require('../scopes')
+states = require('../states')
 Tea = require('../tea')
 
 def ClassStatement(name, inherit, methods)
@@ -10,24 +11,26 @@ def ClassStatement(name, inherit, methods)
     rs = []
     name = self.name.value
 
-    unless scopes.isDefined('__klass')
-      scopes.pushIdentifier('__klass')
-      rs.push Tea.CLASS_DEFINITION
-    end
-
-    unless scopes.isDefined(name)
-      scopes.pushIdentifier(name)
-
-      if self.inherit
-        rs.push "#{name} = __klass(#{self.inherit.compile()});"
-      else
-        rs.push "#{name} = __klass();"
+    states.withState({ className: name }, -> {
+      unless scopes.isDefined('__klass')
+        scopes.pushIdentifier('__klass')
+        rs.push Tea.CLASS_DEFINITION
       end
-    end
 
-    for method of self.methods
-      rs.push(method.compile(objectName: self.name.value)) if method
-    end
+      unless scopes.isDefined(name)
+        scopes.pushIdentifier(name)
+
+        if self.inherit
+          rs.push "#{name} = __klass(#{self.inherit.compile()});"
+        else
+          rs.push "#{name} = __klass();"
+        end
+      end
+
+      for method of self.methods
+        rs.push(method.compile(objectName: self.name.value)) if method
+      end
+    })
 
     return rs.join("\n")
   end

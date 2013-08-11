@@ -1,4 +1,5 @@
 scopes    = require('../scopes')
+states    = require('../states')
 Splat     = require('../expressions/splat')
 Dot       = require('../expressions/dot')
 Operation = require('../expressions/operation')
@@ -52,6 +53,7 @@ def TFunction(name, args, body, parent, type)
     end
 
     self.compileMethods(rs, name)
+    states.pull()
 
     return rs.join('')
   end
@@ -77,17 +79,23 @@ def TFunction(name, args, body, parent, type)
   def compileDefinition(rs, a, options)
     if options.objectName
       name = self.name.compile()
+      state = states.current()
+      states.push(methodName: name) if state and state.className and !state.methodName
       rs.push(options.objectName + '.prototype.' + name + ' = function (' + a.join(', ') + ') {')
+
     elsif options.prefix
       name = self.name.compile()
       rs.push(options.prefix + '.' + name + ' = function (' + a.join(', ') + ') {')
+
     elsif self.name and self.name instanceof Dot
       name = self.name.compile()
       rs.push(name + ' = function (' + a.join(', ') + ') {')
+
     else
       name = self.name ? self.name.compile() : ''
       rs.push('function ' + name + '(' + a.join(', ') + ') {')
     end
+
     return name
   end
 

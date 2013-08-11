@@ -1,0 +1,42 @@
+states = require('../states')
+TCall = require('./call')
+
+def Super
+  def setArguments(args)
+    self.arguments = args
+  end
+
+  def compile
+    state = states.current()
+    method = "#{state.className}.superclass.prototype.#{state.methodName}"
+
+    # super
+    # FIXME: what happens to arguments when called within a lambda?!
+    if self.arguments == undefined
+      return method + ".apply(self, arguments)"
+    end
+
+    TCall.prototype.parseArguments.call(self)
+
+    # super(*args)
+    if self.splat.length == 1 and self.args.length == 0
+      return method + '.apply(self, ' + self.splat[0] + ')'
+    end
+
+    # super(arg, *args)
+    if self.splat.length > 0
+      self.splat.push('[' + self.args.join(', ') + ']') if self.args.length > 0
+      return method + '.apply(self, Array.prototype.concat.call(' + self.splat.join(', ') + '))'
+    end
+
+    # super(arg1, arg2)
+    if self.args.length > 0
+      return method + ".call(self, #{self.args.join(', ')})"
+    end
+
+    # super()
+    return method + ".call(self)"
+  end
+end
+
+module.exports = Super

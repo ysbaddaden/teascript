@@ -30,9 +30,13 @@ Table of Content:
       - [Calls](#calls)
     - [Lambdas](#lambdas)
     - [Prototypes](#prototypes)
-      - [Constructor](#constructor)
+      - [Constructor](#prototype-constructor)
       - [Self](#self)
-      - [Inheritance](#inheritance)
+      - [Inheritance](#prototype-inheritance)
+    - [Classical Inheritance](#classical-inheritance)
+      - [Initialize](#initialize)
+      - [class & superclass](#class--superclass)
+      - [super](#super)
   - [Future](#future)
   - [Author](#author)
 
@@ -41,9 +45,9 @@ Table of Content:
 Being inspired by the Ruby language, Tea greatly reduces the need for semicolons,
 parens, curly brackets and uses the `end` keyword to finish a block.
 
-Despite being inspired by the Ruby language, Tea doesn't define any class based
+<!--Despite being inspired by the Ruby language, Tea doesn't define any class based
 inheritance model, and retains the prototype model of JavaScript —prototypes are
-great once you get the hang of it.
+great once you get the hang of it.-->
 
 Tea tries to stay readable. Even months after the initial code write, you should
 be able to read that code without needing to transcompile it to JavaScript to be
@@ -893,6 +897,80 @@ def <fname> [< <fname>]
   end])*
 end
 ```
+
+### Classical Inheritance
+
+Classical inheritance is just a thin layer atop prototypes. It simply allows for
+a specific `initialize` method, and access to the current `class` and
+`superclass` chain. Of course, it still makes use of prototype features, like
+inheritance, `self`, etc.
+
+#### Initialize
+
+A class is initialized using the `initialize` method:
+
+```tea
+class Model
+  def initialize(attributes = {})
+    self.attributes = attributes
+  end
+end
+
+class Post < Model
+end
+
+new Post(title: "my title").attributes   #  => { title: "my title" }
+```
+
+#### class & superclass
+
+Both the class and its prototype have references to the class and its
+superclass, allowing to walk up the chain of inheritance, easily.
+
+```tea
+class A; end
+class B < A; end
+
+a = new A; b = new B
+
+a.constructor == a.class         #  =>  A
+A.superclass  == a.superclass    #  =>  null
+
+b.constructor == b.class         #  =>  B
+B.superclass  == b.superclass    #  =>  A
+```
+
+#### super
+
+To be implemented, thought already callable directly using the non sugar:
+
+```tea
+self.superclass.prototype.foo.call(self) + self.bar()
+
+// super           =>  self.superclass.prototype.METHOD.apply(self, arguments)
+// super()         =>  self.superclass.prototype.METHOD.call(self)
+// super(x)        =>  self.superclass.prototype.METHOD.call(self, x)
+// super(a, b, c)  =>  self.superclass.prototype.METHOD.call(self, a, b, c)
+```
+
+#### Pseudo BNF
+
+```ebnf
+class <fname> [< <fname>]
+  (def initialize[(][<arguments>][)]
+    [<statements>]
+  end)
+
+  (def [-]<fname>[(][<arguments>][)]
+    <statements>
+  end])*
+
+  (def +<fname>[(][<arguments>][)]
+    <statements>
+  end])*
+end
+```
+
 
 ## Future
 
