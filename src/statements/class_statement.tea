@@ -1,0 +1,36 @@
+scopes = require('../scopes')
+Tea = require('../tea')
+
+def ClassStatement(name, inherit, methods)
+  self.name = name
+  self.inherit = inherit
+  self.methods = methods || []
+
+  def compile
+    rs = []
+    name = self.name.value
+
+    unless scopes.isDefined('__klass')
+      scopes.pushIdentifier('__klass')
+      rs.push Tea.CLASS_DEFINITION
+    end
+
+    unless scopes.isDefined(name)
+      scopes.pushIdentifier(name)
+
+      if self.inherit
+        rs.push "#{name} = __klass(#{self.inherit.compile()});"
+      else
+        rs.push "#{name} = __klass();"
+      end
+    end
+
+    for method of self.methods
+      rs.push(method.compile(objectName: self.name.value)) if method
+    end
+
+    return rs.join("\n")
+  end
+end
+
+module.exports = ClassStatement

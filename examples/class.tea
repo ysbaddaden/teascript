@@ -1,0 +1,45 @@
+class A
+  def foo
+    return 'foo'
+  end
+end
+
+class A
+  def initialize(title = "defaut title from A")
+    self.title = title
+  end
+end
+
+class B < A
+  def getTitle()
+    return self.title
+  end
+end
+
+class C < B
+  def foo
+    #return super + self.bar()
+    return self.superclass.prototype.foo.call(self) + self.bar()
+  end
+
+  def bar
+    return 'bar'
+  end
+
+  def getTitle
+    #return super + " (called from C)"
+    #return self['class'].superclass.prototype.getTitle.call(self) + " (called from C)"
+    return self.superclass.prototype.getTitle.call(self) + " (called from C)"
+  end
+end
+
+a = new A()
+console.log a.foo(), a.title
+
+b = new B("Big Title (defined from B constructor using A's initialize)")
+console.log b.getTitle()
+
+c = new C
+console.log c.foo()
+console.log c.getTitle()
+

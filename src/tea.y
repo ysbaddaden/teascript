@@ -131,6 +131,7 @@ STMT
     | for own IDENTIFIER ',' IDENTIFIER in EXPR DO ASTMT end {
         $$ = new Tea.ForInStatement(true, $3, $5, $7, $9);
     }
+    | CLASS                                      -> $1
     | FUNCTION                                   -> $1
     | return                                     { $$ = new Tea.ReturnStatement(); }
     | return EXPR                                { $$ = new Tea.ReturnStatement($2); }
@@ -159,6 +160,11 @@ RESCUE
 RESCUE_ARGS
     : IDENTIFIER                            { $$ = [ $1 ]; }
     | RESCUE_ARGS ',' IDENTIFIER            { $1.push($3); $$ = $1; }
+    ;
+
+CLASS
+    : class FUNCNAME OSTMT end              { $$ = new Tea.ClassStatement($2, null, $3); }
+    | class FUNCNAME INHERIT OSTMT end      { $$ = new Tea.ClassStatement($2, $3, $4); }
     ;
 
 OSTMT

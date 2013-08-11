@@ -29,6 +29,7 @@ exports.ElseStatement = require('./statements/else_statement.js')
 exports.Statement = require('./statements/statement.js')
 exports.ForOfStatement = require('./statements/for_of_statement.js')
 exports.ForInStatement = require('./statements/for_in_statement.js')
+exports.ClassStatement = require('./statements/class_statement.js')
 exports.Function = require('./statements/function.js')
 exports.IfStatement = require('./statements/if_statement.js')
 exports.LoopStatement = require('./statements/loop_statement.js')
@@ -43,6 +44,43 @@ exports.WhileStatement = require('./statements/while_statement.js')
 exports.ThrowStatement = require('./statements/throw_statement.js')
 exports.BeginStatement = require('./statements/begin_statement.js')
 exports.RescueStatement = require('./statements/rescue_statement.js')
+
+exports.CLASS_DEFINITION = "
+__klass = function (superclass) {
+    var klass = function () {
+        if (typeof this.initialize === 'function') {
+            this.initialize.apply(this, arguments);
+        }
+    };
+    if (superclass) {
+        klass.prototype = Object.create(superclass.prototype);
+        klass.prototype.superclass = klass.superclass = superclass;
+    }
+    klass.prototype.constructor = klass;
+    klass.prototype['class'] = klass;
+    return klass;
+};";
+
+exports.INCLUDE_DEFINITION = "
+__extend = function (destination, source) {
+    for (var property in source) {
+        if (source.hasOwnProperty(property) && property !== 'included') {
+            destination[property] = source[property];
+        }
+    }
+};
+__include = function (klass/*, object, ...*/) {
+    for (var i = 1, l = arguments.length; i < l; i++) {
+        var obj = arguments[i];
+        if (obj) {
+            __extend(klass.prototype, obj);
+            if (typeof obj.included === 'function') {
+                obj.included(klass);
+            }
+        }
+    }
+    return klass;
+};";
 
 exports.parser = parser = require('./parser')
 exports.parser.lexer = lexer = require('./lexer')
