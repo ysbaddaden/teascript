@@ -14,19 +14,105 @@ def TFunction(name, args, body, parent, type)
   self.statics = name ? self.extract('+') : []
 
   def compile(options = {})
-    rs = null
-    scopes.withScope(-> { rs = self.compileFunction(options) })
+    rs = nil
+
+    run = -> {
+      scopes.withScope(-> { rs = self.compileFunction(options) })
+      rs += fn.compile(objectName: self.fullname) for fn of self.methods
+      rs += fn.compile(prefix: self.fullname)     for fn of self.statics
+    }
+
+    if options.objectName
+      state = states.current()
+      states.withState({ methodName: self.name.compile() }, run) if state and state.className
+    end
+
+    run() unless rs
     return rs
+  end
+
+  def compileFunction(options)
+    args = self.prepareArguments()
+
+    rs = []
+    rs.push(self.definition(options))
+    rs.push('(' + args.definition.join(', ') + ') {')
+    rs.push('var self = this;') if self.isPrototype(options)
+    rs.push(args.body.join('')) if args.body.length > 0
+
+    if self.body
+      body = self.body.compile(scope: true)
+      rs.push(body) if body.length > 0
+    end
+
+    rs.push('}')
+    rs.push(';') unless self.isLambda() or self.isDirectDefinition(options)
+
+    if self.parent
+      rs.push(self.fullname + '.prototype = new ' + self.parent.compile() + '();');
+      rs.push(self.fullname + '.prototype.constructor = ' + self.fullname + ';')
+    end
+
+    return rs.join('')
+  end
+
+  def definition(options)
+    self.prepareDefinition(options)
+    return 'function ' + self.fullname if self.isDirectDefinition(options)
+    return 'function ' if self.isLambda()
+    return self.fullname + ' = function '
+  end
+
+  def prepareDefinition(options)
+    return if self.isLambda()
+    name = self.name.compile()
+
+    if options.objectName
+      self.fullname = options.objectName + '.prototype.' + name
+    elsif options.prefix
+      self.fullname = options.prefix + '.' + name
+    elsif self.name and self.name instanceof Dot
+      self.fullname = name
+    else
+      #scopes.pushIdentifier(name, level: 1)
+      self.fullname = name
+    end
+  end
+
+  def prepareArguments
+    definition = []
+    body = []
+
+    for arg of self.args
+      case arg.constructor
+      when Operation
+        ident = arg.left.compile()
+        definition.push(ident)
+        body.push('if (' + ident + ' == null) ' + arg.compile() + ';')
+      when Splat
+        scopes.pushIdentifier(ident = arg.compile())
+        v = 'Array.prototype.slice.call(arguments, ' + definition.length + ') || []'
+        body.push('var ' + ident + ' = ' + v + ';')
+      else
+        scopes.pushIdentifier(arg.compile())
+        definition.push(arg.compile())
+      end
+    end
+
+    return { definition: definition, body: body }
   end
 
   def extract(type)
     rs = []
     i  = self.body.statements.length
+
     until i < 0
       i -= 1
       stmt = self.body.statements[i]
+
       if stmt and stmt instanceof TFunction
         stmt.type = '-' unless stmt.type
+
         if stmt.type == type
           rs.unshift(stmt)
           self.body.statements.splice(i, 1)
@@ -36,91 +122,16 @@ def TFunction(name, args, body, parent, type)
     return rs
   end
 
-  def compileFunction(options)
-    rs = []
-    a  = []
-    b  = []
-
-    self.compileArguments(a, b)
-    name = self.compileDefinition(rs, a, options)
-    rs.push('var self = this;') if self.isPrototype(options)
-    self.compileBody(rs, b, options)
-
-    # inheritance
-    if self.parent
-      rs.push(name + '.prototype = new ' + self.parent.compile() + '();');
-      rs.push(name + '.prototype.constructor = ' + name + ';')
-    end
-
-    self.compileMethods(rs, name)
-    states.pull()
-
-    return rs.join('')
-  end
-
-  def compileArguments(a, b)
-    for arg of self.args
-      case arg.constructor
-      when Operation
-        ident = arg.left.compile()
-        a.push(ident)
-        b.push('if (' + ident + ' == null) ' + arg.compile() + ';')
-      when Splat
-        scopes.pushIdentifier(ident = arg.compile())
-        v = 'Array.prototype.slice.call(arguments, ' + a.length + ') || []'
-        b.push('var ' + ident + ' = ' + v + ';')
-      else
-        scopes.pushIdentifier(arg.compile())
-        a.push(arg.compile())
-      end
-    end
-  end
-
-  def compileDefinition(rs, a, options)
-    if options.objectName
-      name = self.name.compile()
-      state = states.current()
-      states.push(methodName: name) if state and state.className and !state.methodName
-      rs.push(options.objectName + '.prototype.' + name + ' = function (' + a.join(', ') + ') {')
-
-    elsif options.prefix
-      name = self.name.compile()
-      rs.push(options.prefix + '.' + name + ' = function (' + a.join(', ') + ') {')
-
-    elsif self.name and self.name instanceof Dot
-      name = self.name.compile()
-      rs.push(name + ' = function (' + a.join(', ') + ') {')
-
-    else
-      name = self.name ? self.name.compile() : ''
-      rs.push('function ' + name + '(' + a.join(', ') + ') {')
-    end
-
-    return name
-  end
-
-  def compileBody(rs, b, options)
-    body = self.body.compile(scope: true) if self.body
-
-    if body.length > 0 || b.length > 0
-      rs.push(b.join(''))
-      rs.push(body)
-    end
-
-    if options.objectName or options.prefix or (self.name and self.name instanceof Dot)
-      rs.push('};')
-    else
-      rs.push('}')
-    end
-  end
-
-  def compileMethods(rs, name)
-    rs.push(fn.compile(objectName: name)) for fn of self.methods
-    rs.push(fn.compile(prefix: name))     for fn of self.statics
-  end
-
   def isPrototype(options)
     return options.objectName or ((self.parent or self.methods.length > 0) and self.body.statements.length > 0)
+  end
+
+  def isLambda
+    return !self.name
+  end
+
+  def isDirectDefinition(options)
+    return !options.prefix && !options.objectName && self.name && !(self.name instanceof Dot);
   end
 end
 

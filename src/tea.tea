@@ -57,31 +57,29 @@ __klass = function (superclass) {
         klass.prototype = Object.create(superclass.prototype);
         klass.prototype.superclass = klass.superclass = superclass;
     }
-    klass.prototype.constructor = klass;
-    klass.prototype['class'] = klass;
-    return klass;
+    return klass.prototype['class'] = klass.prototype.constructor = klass;
 };";
 
-exports.INCLUDE_DEFINITION = "
-__extend = function (destination, source) {
-    for (var property in source) {
-        if (source.hasOwnProperty(property) && property !== 'included') {
-            destination[property] = source[property];
-        }
-    }
-};
-__include = function (klass/*, object, ...*/) {
-    for (var i = 1, l = arguments.length; i < l; i++) {
-        var obj = arguments[i];
-        if (obj) {
-            __extend(klass.prototype, obj);
-            if (typeof obj.included === 'function') {
-                obj.included(klass);
-            }
-        }
-    }
-    return klass;
-};";
+#exports.INCLUDE_DEFINITION = "
+#__extend = function (destination, source) {
+#    for (var property in source) {
+#        if (source.hasOwnProperty(property) && property !== 'included') {
+#            destination[property] = source[property];
+#        }
+#    }
+#};
+#__include = function (klass/*, object, ...*/) {
+#    for (var i = 1, l = arguments.length; i < l; i++) {
+#        var obj = arguments[i];
+#        if (obj) {
+#            __extend(klass.prototype, obj);
+#            if (typeof obj.included === 'function') {
+#                obj.included(klass);
+#            }
+#        }
+#    }
+#    return klass;
+#};";
 
 exports.parser = parser = require('./parser')
 exports.parser.lexer = lexer = require('./lexer')

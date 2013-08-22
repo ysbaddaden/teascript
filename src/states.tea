@@ -4,10 +4,11 @@ def current
   return states[states.length - 1]
 end
 
-def dup(original)
-  state = {}
-  state[property] = original[property] for own property in original
-  return state
+def dup(original = {})
+  return { className: original.className }
+  #state = {}
+  #state[property] = original[property] for own property in original
+  #return state
 end
 
 def push(options = {})
@@ -25,6 +26,8 @@ def withState(options = {}, callback)
   callback()
   return pull()
 end
+
+push()
 
 module.exports = {
   push: push,

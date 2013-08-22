@@ -18,7 +18,12 @@ end
 
 class C < B
   def foo
-    return super() + self.bar()
+    #super(a, b, c)
+    #super(*c)
+    #super(a, b, *c, d)
+    #super()
+    #super
+    return super + self.bar()
   end
 
   def bar
