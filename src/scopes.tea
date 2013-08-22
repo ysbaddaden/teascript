@@ -24,6 +24,11 @@ def pull
   return scopes.pop()
 end
 
+def parent(level = 1)
+  idx = Math.max(0, scopes.length - level - 1)
+  return scopes[idx];
+end
+
 def current
   return scopes[scopes.length - 1];
 end
@@ -45,8 +50,9 @@ def isGlobal(ident)
   return globals.indexOf(ident) != -1;
 end
 
-def pushIdentifier(ident)
-  current().push(ident) unless isGlobal(ident) or isDefined(ident)
+def pushIdentifier(ident, options = {})
+  scope = parent(options.level || 0)
+  scope.push(ident) unless isGlobal(ident) or isDefined(ident)
 end
 
 def reference(options = {})
@@ -71,6 +77,7 @@ module.exports = {
   push: push,
   pull: pull,
   current: current,
+  parent: parent,
   withScope: withScope,
   isDefined: isDefined,
   isGlobal: isGlobal,
