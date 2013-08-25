@@ -2,8 +2,8 @@ var assert = require("assert");
 var T = require("../../lib/tea");
 
 exports["test empty function statements"] = function () {
-  assert.equal("function fn() {}", T.compile("def fn\nend"));
-  assert.equal("function fn() {}", T.compile("def fn()\nend"));
+  assert.equal("var fn;\nfn = function () {};", T.compile("def fn\nend"));
+  assert.equal("var fn;\nfn = function () {};", T.compile("def fn()\nend"));
 };
 
 exports["test function names as dot expressions"] = function () {
@@ -12,49 +12,49 @@ exports["test function names as dot expressions"] = function () {
 };
 
 exports["test arguments"] = function () {
-  assert.equal("function test(a) {}", T.compile("def test(a);end"));
-  assert.equal("function test(a, b, c, d) {}", T.compile("def test(a, b, c, d);end"));
-  assert.equal("function test(key) {\n    key = 'val';\n}", T.compile("def test(key);key = 'val';end"));
+  assert.equal("var test;\ntest = function (a) {};", T.compile("def test(a);end"));
+  assert.equal("var test;\ntest = function (a, b, c, d) {};", T.compile("def test(a, b, c, d);end"));
+  assert.equal("var test;\ntest = function (key) {\n    key = 'val';\n};", T.compile("def test(key);key = 'val';end"));
 };
 
 exports['test default arguments'] = function () {
-  assert.equal('function test(a) {\n' +
+  assert.equal('var test;\ntest = function (a) {\n' +
                '    if (a == null) a = "str";\n' +
-               '}',
+               '};',
                T.compile('def test(a = "str");end'));
 
-  assert.equal('function test(a, b) {\n' +
+  assert.equal('var test;\ntest = function (a, b) {\n' +
                '    if (b == null) b = "str";\n' +
-               '}',
+               '};',
                T.compile('def test(a, b = "str");end'));
 
-  assert.equal('function test(a, b) {\n' +
+  assert.equal('var test;\ntest = function (a, b) {\n' +
                '    if (a == null) a = "test";\n' +
                '    if (b == null) b = "suite";\n' +
-               '}',
+               '};',
                T.compile('def test(a = "test", b = "suite");end'));
 
-  assert.equal('function render(error, status) {\n' +
+  assert.equal('var render;\nrender = function (error, status) {\n' +
                '    if (status == null) status = error;\n' +
-               '}',
+               '};',
                T.compile('def render(error, status = error);end'));
 };
 
 exports["test splat arguments"] = function () {
-  assert.equal('function sendTo() {\n' +
+  assert.equal('var sendTo;\nsendTo = function () {\n' +
                '    var emails = Array.prototype.slice.call(arguments, 0) || [];\n' +
-               '}',
+               '};',
                T.compile('def sendTo(*emails);end'));
 
-  assert.equal('function send(from) {\n' +
+  assert.equal('var send;\nsend = function (from) {\n' +
                '    var to = Array.prototype.slice.call(arguments, 1) || [];\n' +
-               '}',
+               '};',
                T.compile('def send(from, *to)\nend'));
 
-  assert.equal('function send(from) {\n' +
+  assert.equal('var send;\nsend = function (from) {\n' +
                '    if (from == null) from = Config.default_from;\n' +
                '    var to = Array.prototype.slice.call(arguments, 1) || [];\n' +
-               '}',
+               '};',
                T.compile('def send(from = Config.default_from, *to)\nend'));
 };
 
@@ -136,26 +136,27 @@ exports["test lambda assignment with body"] = function () {
 };
 
 exports["test inheritance"] = function () {
-  assert.equal('function A() {}\nA.prototype = new B();\nA.prototype.constructor = A;', T.compile("def A < B;end"));
-  assert.equal('function A() {}\nA.prototype = new B.C.D();\nA.prototype.constructor = A;', T.compile("def A < B.C.D;end"));
+  assert.equal('var A;\nA = function () {};\nA.prototype = new B();\nA.prototype.constructor = A;', T.compile("def A < B;end"));
+  assert.equal('var A;\nA = function () {};\nA.prototype = new B.C.D();\nA.prototype.constructor = A;', T.compile("def A < B.C.D;end"));
 };
 
 exports["test prototype methods"] = function () {
-  assert.equal('function A() {}\nA.prototype.init = function () {\n    var self = this;\n};',
+  assert.equal('var A;\nA = function () {};\nA.prototype.init = function () {\n    var self = this;\n};',
     T.compile('def A;def -init;end;end'));
 
-  assert.equal('function B() {}\nB.prototype.init = function () {\n    var self = this;\n};',
+  assert.equal('var B;\nB = function () {};\nB.prototype.init = function () {\n    var self = this;\n};',
     T.compile('def B;def init;end;end'));
 };
 
 exports["test object methods"] = function () {
-  assert.equal('function A() {}\nA.create = function () {};',
+  assert.equal('var A;\nA = function () {};\nA.create = function () {};',
     T.compile('def A;def +create;end;end'));
 };
 
 exports["test prototype definition inside lambda"] = function () {
   assert.equal('define(function (require) {\n' +
-               '    function MyObject() {}\n' +
+               '    var MyObject;\n' +
+               '    MyObject = function () {};\n' +
                '    MyObject.prototype.init = function () {\n' +
                    '        var self = this;\n' +
                '    };\n' +
@@ -169,10 +170,10 @@ exports["test prototype definition inside lambda"] = function () {
 };
 
 exports["test self in prototype definition"] = function () {
-  assert.equal('function A(value) {\n' +
+  assert.equal('var A;\nA = function (value) {\n' +
       '    var self = this;\n' +
       '    self.value = value;\n' +
-      '}\n' +
+      '};\n' +
       'A.prototype.compile = function () {\n' +
       '    var self = this;\n' +
       '};',

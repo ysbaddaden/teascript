@@ -15,41 +15,35 @@ def TFunction(name, args, body, parent, type)
   def compile(options = {})
     rs = nil
     scopes.withScope(-> { rs = self.compileFunction(options) })
+
+    # TODO: move to a proper Tea.Prototype object
     rs += fn.compile(objectName: self.fullname) for fn of self.methods
     rs += fn.compile(prefix: self.fullname)     for fn of self.statics
+
     return rs
   end
 
   def compileFunction(options)
+    self.prepareDefinition(options)
     args = self.prepareArguments()
 
     rs = []
-    rs.push(self.definition(options))
-    rs.push('(' + args.definition.join(', ') + ') {')
-    rs.push('var self = this;') if self.isPrototype(options)
-    rs.push(args.body.join('')) if args.body.length > 0
+    rs.push self.fullname + ' = ' unless self.isLambda()
+    rs.push 'function '
+    rs.push '(' + args.definition.join(', ') + ') {'
+    rs.push 'var self = this;' if self.isPrototype(options)
+    rs.push args.body.join('')
+    rs.push self.body.compile(scope: true) if self.body
+    rs.push '}'
+    rs.push ';' unless self.isLambda()
 
-    if self.body
-      body = self.body.compile(scope: true)
-      rs.push(body) if body.length > 0
-    end
-
-    rs.push('}')
-    rs.push(';') unless self.isLambda() or self.isDirectDefinition(options)
-
+    # TODO: move to a proper Tea.Prototype object
     if self.parent
       rs.push(self.fullname + '.prototype = new ' + self.parent.compile() + '();');
       rs.push(self.fullname + '.prototype.constructor = ' + self.fullname + ';')
     end
 
     return rs.join('')
-  end
-
-  def definition(options)
-    self.prepareDefinition(options)
-    return 'function ' + self.fullname if self.isDirectDefinition(options)
-    return 'function ' if self.isLambda()
-    return self.fullname + ' = function '
   end
 
   def prepareDefinition(options)
@@ -63,7 +57,7 @@ def TFunction(name, args, body, parent, type)
     elsif self.name and self.name instanceof Dot
       self.fullname = name
     else
-      #scopes.pushIdentifier(name, level: 1)
+      scopes.pushIdentifier(name, level: 1)
       self.fullname = name
     end
   end
@@ -119,9 +113,9 @@ def TFunction(name, args, body, parent, type)
     return !self.name
   end
 
-  def isDirectDefinition(options)
-    return !options.prefix && !options.objectName && self.name && !(self.name instanceof Dot);
-  end
+  #def isDirectDefinition(options)
+  #  return !options.prefix && !options.objectName && self.name && !(self.name instanceof Dot);
+  #end
 end
 
 module.exports = TFunction
