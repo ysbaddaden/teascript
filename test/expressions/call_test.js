@@ -65,6 +65,27 @@ exports["test call without parens (DSL)"] = function () {
               "}"));
 };
 
+exports["test call without parens followed by statement modifiers"] = function () {
+    assert.equal("if (options.verbose) {\n    log('changed event');\n}",
+        T.compile("log 'changed event' if options.verbose"));
+
+    assert.equal("if (!(options.silent)) {\n    emit('changed');\n}",
+        T.compile("emit 'changed' unless options.silent"));
+
+    assert.equal("while (working) {\n    doWork(acceptWork());\n}",
+        T.compile("doWork acceptWork() while working"));
+
+    assert.equal("while (!(self.stopping)) {\n    self.doWork(self.server.accept);\n}",
+        T.compile("self.doWork self.server.accept until self.stopping"));
+
+    assert.equal("var __ref1, __ref2, callback;\n" +
+        "for (__ref1 = 0, __ref2 = callbacks.length; __ref1 < __ref2; __ref1++) {\n" +
+        "    callback = callbacks[__ref1];\n" +
+        "    callback(value);\n" +
+        "}",
+        T.compile("callback value for callback of callbacks"));
+};
+
 exports["test special DSL cases"] = function () {
   assert.equal("add(-1);", T.compile("add -1"));
   assert.equal("add(+x);", T.compile("add +x"));

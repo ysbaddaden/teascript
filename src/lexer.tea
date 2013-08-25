@@ -185,12 +185,12 @@ def Lexer(input)
         end
         next
 
-      when 'LF'
+      when 'LF' , 'if', 'unless', 'while', 'until', 'for'
         if state.is('call')
           state.pop()
           rs.push(new Token(')', ')', token.line, token.column))
         end
-        next if skip()
+        next if token.name == 'LF' and skip()
 
       when '{'
         if state.is('lambda_def')
