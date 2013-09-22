@@ -12,7 +12,7 @@
   },
   "main": "lib/tea",
   "bin": {
-    "teascript": "lib/teascript.js"
+    "tea": "bin/tea"
   },
   "dependencies": {
     "js-beautify":  "0.2.x",
