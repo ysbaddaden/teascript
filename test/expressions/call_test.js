@@ -39,16 +39,6 @@ exports['test call with options hash'] = function () {
     T.compile("model.clear(silent: true)"));
 };
 
-exports['test call with reserved keywords'] = function () {
-  assert.equal("req.delete('/posts/1.json');", T.compile("req.delete('/posts/1.json')"));
-  assert.equal("req.loop(function () {});", T.compile("req.loop(-> {})"));
-  assert.equal("req.next();", T.compile("req.next()"));
-  assert.equal("req.object;", T.compile("req.object"));
-  assert.equal("req.own;", T.compile("req.own"));
-  assert.equal("req.then;", T.compile("req.then"));
-  assert.equal("req.when;", T.compile("req.when"));
-};
-
 exports["test call without parens (DSL)"] = function () {
   assert.equal("add(1);", T.compile("add 1"));
   assert.equal("add(1 * 2);", T.compile("add 1 * 2"));

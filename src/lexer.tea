@@ -208,6 +208,25 @@ def Lexer(input)
         rs.push(new Token('LF', nil, token.line, token.column))
         next
 
+      # keywords that can be used as dot and assoc expressions or function names
+      # (ie. they can be considered as identifiers):
+      when 'def', 'delete', 'then', 'end', 'loop', 'own', 'when', 'next',
+          'begin', 'rescue', 'ensure', 'and', 'or', 'not'
+
+        #if (rs.last() and (rs.last().name == '.' or rs.last().name == 'def')) or
+        #    (next_token() and (next_token().name == ':' or next_token().name == '('))
+        if (rs.last() and (rs.last().name == '.' or rs.last().name == 'def')) or
+            (next_token() and next_token().name == ':')
+          rs.push(new Token('identifier', token.name, token.line, token.column))
+          next
+        end
+
+        prev = rs.slice(-2)
+        if prev.length == 2 and prev[0].name == 'def' and prev[1].name == '+'
+          rs.push(new Token('identifier', token.name, token.line, token.column))
+          next
+        end
+
       when 'EOF'
         while s = state.pop()
           rs.push(new Token(')', ')', token.line, token.column)) if s == 'call'
