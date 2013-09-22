@@ -61,3 +61,11 @@ def exports.compile(source, options)
   return beautify(exports.ast(source).compile(options), jslint_happy: true)
 end
 
+if require.extensions
+  require.extensions['.tea'] = ->(module, filename) {
+    source = require('fs').readFileSync(filename, 'utf8')
+    js = exports.compile(source)
+    module._compile(js, filename);
+  }
+end
+
