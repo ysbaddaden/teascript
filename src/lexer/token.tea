@@ -1,0 +1,56 @@
+KEYWORDS  = require('./definition').KEYWORDS
+OPERATORS = require('./definition').OPERATORS
+ARGUMENT  = require('./definition').ARGUMENT
+
+def Token(name, value, line = nil, column = nil)
+  self.name   = name
+  self.value  = value
+  self.line   = line
+  self.column = column
+
+  def inspect
+    value = self.value == null ? '' : (self.value == self.name ? '' : self.value)
+    return "[" + self.name + (value ? ' ' + value : '') + "]"
+  end
+
+  def yylloc
+    lloc = {
+      first_line:   self.line,
+      last_line:    self.line,
+      first_column: self.column,
+      last_column:  self.column,
+    }
+
+    if self.value
+      if m = self.value.match(/(\n)/g)
+        lloc.last_line += m.length
+
+        idx = self.value.lastIndexOf('\n')
+        if idx == -1
+          lloc.last_column += self.value.length
+        else
+          lloc.last_column = self.value.slice(idx).length
+        end
+      else
+        lloc.last_column += self.value.length
+      end
+    end
+
+    return lloc
+  end
+
+  def is(name)
+    case name
+    when 'keyword'
+      return KEYWORDS.contains(self.name)
+    when 'operator'
+      return OPERATORS.contains(self.name)
+    when 'argument'
+      return ARGUMENT.contains(self.name)
+    else
+      return self.name == name
+    end
+  end
+end
+
+module.exports = Token

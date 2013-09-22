@@ -1,0 +1,107 @@
+words = require('./words')
+Token = require('./token');
+OPERATORS = require('./definition').OPERATORS
+
+SKIP_LF_AFTER = OPERATORS.concat(words("and or not LF COMMENT ( { [ ,"))
+SKIP_LF_AFTER.contains = ->(value) { return this.indexOf(value) != -1 }
+
+SKIP_LF_BEFORE = words(", : ) } ]") # = .
+SKIP_LF_BEFORE.contains = ->(value) { return this.indexOf(value) != -1 }
+
+def rewrite(tokens)
+  i = 0
+
+  rs = []
+  rs.last = -> { return this[this.length - 1] }
+
+  state = []
+  state.is = ->(name) { return this[this.length - 1] == name }
+
+  next_token = -> {
+    if tokens[i] and !tokens[i].is('whitespace')
+      return tokens[i]
+    else
+      return tokens[i + 1]
+    end
+  }
+
+  skip = -> {
+    lst = rs.last()
+    return (lst and SKIP_LF_AFTER.contains(lst.name)) or (next_token() and SKIP_LF_BEFORE.contains(next_token().name))
+  }
+
+  while token = tokens[i]
+    i += 1
+
+    case token.name
+    when 'whitespace'
+      lst = rs.last()
+
+      if lst and lst.is('identifier') and tokens[i]
+        if tokens[i].is('argument')
+          state.push('call')
+          rs.push(new Token('(', '(', token.line, token.column))
+        elsif words('- + ~ *').contains(tokens[i].name) and tokens[i + 1] and
+            !tokens[i + 1].is('whitespace') and !tokens[i + 1].is('LF')
+          state.push('call')
+          rs.push(new Token('(', '(', token.line, token.column))
+        end
+      end
+      next
+
+    when 'LF' , 'if', 'unless', 'while', 'until', 'for'
+      if state.is('call')
+        state.pop()
+        rs.push(new Token(')', ')', token.line, token.column))
+      end
+      next if token.name == 'LF' and skip()
+
+    when '{'
+      if state.is('lambda_def')
+        state.pop()
+        state.push('lambda')
+      else
+        state.push('object')
+      end
+
+    when '}'       then state.pop() # either 'lambda' or 'object'
+    when '('       then state.push('paren')
+    when ')'       then state.pop() # either 'call' or 'paren'
+    when '->'      then state.push('lambda_def')
+    when 'COMMENT' then next
+    when ';'
+      rs.push(new Token('LF', nil, token.line, token.column))
+      next
+
+    # keywords that can be used as dot and assoc expressions or function names
+    # (ie. they can be considered as identifiers):
+    when 'def', 'delete', 'then', 'end', 'loop', 'own', 'when', 'next',
+        'begin', 'rescue', 'ensure', 'and', 'or', 'not'
+
+      lst = rs.last()
+      if (lst and (lst.name == '.' or lst.name == 'def')) or (next_token() and next_token().name == ':')
+        rs.push(new Token('identifier', token.name, token.line, token.column))
+        next
+      end
+
+      prev = rs.slice(-2)
+      if prev.length == 2 and prev[0].name == 'def' and prev[1].name == '+'
+        rs.push(new Token('identifier', token.name, token.line, token.column))
+        next
+      end
+
+    when 'EOF'
+      while s = state.pop()
+        rs.push(new Token(')', ')', token.line, token.column)) if s == 'call'
+        rs.push(token)
+      end
+      return rs
+    end
+
+    rs.push(token)
+  end
+
+  return rs
+end
+
+module.exports = rewrite

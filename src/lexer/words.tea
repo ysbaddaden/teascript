@@ -1,0 +1,17 @@
+def escape(str)
+  return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')
+end
+
+def toRegExp(ary, bound)
+  map = ary.map(->(t) { return escape(t) }).join('|')
+  return new RegExp('^(' + map + ')' + (bound ? '\\b' : ''))
+end
+
+def words(str)
+  ary = str.trim().split(/\s+/)
+  ary.contains = ->(value) { return this.indexOf(value) != -1 }
+  ary.toRegExp = ->(bound) { return toRegExp(this, bound) }
+  return ary
+end
+
+module.exports = words
