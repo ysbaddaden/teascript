@@ -21,15 +21,17 @@ exports['test function declaration'] = function () {
 exports['test method declaration'] = function () {
     assert.equal("Request.delete = function () {};", T.compile("def Request.delete;end"));
 
-    assert.equal("var Request;\n" +
-            "Request = function () {};\n" +
-            "Request.prototype.delete = function () {\n    var self = this;\n};",
-            T.compile("def Request;def delete;end;end"));
+    assert.equal(
+        "function Request() {}\n" +
+        "Request.prototype.constructor = Request;\n" +
+        "Request.prototype.delete = function () {\n    var self = this;\n};",
+        T.compile("prototype Request;def delete;end;end"));
 
-    assert.equal("var Request;\n" +
-            "Request = function () {};\n" +
-            "Request.delete = function () {};",
-            T.compile("def Request;def +delete;end;end"));
+    assert.equal(
+        "function Request() {}\n" +
+        "Request.prototype.constructor = Request;\n" +
+        "Request.delete = function () {};",
+        T.compile("prototype Request;def +delete;end;end"));
 };
 
 exports['test function call'] = function () {

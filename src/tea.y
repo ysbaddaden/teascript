@@ -167,6 +167,10 @@ PROTOTYPE
     | prototype FUNCNAME INHERIT LF PSTMT end  { $$ = new Tea.Prototype($2, $3, $5); }
     ;
 
+INHERIT
+    : '<' FUNCNAME  -> $2
+    ;
+
 PSTMT
     : METHOD                                { $$ = [ $1 ]; }
     | COMPFUNC                              -> $1
@@ -196,21 +200,15 @@ TMETHOD
 
 METHOD
     : FUNCTION                              -> $1
+    | def '-' FUNCNAME LF ASTMT end                      { $$ = new Tea.Function($3, null, $5, "-"); }
+    | def '-' FUNCNAME '(' ARGLIST ')' ASTMT end         { $$ = new Tea.Function($3, $5,   $7, "-"); }
+    | def '+' FUNCNAME LF ASTMT end                      { $$ = new Tea.Function($3, null, $5, "+"); }
+    | def '+' FUNCNAME '(' ARGLIST ')' ASTMT end         { $$ = new Tea.Function($3, $5,   $7, "+"); }
     ;
 
 FUNCTION
     : def FUNCNAME LF ASTMT end                          { $$ = new Tea.Function($2, null, $4); }
-    | def FUNCNAME INHERIT LF ASTMT end                  { $$ = new Tea.Function($2, null, $5, $3); }
     | def FUNCNAME '(' ARGLIST ')' ASTMT end             { $$ = new Tea.Function($2, $4,   $6); }
-    | def FUNCNAME '(' ARGLIST ')' INHERIT LF ASTMT end  { $$ = new Tea.Function($2, $4,   $8, $6); }
-    | def '-' FUNCNAME LF ASTMT end                      { $$ = new Tea.Function($3, null, $5, null, "-"); }
-    | def '-' FUNCNAME '(' ARGLIST ')' ASTMT end         { $$ = new Tea.Function($3, $5,   $7, null, "-"); }
-    | def '+' FUNCNAME LF ASTMT end                      { $$ = new Tea.Function($3, null, $5, null, "+"); }
-    | def '+' FUNCNAME '(' ARGLIST ')' ASTMT end         { $$ = new Tea.Function($3, $5,   $7, null, "+"); }
-    ;
-
-INHERIT
-    : '<' FUNCNAME  -> $2
     ;
 
 FUNCNAME

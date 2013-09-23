@@ -49,6 +49,9 @@ exports["test constructor"] = function () {
     assert.equal("function Model() {}\nModel.prototype.constructor = Model;",
         T.compile("prototype Model\n  def constructor();end\nend"));
 
+    assert.equal("function Model() {\n    var self = this;\n    return self;\n}\nModel.prototype.constructor = Model;",
+        T.compile("prototype Model\n  def constructor(); return self; end\nend"));
+
     assert.equal("function Model(attributes) {}\nModel.prototype.constructor = Model;",
         T.compile("prototype Model\n  def constructor(attributes);end\nend"));
 };

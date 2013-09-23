@@ -135,51 +135,6 @@ exports["test lambda assignment with body"] = function () {
   );
 };
 
-exports["test inheritance"] = function () {
-  assert.equal('var A;\nA = function () {};\nA.prototype = new B();\nA.prototype.constructor = A;', T.compile("def A < B;end"));
-  assert.equal('var A;\nA = function () {};\nA.prototype = new B.C.D();\nA.prototype.constructor = A;', T.compile("def A < B.C.D;end"));
-};
-
-exports["test prototype methods"] = function () {
-  assert.equal('var A;\nA = function () {};\nA.prototype.init = function () {\n    var self = this;\n};',
-    T.compile('def A;def -init;end;end'));
-
-  assert.equal('var B;\nB = function () {};\nB.prototype.init = function () {\n    var self = this;\n};',
-    T.compile('def B;def init;end;end'));
-};
-
-exports["test object methods"] = function () {
-  assert.equal('var A;\nA = function () {};\nA.create = function () {};',
-    T.compile('def A;def +create;end;end'));
-};
-
-exports["test prototype definition inside lambda"] = function () {
-  assert.equal('define(function (require) {\n' +
-               '    var MyObject;\n' +
-               '    MyObject = function () {};\n' +
-               '    MyObject.prototype.init = function () {\n' +
-                   '        var self = this;\n' +
-               '    };\n' +
-               '});',
-          T.compile('define ->(require) {\n' +
-              '  def MyObject\n' +
-              '    def init\n' +
-              '    end\n' +
-              '  end\n' +
-              '\n}'));
-};
-
-exports["test self in prototype definition"] = function () {
-  assert.equal('var A;\nA = function (value) {\n' +
-      '    var self = this;\n' +
-      '    self.value = value;\n' +
-      '};\n' +
-      'A.prototype.compile = function () {\n' +
-      '    var self = this;\n' +
-      '};',
-      T.compile('def A(value)\n  self.value = value;\n  def compile\n  end\nend'));
-};
-
 if (module === require.main) {
   require("../test").run(exports);
 }
