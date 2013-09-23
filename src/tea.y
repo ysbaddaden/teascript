@@ -163,25 +163,25 @@ RESCUE_ARGS
     ;
 
 PROTOTYPE
-    : prototype FUNCNAME LF OSTMT end          { $$ = new Tea.Prototype($2, null, $4); }
-    | prototype FUNCNAME INHERIT LF OSTMT end  { $$ = new Tea.Prototype($2, $3, $5); }
+    : prototype FUNCNAME LF PSTMT end          { $$ = new Tea.Prototype($2, null, $4); }
+    | prototype FUNCNAME INHERIT LF PSTMT end  { $$ = new Tea.Prototype($2, $3, $5); }
     ;
 
-OSTMT
-    : OFUNC                                    { $$ = [ $1 ]; }
-    | COMPFUNC                                 -> $1
-    | COMPFUNC OFUNC                           { $1.push($2); $$ = $1; }
-    |                                          { $$ = []; }
+PSTMT
+    : METHOD                                { $$ = [ $1 ]; }
+    | COMPFUNC                              -> $1
+    | COMPFUNC METHOD                       { $1.push($2); $$ = $1; }
+    |                                       { $$ = []; }
     ;
 
 COMPFUNC
-    : TFUNC {
+    : TMETHOD {
         $$ = [];
-        if (typeof $1 !== "string")
+        if (typeof $1 !== "string") {
             $$.push($1);
         }
     }
-    | COMPFUNC TFUNC {
+    | COMPFUNC TMETHOD {
         if (typeof $2 !== "string") {
             $1.push($2);
         }
@@ -189,12 +189,12 @@ COMPFUNC
     }
     ;
 
-TFUNC
+TMETHOD
     : LF
-    | OFUNC LF                              -> $1
+    | METHOD LF                             -> $1
     ;
 
-OFUNC
+METHOD
     : FUNCTION                              -> $1
     ;
 
