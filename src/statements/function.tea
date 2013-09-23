@@ -17,7 +17,7 @@ def TFunction(name, args, body, parent, type)
     scopes.withScope(-> { rs = self.compileFunction(options) })
 
     # TODO: move to a proper Tea.Prototype object
-    rs += fn.compile(objectName: self.fullname) for fn of self.methods
+    rs += fn.compile(proto: self.fullname) for fn of self.methods
     rs += fn.compile(prefix: self.fullname)     for fn of self.statics
 
     return rs
@@ -39,7 +39,7 @@ def TFunction(name, args, body, parent, type)
 
     # TODO: move to a proper Tea.Prototype object
     if self.parent
-      rs.push(self.fullname + '.prototype = new ' + self.parent.compile() + '();');
+      rs.push(self.fullname + '.prototype = new ' + self.parent.compile() + '();')
       rs.push(self.fullname + '.prototype.constructor = ' + self.fullname + ';')
     end
 
@@ -50,8 +50,8 @@ def TFunction(name, args, body, parent, type)
     return if self.isLambda()
     name = self.name.compile()
 
-    if options.objectName
-      self.fullname = options.objectName + '.prototype.' + name
+    if options.proto
+      self.fullname = options.proto + '.prototype.' + name
     elsif options.prefix
       self.fullname = options.prefix + '.' + name
     elsif self.name and self.name instanceof Dot
@@ -106,7 +106,8 @@ def TFunction(name, args, body, parent, type)
   end
 
   def isPrototype(options)
-    return options.objectName or ((self.parent or self.methods.length > 0) and self.body.statements.length > 0)
+    return options.proto or ((self.parent or self.methods.length > 0) and
+      self.body.statements.length > 0)
   end
 
   def isLambda
@@ -114,7 +115,7 @@ def TFunction(name, args, body, parent, type)
   end
 
   #def isDirectDefinition(options)
-  #  return !options.prefix && !options.objectName && self.name && !(self.name instanceof Dot);
+  #  return !options.prefix && !options.proto && self.name && !(self.name instanceof Dot);
   #end
 end
 

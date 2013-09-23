@@ -4,7 +4,7 @@ def StaticFunction(name, args, body)
   self.fn = new TFunction(name, args, body)
 
   def compile(options)
-    return self.fn.compile(prefix: options.objectName)
+    return self.fn.compile(prefix: options.proto)
   end
 end
 

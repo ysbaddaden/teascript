@@ -131,6 +131,7 @@ STMT
     | for own IDENTIFIER ',' IDENTIFIER in EXPR DO ASTMT end {
         $$ = new Tea.ForInStatement(true, $3, $5, $7, $9);
     }
+    | PROTOTYPE                                  -> $1
     | FUNCTION                                   -> $1
     | return                                     { $$ = new Tea.ReturnStatement(); }
     | return EXPR                                { $$ = new Tea.ReturnStatement($2); }
@@ -157,20 +158,26 @@ RESCUE
     ;
 
 RESCUE_ARGS
-    : IDENTIFIER                            { $$ = [ $1 ]; }
-    | RESCUE_ARGS ',' IDENTIFIER            { $1.push($3); $$ = $1; }
+    : IDENTIFIER                                         { $$ = [ $1 ]; }
+    | RESCUE_ARGS ',' IDENTIFIER                         { $1.push($3); $$ = $1; }
+    ;
+
+PROTOTYPE
+    : prototype FUNCNAME LF OSTMT end          { $$ = new Tea.Prototype($2, null, $4); }
+    | prototype FUNCNAME INHERIT LF OSTMT end  { $$ = new Tea.Prototype($2, $3, $5); }
     ;
 
 OSTMT
-    : OFUNC                                 { $$ = [ $1 ]; }
-    | COMPFUNC                              -> $1
-    | COMPFUNC OFUNC                        {  $1.push($2); $$ = $1; }
+    : OFUNC                                    { $$ = [ $1 ]; }
+    | COMPFUNC                                 -> $1
+    | COMPFUNC OFUNC                           { $1.push($2); $$ = $1; }
+    |                                          { $$ = []; }
     ;
 
 COMPFUNC
     : TFUNC {
         $$ = [];
-        if (typeof $1 !== "string") {
+        if (typeof $1 !== "string")
             $$.push($1);
         }
     }

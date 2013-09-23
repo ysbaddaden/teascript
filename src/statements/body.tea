@@ -5,7 +5,7 @@ def Body(statement)
   self.push(statement) if statement
 
   def push(statement)
-    self.statements.push(statement)
+    self.statements.push(statement) if statement
   end
 
   def parseStatements

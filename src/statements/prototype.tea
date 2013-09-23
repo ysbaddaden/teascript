@@ -1,0 +1,63 @@
+scopes = require('../scopes')
+Identifier = require('../identifier')
+
+def TPrototype(name, parent, methods = [])
+  self.name    = name
+  self.parent  = parent || nil
+  self.methods = methods.filter ->(method) { return method.type != '+' }
+  self.statics = methods.filter ->(method) { return method.type == '+' }
+
+  def compile
+    name = self.name.compile()
+    rs = []
+
+    scopes.withScope -> {
+      return if self.simpleDeclaration() && scopes.isDefined(name)
+      rs.push self.compileConstructor(name, self.getConstructor())
+
+      if self.parent
+        rs.push "#{name}.prototype = Object.create(#{self.parent.compile()}.prototype);"
+      end
+      rs.push "#{name}.prototype.constructor = #{name};"
+    }
+
+    rs.push fn.compile(proto:  name) for fn of self.methods
+    rs.push fn.compile(prefix: name) for fn of self.statics
+
+    return rs.join('')
+  end
+
+  def compileConstructor(name, constr)
+    args = constr ? constr.prepareArguments() : { body: [], definition: [] }
+    rs = []
+
+    if self.simpleDeclaration()
+      rs.push "function #{name}(#{args.definition.join(', ')}) {"
+    else
+      rs.push "#{name} = function (#{args.definition.join(', ')}) {"
+    end
+
+    rs.push 'var self = this;' if constr && constr.body.statements.length
+    rs.push args.body.join('')
+    rs.push constr.body.compile(scope: true) if constr && constr.body
+    rs.push '}'
+    rs.push ';' unless self.simpleDeclaration()
+
+    return rs.join('')
+  end
+
+  def simpleDeclaration
+    return self.name instanceof Identifier
+  end
+
+  def getConstructor
+    for method, i of self.methods
+      if method.name.value == 'constructor'
+        self.methods.splice(i, 1)
+        return method
+      end
+    end
+  end
+end
+
+module.exports = TPrototype
