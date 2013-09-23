@@ -6,6 +6,9 @@ exports['test dot expression'] = function () {
     assert.equal("req.loop(function () {});", T.compile("req.loop(-> {})"));
     assert.equal("req.next();", T.compile("req.next()"));
     assert.equal("req.then().then;", T.compile("req.then().then"));
+
+    assert.equal("Array.prototype.any = function () {\n    return this.length > 0;\n};",
+        T.compile("Array.prototype.any = -> { return this.length > 0 }"));
 };
 
 exports['test assoc definition'] = function () {

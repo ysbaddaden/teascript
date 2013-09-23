@@ -76,7 +76,7 @@ def rewrite(tokens)
     # keywords that can be used as dot and assoc expressions or function names
     # (ie. they can be considered as identifiers):
     when 'def', 'delete', 'then', 'end', 'loop', 'own', 'when', 'next',
-        'begin', 'rescue', 'ensure', 'and', 'or', 'not'
+        'begin', 'rescue', 'ensure', 'and', 'or', 'not', 'prototype'
 
       lst = rs.last()
       if (lst and (lst.name == '.' or lst.name == 'def')) or (next_token() and next_token().name == ':')
