@@ -1,6 +1,8 @@
-def WhileStatement(test, body)
-  self.test = test
-  self.body = body
+prototype WhileStatement
+  def constructor(test, body)
+    self.test = test
+    self.body = body
+  end
 
   def compile
     return 'while (' + self.test.compile() + ') {' + self.body.compile() + '}';

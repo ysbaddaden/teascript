@@ -1,12 +1,14 @@
 scopes = require('./scopes')
 
-def Program(body)
-  self.body = body
+prototype Program
+  def constructor(body)
+    self.body = body
+  end
 
   def compile(options = {})
-    body = scopes.run(-> {
+    body = scopes.run -> {
       return self.body.compile(scope: true)
-    })
+    }
     return '(function () {' + body + '}());' if options.scoped
     return 'function (require, module, exports) {' + body + '});' if options.amd
     return body

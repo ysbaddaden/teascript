@@ -7,10 +7,12 @@ def isNil(arg)
   return arg instanceof Keyword and arg.value == 'nil'
 end
 
-def Operation(operator, left, right)
-  self.operator = operator
-  self.left     = left
-  self.right    = right
+prototype Operation
+  def constructor(operator, left, right)
+    self.operator = operator
+    self.left     = left
+    self.right    = right
+  end
 
   def compile
     case self.operator.trim()

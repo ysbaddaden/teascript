@@ -1,5 +1,7 @@
-def DeleteStatement(primary)
-  self.primary = primary
+prototype DeleteStatement
+  def constructor(primary)
+    self.primary = primary
+  end
 
   def compile
     return 'delete ' + self.primary.compile() + ';'

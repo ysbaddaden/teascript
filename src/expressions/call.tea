@@ -1,7 +1,9 @@
 Splat = require('./splat')
 
-def Call(expression, args)
-  self.init(expression, args)
+prototype Call
+  def constructor(expression, args)
+    self.init(expression, args)
+  end
 
   def init(expression, args)
     self.expression = expression

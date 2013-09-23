@@ -1,5 +1,7 @@
-def TRegExp(value)
-  self.value = value
+prototype TRegExp
+  def constructor(value)
+    self.value = value
+  end
 
   def compile
     return self.value

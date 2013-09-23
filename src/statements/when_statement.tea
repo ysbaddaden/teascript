@@ -1,8 +1,10 @@
 ReturnStatement = require('./return_statement')
 
-def WhenStatement(tests, body)
-  self.tests = tests
-  self.body = body
+prototype WhenStatement
+  def constructor(tests, body)
+    self.tests = tests
+    self.body = body
+  end
 
   # NOTE: check wether there is a good reason to generate the body before the tests
   def compile

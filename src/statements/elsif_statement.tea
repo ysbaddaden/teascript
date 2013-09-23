@@ -1,6 +1,8 @@
-def ElsifStatement(test, body)
-  self.test = test
-  self.body = body
+prototype ElsifStatement
+  def constructor(test, body)
+    self.test = test
+    self.body = body
+  end
 
   def compile
     return '} else if (' + self.test.compile() + ') {' + self.body.compile();

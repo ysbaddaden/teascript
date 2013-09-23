@@ -1,5 +1,7 @@
-def RequireStatement(expression)
-  self.expression = expression
+prototype RequireStatement
+  def constructor(expression)
+    self.expression = expression
+  end
 
   def compile
     return 'require(' + self.expression.compile() + ')';

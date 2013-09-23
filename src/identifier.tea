@@ -1,6 +1,8 @@
-def Identifier(value)
-  self.value = value
-  self.refute_reserved()
+prototype Identifier
+  def constructor(value)
+    self.value = value
+    self.refute_reserved()
+  end
 
   def refute_reserved
     if /^__/.test(self.value)

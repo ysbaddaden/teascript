@@ -4,15 +4,17 @@ Token   = require('./lexer/token')
 RE      = require('./lexer/definition').RE
 REGEXP  = require('./lexer/definition').REGEXP
 
-def Lexer(input)
-  self.input  = input
-  self.index  = 0
-  self.line   = 1
-  self.column = 1
+prototype Lexer
+  def constructor(input)
+    self.input  = input
+    self.index  = 0
+    self.line   = 1
+    self.column = 1
 
-  self.tokens = []
-  self.state = []
-  self.state.is = ->(name) { return this[this.length - 1] == name }
+    self.tokens = []
+    self.state = []
+    self.state.is = ->(name) { return this[this.length - 1] == name }
+  end
 
   def tokenize
     loop

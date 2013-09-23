@@ -1,11 +1,13 @@
 scopes = require('../scopes')
 Identifier = require('../identifier')
 
-def TPrototype(name, parent, methods = [])
-  self.name    = name
-  self.parent  = parent || nil
-  self.methods = methods.filter ->(method) { return method.type != '+' }
-  self.statics = methods.filter ->(method) { return method.type == '+' }
+prototype TPrototype
+  def constructor(name, parent, methods = [])
+    self.name    = name
+    self.parent  = parent || nil
+    self.methods = methods.filter ->(method) { return method.type != '+' }
+    self.statics = methods.filter ->(method) { return method.type == '+' }
+  end
 
   def compile
     name = self.name.compile()

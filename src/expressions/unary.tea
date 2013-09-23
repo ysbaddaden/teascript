@@ -1,6 +1,8 @@
-def Unary(operator, right)
-  self.operator = operator
-  self.right = right
+prototype Unary
+  def constructor(operator, right)
+    self.operator = operator
+    self.right = right
+  end
 
   def compile
     rs = [ self.operator, self.right.compile() ]

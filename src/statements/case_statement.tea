@@ -1,6 +1,8 @@
-def CaseStatement(test, whenStatements)
-  self.test = test
-  self.whenStatements = whenStatements || []
+prototype CaseStatement
+  def constructor(test, whenStatements)
+    self.test = test
+    self.whenStatements = whenStatements || []
+  end
 
   def compile
     rs = self.whenStatements.reduce(->(rs, stmt) {

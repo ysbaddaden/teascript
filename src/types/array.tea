@@ -1,7 +1,9 @@
-def TArray(declaration)
-  self.declaration = declaration || []
+prototype TArray
+  def constructor(declaration)
+    self.declaration = declaration || []
+  end
 
-  def -compile
+  def compile
     declaration = self.declaration.map(->(decl) { return decl.compile() })
     return "[" + declaration.join(", ") + "]"
   end

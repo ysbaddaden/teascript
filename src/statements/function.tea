@@ -3,14 +3,16 @@ Splat     = require('../expressions/splat')
 Dot       = require('../expressions/dot')
 Operation = require('../expressions/operation')
 
-def TFunction(name, args, body, parent, type)
-  self.name    = name
-  self.args    = args || []
-  self.body    = body
-  self.parent  = parent
-  self.type    = type
-  self.methods = name ? self.extract('-') : []
-  self.statics = name ? self.extract('+') : []
+prototype TFunction
+  def constructor(name, args, body, parent, type)
+    self.name    = name
+    self.args    = args || []
+    self.body    = body
+    self.parent  = parent
+    self.type    = type
+    self.methods = name ? self.extract('-') : []
+    self.statics = name ? self.extract('+') : []
+  end
 
   def compile(options = {})
     rs = nil

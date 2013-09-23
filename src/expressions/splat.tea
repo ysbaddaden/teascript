@@ -1,5 +1,7 @@
-def Splat(expression)
-  self.expression = expression
+prototype Splat
+  def constructor(expression)
+    self.expression = expression
+  end
 
   def compile
     return self.expression.compile()

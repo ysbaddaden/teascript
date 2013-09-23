@@ -1,11 +1,13 @@
 scopes = require('../scopes')
 
-def ForInStatement(_own, key, value, expression, body)
-  self._own = _own
-  self.key = key
-  self.value = value
-  self.expression = expression
-  self.body = body
+prototype ForInStatement
+  def constructor(_own, key, value, expression, body)
+    self._own = _own
+    self.key = key
+    self.value = value
+    self.expression = expression
+    self.body = body
+  end
 
   def compile
     rs   = []

@@ -1,7 +1,9 @@
-def IfStatement(test, body, alternatives)
-  self.test = test
-  self.body = body
-  self.alternatives = alternatives || []
+prototype IfStatement
+  def constructor(test, body, alternatives)
+    self.test = test
+    self.body = body
+    self.alternatives = alternatives || []
+  end
 
   def compile
     rs = []

@@ -1,9 +1,11 @@
 scopes = require('../scopes')
 
-def RescueStatement(names, identifier, body)
-  self.names = names || []
-  self.identifier = identifier
-  self.body = body
+prototype RescueStatement
+  def constructor(names, identifier, body)
+    self.names = names || []
+    self.identifier = identifier
+    self.body = body
+  end
 
   def compile(ref)
     rs = []

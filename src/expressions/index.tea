@@ -1,8 +1,10 @@
 TRange = require('../types/range')
 
-def Index(left, index)
-  self.left  = left
-  self.index = index
+prototype Index
+  def constructor(left, index)
+    self.left  = left
+    self.index = index
+  end
 
   def compile
     if self.index.constructor == TRange

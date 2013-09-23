@@ -1,5 +1,7 @@
-def TNumber(value)
-  self.value = value
+prototype TNumber
+  def constructor(value)
+    self.value = value
+  end
 
   def compile
     # disambiguates float numbers like .125

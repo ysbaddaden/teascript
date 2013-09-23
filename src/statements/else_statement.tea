@@ -1,5 +1,7 @@
-def ElseStatement(body)
-  self.body = body
+prototype ElseStatement
+  def constructor(body)
+    self.body = body
+  end
 
   def compile(options = {})
     if options['case']

@@ -1,5 +1,7 @@
-def ReturnStatement(expression)
-  self.expression = expression
+prototype ReturnStatement
+  def constructor(expression)
+    self.expression = expression
+  end
 
   def compile
     return 'return;' if self.expression == nil

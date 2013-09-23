@@ -1,5 +1,7 @@
-def Statement(value)
-  self.value = value
+prototype Statement
+  def constructor(value)
+    self.value = value
+  end
 
   def compile
     return self.value.compile() + ';'

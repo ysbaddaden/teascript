@@ -1,6 +1,8 @@
-def Dot(left, right)
-  self.left  = left
-  self.right = right
+prototype Dot
+  def constructor(left, right)
+    self.left  = left
+    self.right = right
+  end
 
   def compile
     return self.left.compile() + '.' + self.right.compile()

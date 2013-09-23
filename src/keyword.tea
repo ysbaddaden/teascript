@@ -1,5 +1,7 @@
-def Keyword(value)
-  self.value = value
+prototype Keyword
+  def constructor(value)
+    self.value = value
+  end
 
   def compile
     return self.value == 'nil' ? 'null' : self.value
