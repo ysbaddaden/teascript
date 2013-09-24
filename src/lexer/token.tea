@@ -2,11 +2,13 @@ KEYWORDS  = require('./definition').KEYWORDS
 OPERATORS = require('./definition').OPERATORS
 ARGUMENT  = require('./definition').ARGUMENT
 
-def Token(name, value, line = nil, column = nil)
-  self.name   = name
-  self.value  = value
-  self.line   = line
-  self.column = column
+prototype Token
+  def constructor(name, value, line = nil, column = nil)
+    self.name   = name
+    self.value  = value
+    self.line   = line
+    self.column = column
+  end
 
   def inspect
     value = self.value == null ? '' : (self.value == self.name ? '' : self.value)
