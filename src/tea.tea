@@ -51,7 +51,7 @@ beautify = require('js-beautify').js_beautify
 
 def exports.lex(source)
   lexer.setInput(source)
-  return lexer.map(->(token) { return token.inspect() })
+  return lexer.tokens.map(->(token) { return token.inspect() })
 end
 
 def exports.ast(source)

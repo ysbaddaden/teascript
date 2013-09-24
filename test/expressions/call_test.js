@@ -76,11 +76,23 @@ exports["test call without parens followed by statement modifiers"] = function (
         T.compile("callback value for callback of callbacks"));
 };
 
-exports["test special DSL cases"] = function () {
-  assert.equal("add(-1);", T.compile("add -1"));
-  assert.equal("add(+x);", T.compile("add +x"));
-  assert.equal("add(~doSomething());", T.compile("add ~doSomething()"));
-  assert.equal("add.apply(null, args);", T.compile("add *args"));
+exports["test corner cases for calls without parens"] = function () {
+    assert.equal("add(-1);", T.compile("add -1"));
+    assert.equal("add(+x);", T.compile("add +x"));
+    assert.equal("add(~doSomething());", T.compile("add ~doSomething()"));
+    assert.equal("add.apply(null, args);", T.compile("add *args"));
+};
+
+exports["test nested calls without parens must be correctly closed"] = function () {
+    assert.equal("beforeEach(inject(function () {}));", T.compile("beforeEach(inject(-> {}))"));
+    assert.equal("beforeEach(inject(function () {}));", T.compile("beforeEach inject(-> {})"));
+    assert.equal("beforeEach(inject(function () {}));", T.compile("beforeEach(inject -> {})"));
+    assert.equal("beforeEach(inject(function () {}));", T.compile("beforeEach inject -> {}"));
+};
+
+exports["test nested calls with lambdas and no parens"] = function () {
+    assert.equal("ary.map(function (a) {\n    a.map(function () {});\n});",
+            T.compile("ary.map ->(a) { a.map -> {} }"));
 };
 
 if (module === require.main) {

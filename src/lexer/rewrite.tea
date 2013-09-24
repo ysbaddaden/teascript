@@ -50,9 +50,9 @@ def rewrite(tokens)
       next
 
     when 'LF' , 'if', 'unless', 'while', 'until', 'for'
-      if state.is('call')
-        state.pop()
+      while state.is('call')
         rs.push(new Token(')', ')', token.line, token.column))
+        state.pop()
       end
       next if token.name == 'LF' and skip()
 
@@ -64,11 +64,24 @@ def rewrite(tokens)
         state.push('object')
       end
 
-    when '}'       then state.pop() # either 'lambda' or 'object'
+    when '}'
+      while state.is('call')
+        rs.push(new Token(')', ')', token.line, token.column))
+        state.pop()
+      end
+      state.pop()  # either 'lambda' or 'object'
+
     when '('       then state.push('paren')
-    when ')'       then state.pop() # either 'call' or 'paren'
+    when ')'
+      while state.is('call')
+        rs.push(new Token(')', ')', token.line, token.column))
+        state.pop()
+      end
+      state.pop()  # 'paren'
+
     when '->'      then state.push('lambda_def')
     when 'COMMENT' then next
+
     when ';'
       rs.push(new Token('LF', nil, token.line, token.column))
       next
