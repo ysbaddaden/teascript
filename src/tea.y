@@ -277,13 +277,13 @@ OPERATION
 
 UNARY
     : PRIMARY                               -> $1
-    | '+'    PRIMARY                        { $$ = new Tea.Unary("+",      $2); }
-    | '-'    PRIMARY                        { $$ = new Tea.Unary("-",      $2); }
-    | '~'    PRIMARY                        { $$ = new Tea.Unary("~",      $2); }
-    | '!'    PRIMARY                        { $$ = new Tea.Unary("!",      $2); }
-    | not    PRIMARY                        { $$ = new Tea.Unary("!",      $2); }
-    | typeof PRIMARY                        { $$ = new Tea.Unary("typeof", $2); }
-    | new    PRIMARY                        {
+    | '+'    UNARY                          { $$ = new Tea.Unary("+",      $2); }
+    | '-'    UNARY                          { $$ = new Tea.Unary("-",      $2); }
+    | '~'    UNARY                          { $$ = new Tea.Unary("~",      $2); }
+    | '!'    UNARY                          { $$ = new Tea.Unary("!",      $2); }
+    | not    UNARY                          { $$ = new Tea.Unary("!",      $2); }
+    | typeof UNARY                          { $$ = new Tea.Unary("typeof", $2); }
+    | new    UNARY                          {
         if ($2 instanceof Tea.Call) {
             $$ = new Tea.NewExpression($2.expression, $2.arguments);
         } else {

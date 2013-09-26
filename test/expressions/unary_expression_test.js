@@ -5,7 +5,7 @@ exports.testMinus = function () {
   assert.equal("-1;", T.compile("-1"));
   assert.equal("-doSomething();", T.compile("-doSomething()"));
   assert.equal("var x;\nx = -(e.pageX + div.scrollTop);",
-      T.compile("x = -(e.pageX + div.scrollTop)"));
+    T.compile("x = -(e.pageX + div.scrollTop)"));
 };
 
 exports.testPlus = function () {
@@ -23,9 +23,15 @@ exports.testNot = function () {
   assert.equal("var b;\nb = !doSomething();", T.compile("b = !doSomething()"));
 };
 
+exports.testNotNot = function () {
+  assert.equal("!! true;", T.compile("!!true"));
+  assert.equal("!typeof x === 'undefined';", T.compile("!typeof x == 'undefined'"));
+};
+
 exports.testTypeof = function () {
   assert.equal("typeof x;", T.compile("typeof x"));
-  assert.equal("var type;\ntype = typeof x === 'undefined';", T.compile("type = typeof x == 'undefined'"));
+  assert.equal("var type;\ntype = typeof x === 'undefined';",
+    T.compile("type = typeof x == 'undefined'"));
 };
 
 if (module === require.main) {
