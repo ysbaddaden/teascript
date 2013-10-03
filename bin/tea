@@ -1,7 +1,23 @@
 #! /usr/bin/env node
 var fs = require('fs');
 var path = require('path');
+var Tea = require('../lib/tea');
 var CHARSET = 'utf8';
+
+function compile(input, options) {
+    return Tea.compile(fs.readFileSync(input, CHARSET), options);
+}
+
+function print_tokens(input) {
+    var result = Tea.lex(fs.readFileSync(input, CHARSET));
+    process.stdout.write(result.join(" ") + '\n');
+}
+
+function print_ast(input) {
+    var result = Tea.ast(fs.readFileSync(input, CHARSET)),
+        debug = require('util').inspect(result, false, null);
+    process.stdout.write(debug + '\n');
+}
 
 function realpath(arg) {
     if (/^\//.test(arg)) {
@@ -9,29 +25,6 @@ function realpath(arg) {
     } else {
         return path.join(process.cwd(), arg);
     }
-}
-
-function main(argv) {
-    var input  = realpath(argv._[0]);
-    var result = compile(input, argv);
-    if (argv.output) {
-        write(argv.output, result);
-    } else {
-        process.stdout.setEncoding(CHARSET);
-        process.stdout.write(result + '\n');
-    }
-}
-
-function compile(input, options) {
-    var Tea = require('../lib/tea');
-    return Tea.compile(fs.readFileSync(input, CHARSET), options);
-}
-
-function write(output, result) {
-    if (isDirectory(output)) {
-        output = path.join(output, path.basename(input, '.tea') + '.js');
-    }
-    fs.writeFileSync(path.join(process.cwd(), output), result, CHARSET);
 }
 
 function isDirectory(file) {
@@ -42,11 +35,46 @@ function isDirectory(file) {
     }
 }
 
+function write(input, output, result) {
+    var parentDirectory = fs.dirname(path.dirname(output));
+    if (!fs.existsSync(parentDirectory)) {
+        fs.mkdirSync(parentDirectory);
+    }
+    if (isDirectory(output)) {
+        output = path.join(output, path.basename(input, '.tea') + '.js');
+    }
+    fs.writeFileSync(path.join(process.cwd(), output), result, CHARSET);
+}
+
+function main(argv) {
+    var input = realpath(argv._[0]),
+        result;
+
+    if (argv.tokens) {
+        print_tokens(input);
+    } else if (argv.ast) {
+        print_ast(input);
+    } else {
+        result = compile(input, argv);
+        if (argv.output) {
+            write(input, argv.output, result);
+        } else {
+            process.stdout.setEncoding(CHARSET);
+            process.stdout.write(result + '\n');
+        }
+    }
+}
+
 main(require('optimist').
     usage('Usage: $0 <fname> [-o <fname>]').
     alias('o', 'output').
-    describe('output', "Write result to file (defaults to STDOUT)").
-    describe('scope',  "Scope result in an IIFE").
-    describe('amd',    "Scope result in an AMD definition").
+    alias('t', 'tokens').
+    alias('c', 'compile').
+    describe('output',  "Write result to file (defaults to STDOUT)").
+    describe('compile', "Compile to JavaScript").boolean('compile').default('compile', true).
+    describe('tokens',  "Print the parsed tokens only").boolean('tokens').
+    describe('ast',     "Print the parsed AST").boolean('ast').
+    describe('scope',   "Scope result in an IIFE").boolean('scope').
+    describe('amd',     "Scope result in an AMD definition").boolean('amd').
     demand(1).argv);
 
