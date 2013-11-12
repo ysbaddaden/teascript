@@ -9,7 +9,7 @@ exports.testProgram = function () {
     "    var T;\n" +
     "    T = require('./tea');\n" +
     "}());",
-    T.compile("T = require('./tea')", { scoped: true }));
+    T.compile("T = require('./tea')", { scope: true }));
 };
 
 if (module === require.main) {

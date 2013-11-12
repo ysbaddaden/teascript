@@ -9,7 +9,7 @@ prototype Program
     body = scopes.run -> {
       return self.body.compile(scope: true)
     }
-    return '(function () {' + body + '}());' if options.scoped
+    return '(function () {' + body + '}());' if options.scope
     return 'function (require, module, exports) {' + body + '});' if options.amd
     return body
   end

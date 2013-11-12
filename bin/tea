@@ -36,7 +36,7 @@ function isDirectory(file) {
 }
 
 function write(input, output, result) {
-    var parentDirectory = fs.dirname(path.dirname(output));
+    var parentDirectory = path.dirname(output);
     if (!fs.existsSync(parentDirectory)) {
         fs.mkdirSync(parentDirectory);
     }
