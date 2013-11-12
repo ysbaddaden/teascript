@@ -59,7 +59,7 @@ def exports.ast(source)
 end
 
 def exports.compile(source, options)
-  return beautify(exports.ast(source).compile(options), jslint_happy: true)
+  return beautify(exports.ast(source).compile(options), jslint_happy: true) + "\n"
 end
 
 if require.extensions
